@@ -1,0 +1,6 @@
+# develop in python 3.11.9
+# fastapi[standard]
+fastapi[standard]==0.115.12
+uvicorn[standard]
+sqlalchemy==2.0.39
+alembic==1.15.1
