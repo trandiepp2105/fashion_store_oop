@@ -15,16 +15,43 @@ class ShippingInfo(Base, BaseModel):
     specific_address = Column(String(255), nullable=False)
     user = relationship("User", back_populates="shipping_infos")
     
-    def add_shipping_info(self, session):
+    def addShippingInfo(self, session):
+        """Add new shipping information to the database."""
         session.add(self)
         session.commit()
-
-    def update_shipping_info(self, session, **kwargs):
+    
+    def updateShippingInfo(self, session, **kwargs):
+        """Update shipping information details."""
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         session.commit()
-
-    def delete_shipping_info(self, session):
+    
+    def deleteShippingInfo(self, session):
+        """Delete shipping information from the database."""
         session.delete(self)
         session.commit()
+    
+    def getShippingInfo(self):
+        """Retrieve shipping information details."""
+        return {
+            "recipient_name": self.recipient_name,
+            "phone_number": self.phone_number,
+            "provine_city": self.provine_city,
+            "district": self.district,
+            "ward_commune": self.ward_commune,
+            "specific_address": self.specific_address,
+            "is_default": self.is_default
+        }
+    
+    def setDefault(self, session):
+        """Set this shipping information as the default one."""
+        for info in self.user.shipping_infos:
+            info.is_default = False
+        self.is_default = True
+        session.commit()
+    
+    @classmethod
+    def getAllShippingInfosByUser(cls, session, user_id):
+        """Retrieve all shipping addresses of a user."""
+        return session.query(cls).filter_by(user_id=user_id).all()
