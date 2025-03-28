@@ -12,10 +12,9 @@ class Product(Base, BaseModel):
     original_price = Column(Integer, nullable=False)
     selling_price = Column(Integer, nullable=False)
     total_ratings = Column(Integer, default=0)
-    rating_sum = Column(Integer, default=0)    
+    rating_sum = Column(Integer, default=0)
     image_url = Column(String(255), nullable=True)
     
-    # Relationships with other tables
     categories = relationship("ProductCategory", back_populates="product")
     variants = relationship("ProductVariant", back_populates="product")
     supplier = relationship("Supplier", back_populates="products")
@@ -25,11 +24,13 @@ class Product(Base, BaseModel):
 
     @staticmethod
     def current_time():
-        """Trả về thời gian hiện tại dưới dạng chuỗi."""
+        """Trả về thời gian hiện tại dưới dạng chuỗi theo định dạng 'YYYY-MM-DD HH:MM:SS'.
+        Tham số: Không
+        Trả về: str: Thời gian hiện tại
+        """
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def to_dict(self):
-        """Chuyển đổi đối tượng Product thành dict."""
         return {
             "id": self.id,
             "supplier_id": self.supplier_id,
@@ -39,39 +40,36 @@ class Product(Base, BaseModel):
             "selling_price": self.selling_price,
             "total_ratings": self.total_ratings,
             "rating_sum": self.rating_sum,
+            "average_rating": self.get_average_rating(),
             "image_url": self.image_url,
             "created_at": self.created_at.isoformat() if hasattr(self, "created_at") and self.created_at else None,
             "updated_at": self.updated_at.isoformat() if hasattr(self, "updated_at") and self.updated_at else None,
         }
 
     def get_average_rating(self):
-        """Tính và trả về điểm đánh giá trung bình của sản phẩm."""
+        """Tính toán và trả về điểm đánh giá trung bình của sản phẩm.
+        Tham số: Không có
+        Trả về: float hoặc None: Điểm đánh giá trung bình, hoặc None nếu chưa có đánh giá.
+        """
         if self.total_ratings > 0:
             return self.rating_sum / self.total_ratings
         return None
 
-    def add_variant(self, variant):
-        """Thêm một đối tượng ProductVariant vào danh sách variants."""
-        self.variants.append(variant)
+    def update_info(self, name=None, description=None, original_price=None, selling_price=None, image_url=None, supplier_id=None):
+        if name is not None:
+            self.name = name
+        if description is not None:
+            self.description = description
+        if original_price is not None:
+            self.original_price = original_price
+        if selling_price is not None:
+            self.selling_price = selling_price
+        if image_url is not None:
+            self.image_url = image_url
+        if supplier_id is not None:
+            self.supplier_id = supplier_id
+        self.updated_at = datetime.now()
 
-    def display(self):
-        """Hiển thị thông tin chi tiết của sản phẩm và các variant kèm theo."""
-        print(f"Product ID: {self.id}")
-        print(f"Name: {self.name}")
-        print(f"Description: {self.description}")
-        print(f"Original Price: {self.original_price}")
-        print(f"Selling Price: {self.selling_price}")
-        avg_rating = self.get_average_rating()
-        print(f"Average Rating: {avg_rating if avg_rating is not None else 'No ratings yet'}")
-        print(f"Image URL: {self.image_url}")
-        if self.supplier:
-            print(f"Supplier: {self.supplier}")  # Giả sử Supplier có __repr__ hợp lý
-        else:
-            print("Supplier: None")
-        print("Variants:")
-        for variant in self.variants:
-            variant.display()
-            print("-" * 20)
 
 class ProductVariant(Base, BaseModel):
     __tablename__ = "product_variants"
@@ -88,7 +86,6 @@ class ProductVariant(Base, BaseModel):
         return f"<ProductVariant(variant_id={self.variant_id}, stock_quantity={self.stock_quantity})>"
 
     def to_dict(self):
-        """Chuyển đổi đối tượng ProductVariant thành dict."""
         return {
             "id": self.id,
             "product_id": self.product_id,
@@ -99,22 +96,15 @@ class ProductVariant(Base, BaseModel):
         }
 
     def update_stock(self, session, quantity):
-        """
-        Cập nhật số lượng tồn kho của variant và commit thay đổi vào cơ sở dữ liệu.
-        :param session: SQLAlchemy session
-        :param quantity: Số lượng cần cộng thêm (có thể âm nếu giảm số lượng)
+        """Cập nhật số lượng tồn kho cho phiên bản sản phẩm.
+        Tham số: 
+            session (SQLAlchemy session): dùng để lưu thay đổi về số lượng tồn kho
+            quantity (int): Số lượng cần cộng thêm (có thể âm nếu muốn giảm số lượng).
+        Trả về: None
         """
         self.stock_quantity += quantity
         session.commit()
 
-    def display(self):
-        """Hiển thị thông tin chi tiết của ProductVariant."""
-        print(f"Product Variant ID: {self.id}")
-        print(f"Product ID: {self.product_id}")
-        print(f"Variant ID: {self.variant_id}")
-        print(f"Description: {self.description}")
-        print(f"Stock Quantity: {self.stock_quantity}")
-        print(f"Image URL: {self.image_url}")
 
 class ProductCategory(Base):
     __tablename__ = "product_categories"
@@ -129,7 +119,6 @@ class ProductCategory(Base):
         return f"<ProductCategory(product_id={self.product_id}, category_id={self.category_id})>"
 
     def to_dict(self):
-        """Chuyển đổi đối tượng ProductCategory thành dict."""
         return {
             "product_id": self.product_id,
             "category_id": self.category_id,

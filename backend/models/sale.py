@@ -15,12 +15,14 @@ class Sale(Base, BaseModel):
     end_date = Column(DateTime, nullable=False)
 
     def is_active(self):
-        """Kiểm tra xem đợt sale có đang hoạt động hay không."""
+        """Hàm này kiểm tra xem đợt sale có đang hoạt động hay không.
+        Tham số: Không có
+        Trả về: bool: True nếu sale đang hoạt động, ngược lại False
+        """
         now = datetime.utcnow()
         return self.start_date <= now <= self.end_date
 
     def to_dict(self):
-        """Chuyển đổi đối tượng Sale thành dict."""
         return {
             "id": self.id,
             "name": self.name,
@@ -63,16 +65,24 @@ class Coupon(Base, BaseModel):
     end_date = Column(DateTime, nullable=False)
 
     def is_active(self):
-        """Kiểm tra xem coupon có còn hiệu lực theo thời gian không."""
+        """Hàm này kiểm tra xem coupon có còn hiệu lực theo thời gian không.
+        Tham số: Không có
+        Trả về: bool: True nếu coupon còn hiệu lực, ngược lại False
+        """
         now = datetime.utcnow()
         return self.start_date <= now <= self.end_date
 
     def is_valid(self, order_value, usage_count):
-        """
-        Kiểm tra xem coupon có hợp lệ dựa trên:
-         - Có đang còn hiệu lực không.
-         - Giá trị đơn hàng có đủ không.
-         - Số lần sử dụng đã vượt quá giới hạn hay chưa.
+        """Hàm này kiểm tra tính hợp lệ của coupon dựa trên các điều kiện:
+        - Coupon còn hiệu lực.
+        - Giá trị đơn hàng đạt yêu cầu.
+        - Số lần sử dụng chưa vượt quá giới hạn.
+
+        Tham số: 
+        order_value (int): Giá trị đơn hàng.
+        usage_count (int): Số lần coupon đã được sử dụng.
+        
+        Trả về: bool: True nếu coupon hợp lệ, ngược lại False
         """
         if not self.is_active():
             return False
@@ -83,7 +93,6 @@ class Coupon(Base, BaseModel):
         return True
 
     def to_dict(self):
-        """Chuyển đổi đối tượng Coupon thành dict."""
         return {
             "id": self.id,
             "code": self.code,
