@@ -43,11 +43,6 @@ class Category(Base):
         """Convert objects to dictionaries for easy handling"""
         return {
             "id": self.id,
-            "order_id": self.order_id,
-            "total_refund": float(self.total_refund),
-            "total_items": self.total_items,
-            "status": self.status,
-            "general_reason": self.general_reason,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "processed_at": self.processed_at.isoformat() if self.processed_at else None,
+            "name": self.name,
+            "parent_id": self.parent_id
         }
