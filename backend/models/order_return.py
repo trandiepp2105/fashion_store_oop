@@ -57,7 +57,6 @@ class OrderReturn(Base):
             "general_reason": self.general_reason,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "processed_at": self.processed_at.isoformat() if self.processed_at else None,
-            "items": [item.to_dict() for item in self.items],
         }
 
 # models/order_item_return.py

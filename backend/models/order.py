@@ -26,16 +26,6 @@ class Order(Base, BaseModel):
         self.status = new_status
         session.commit()
     
-    def add_order(self, session):
-        """Add order to database."""
-        session.add(self)
-        session.commit()
-
-    def update_status(self, session, new_status):
-        """Update order status."""
-        self.status = new_status
-        session.commit()
-    
     def cancel_order(self, session):
         """Cancel order if not delivered."""
         if self.status in [OrderStatus.PENDING, OrderStatus.PACKAGED]:
@@ -63,9 +53,10 @@ class Order(Base, BaseModel):
         return {
             "id": self.id,
             "user_id": self.user_id,
+            "shipping_info_id": self.shipping_info_id,
             "total_amount": self.total_amount,
             "final_amount": self.final_amount,
-            "order_date": self.order_date,
+            "order_date": self.order_date.isoformat() if self.order_date else None,
             "status": self.status.name,
         }
 
@@ -97,8 +88,9 @@ class OrderItem(Base):
         return {
             "id": self.id,
             "order_id": self.order_id,
+            "variant_id": self.variant_id,
             "product_id": self.product_id,
-            "quantity": self.quantity,
+            "quantity": self.quantity
         }
 
 class OrderCoupon(Base):
