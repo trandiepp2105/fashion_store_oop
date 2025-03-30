@@ -8,9 +8,38 @@ class Variant(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     color = Column(Enum(FashionColor), nullable=False)
-    size = Column(Enum(BaseSizeEnum), nullable=False)  
+    size = Column(Enum(BaseSizeEnum), nullable=False)
 
     __table_args__ = (UniqueConstraint('color', 'size', name='unique_color_size'),)
 
     def __repr__(self):
         return f"<Variant(color={self.color.value}, size={self.size.value})>"
+
+    def add_variant(self, session):
+        session.add(self)
+        session.commit()
+
+    def update_variant(self, session, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        session.commit()
+
+    def delete_variant(self, session):
+        session.delete(self)
+        session.commit()
+
+    @classmethod
+    def get_variant_by_id(cls, session, variant_id):
+        return session.query(cls).filter_by(id=variant_id).first()
+
+    @classmethod
+    def get_all_variants(cls, session):
+        return session.query(cls).all()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "color": self.color.name,
+            "size": self.size.name
+        }
