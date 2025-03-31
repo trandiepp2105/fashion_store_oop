@@ -18,38 +18,3 @@ class Supplier(Base, BaseModel):
 
     products = relationship("Product", back_populates="supplier")
     
-    def add_supplier(self, session):
-        session.add(self)
-        session.commit()
-    
-    def update_supplier(self, session, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-        session.commit()
-    
-    def delete_supplier(self, session):
-        session.delete(self)
-        session.commit()
-    
-    @classmethod
-    def get_supplier_by_id(cls, session, supplier_id):
-        return session.query(cls).filter_by(id=supplier_id).first()
-    
-    @classmethod
-    def get_all_suppliers(cls, session):
-        return session.query(cls).all()
-    
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "company_name": self.company_name,
-            "contact_person": self.contact_person,
-            "email": self.email,
-            "phone_number": self.phone_number,
-            "address": self.address,
-            "tax_id": self.tax_id,
-            "website": self.website,
-            "status": self.status.name,
-            "started_at": self.started_at.strftime('%Y-%m-%d %H:%M:%S') if self.started_at else None
-        }
