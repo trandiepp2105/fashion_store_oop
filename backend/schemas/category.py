@@ -1,6 +1,7 @@
 # schemas/category.py
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
+from fastapi import UploadFile
 
 class CategoryBase(BaseModel):
     """Schema cơ bản, bao gồm các trường có thể có khi tạo/cập nhật."""
