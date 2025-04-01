@@ -13,7 +13,7 @@ class Payment(Base):
     status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
     method = Column(Enum(PaymentMethod), nullable=False)
     paid_at = Column(DateTime, nullable=True)
-    create_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
     def mark_as_paid(self, session):
         """Mark payment as paid."""
         self.status = PaymentStatus.PAID
