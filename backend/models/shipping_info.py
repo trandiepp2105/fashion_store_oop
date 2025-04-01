@@ -1,19 +1,18 @@
 from models.base import Base, BaseModel
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
 
 class ShippingInfo(Base, BaseModel):
-    __tablename__ = "shipping_infos"
+    __tablename__ = "shippinginfo"
     
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     is_default = Column(Boolean, default=False)
-    recipient_name = Column(String(255), nullable=False)
+    recipient_name = Column(String(50), nullable=False)
     phone_number = Column(String(20), nullable=False)
     provine_city = Column(String(255), nullable=False)
     district = Column(String(255), nullable=False)
     ward_commune = Column(String(255), nullable=False)
-    specific_address = Column(String(255), nullable=False)
-    user = relationship("User", back_populates="shipping_infos")
+    specific_address = Column(Text, nullable=False)
     
     def addShippingInfo(self, session):
         """Add new shipping information to the database."""

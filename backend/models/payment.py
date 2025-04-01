@@ -5,7 +5,7 @@ from enums.payment_method import PaymentMethod
 from enums.payment_status import PaymentStatus
 
 class Payment(Base):
-    __tablename__ = "payments"
+    __tablename__ = "payment"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
@@ -13,8 +13,7 @@ class Payment(Base):
     status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
     method = Column(Enum(PaymentMethod), nullable=False)
     paid_at = Column(DateTime, nullable=True)
-
-    order = relationship("Order", back_populates="payments")
+    create_at = Column(DateTime, nullable=False)
     def mark_as_paid(self, session):
         """Mark payment as paid."""
         self.status = PaymentStatus.PAID

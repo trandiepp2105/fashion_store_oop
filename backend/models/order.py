@@ -7,16 +7,12 @@ from enums.order_status import OrderStatus
 class Order(Base, BaseModel):
     __tablename__ = "orders"
 
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-    shipping_info_id = Column(Integer, ForeignKey("shipping_infos.id", ondelete="SET NULL"), nullable=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
+    shipping_info_id = Column(Integer, ForeignKey("shippinginfo.id", ondelete="SET NULL"), nullable=False)
     total_amount = Column(Integer, nullable=False)
     final_amount = Column(Integer, nullable=False)
     order_date = Column(DateTime, default=current_timestamp)
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
-
-    user = relationship("User", back_populates="orders")
-    items = relationship("OrderItem", back_populates="order")
-    payments = relationship("Payment", back_populates="order")
     
     def add_order(self, session):
         session.add(self)
@@ -60,18 +56,15 @@ class Order(Base, BaseModel):
             "status": self.status.name,
         }
 
-
 class OrderItem(Base):
-    __tablename__ = "order_items"
+    __tablename__ = "orderitem"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
-    variant_id = Column(Integer, ForeignKey("variants.id", ondelete="CASCADE"), nullable=False)
-    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    variant_id = Column(Integer, ForeignKey("variant.id", ondelete="SET NULL"), nullable=True)
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
     quantity = Column(Integer, nullable=False)
     
-    order = relationship("Order", back_populates="items")
-    product = relationship("Product")
 
     def update_quantity(self, session, new_quantity):
         """Update the quantity of products in the order."""
@@ -92,17 +85,13 @@ class OrderItem(Base):
             "product_id": self.product_id,
             "quantity": self.quantity
         }
-
 class OrderCoupon(Base):
-    __tablename__ = "order_coupons"
+    __tablename__ = "ordercoupon"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
-    coupon_id = Column(Integer, ForeignKey("coupons.id", ondelete="CASCADE"), nullable=False)
+    coupon_id = Column(Integer, ForeignKey("coupon.id", ondelete="CASCADE"), nullable=False)
     
-    order = relationship("Order")
-    coupon = relationship("Coupon")
-
     def apply_coupon(self, session):
         """Apply discount code to order."""
         session.add(self)

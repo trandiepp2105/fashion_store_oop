@@ -5,7 +5,7 @@ from enums.sale_type import SaleType
 from datetime import datetime, timezone
 
 class Sale(Base, BaseModel):
-    __tablename__ = "sales"
+    __tablename__ = "sale"
     
     name = Column(String(255), nullable=False)
     description = Column(Text)
@@ -21,10 +21,10 @@ class Sale(Base, BaseModel):
 
 
 class SaleProduct(Base):
-    __tablename__ = "sale_products"
+    __tablename__ = "saleproduct"
     __table_args__ = {"extend_existing": True}
-    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False, primary_key=True)
-    sale_id = Column(Integer, ForeignKey("sales.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    sale_id = Column(Integer, ForeignKey("sale.id", ondelete="CASCADE"), nullable=False, primary_key=True)
 
     def __repr__(self):
         return f"<SaleProduct(product_id={self.product_id}, sale_id={self.sale_id})>"
@@ -42,10 +42,10 @@ class SaleProduct(Base):
 
 
 class SaleCategory(Base):
-    __tablename__ = "sale_categories"
+    __tablename__ = "salecategory"
     __table_args__ = {"extend_existing": True}
-    category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, primary_key=True)
-    sale_id = Column(Integer, ForeignKey("sales.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    category_id = Column(Integer, ForeignKey("category.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    sale_id = Column(Integer, ForeignKey("sale.id", ondelete="CASCADE"), nullable=False, primary_key=True)
 
     def __repr__(self):
         return f"<SaleCategory(category_id={self.category_id}, sale_id={self.sale_id})>"
@@ -64,7 +64,7 @@ class SaleCategory(Base):
 
 
 class Coupon(Base, BaseModel):
-    __tablename__ = "coupons"
+    __tablename__ = "coupon"
     
     code = Column(String(255), nullable=False)
     description = Column(Text)
@@ -72,7 +72,7 @@ class Coupon(Base, BaseModel):
     value = Column(Integer, nullable=False)
     min_order_value = Column(Integer, nullable=False)
     discount_limit = Column(Integer)
-    usage_limit = Column(Integer)
+    # usage_limit = Column(Integer)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
 

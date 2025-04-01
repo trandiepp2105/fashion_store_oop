@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from enums.supplier_status import SupplierStatus
 
 class Supplier(Base, BaseModel):
-    __tablename__ = "suppliers"
+    __tablename__ = "supplier"
     
-    company_name = Column(String(255), unique=True, nullable=False)
+    company_name = Column(String(100), unique=True, nullable=False)
     contact_person = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
     phone_number = Column(String(20), nullable=False)
@@ -16,5 +16,4 @@ class Supplier(Base, BaseModel):
     status = Column(Enum(SupplierStatus), default=SupplierStatus.ACTIVE)
     started_at = Column(DateTime, nullable=False)
 
-    products = relationship("Product", back_populates="supplier")
     

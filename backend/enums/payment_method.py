@@ -2,10 +2,7 @@ from enum import Enum
 
 class PaymentMethod(Enum):
     CREDIT_CARD = "CREDIT CARD"
-    DEBIT_CARD = "DEBIT CARD"
-    PAYPAL = "PAYPAL"
-    GOOGLE_PAY = "GOOGLE PAY"
-    APPLE_PAY = "APPLE PAY"
+    BANK_TRANSFER = "BANK TRANSFER"
     CASH_ON_DELIVERY = "CASH ON DELIVERY"
     
     @classmethod

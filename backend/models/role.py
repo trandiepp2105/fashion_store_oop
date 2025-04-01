@@ -4,13 +4,12 @@ from sqlalchemy.orm import relationship
 from enums.role import Role
 
 class Role(Base):
-    __tablename__ = "roles"
+    __tablename__ = "role"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Enum(Role), nullable=False)
     description = Column(Text)
 
-    users = relationship("UserRole", back_populates="role")
     
     def __repr__(self):
         return f"<Role(name={self.name})>"
@@ -48,13 +47,11 @@ class Role(Base):
         return session.query(cls).filter(cls.id == role_id).first()
     
 class UserRole(Base):
-    __tablename__ = "user_roles"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    role_id = Column(Integer, ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
+    __tablename__ = "userrole"
+    __table_args__ = {"extend_existing": True}
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    role_id = Column(Integer, ForeignKey("role.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     
-    user = relationship("User", back_populates="roles")
-    role = relationship("Role", back_populates="users")
     
     def __repr__(self):
         return f"<UserRole(user_id={self.user_id}, role_id={self.role_id})>"

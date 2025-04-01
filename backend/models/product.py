@@ -1,12 +1,13 @@
 from models.base import Base, BaseModel
-from sqlalchemy import Column, String, Text, Integer, ForeignKey
+from sqlalchemy import Column, String, Text, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from sqlalchemy.sql.functions import current_timestamp
 
 class Product(Base, BaseModel):
-    __tablename__ = "products"
+    __tablename__ = "product"
 
-    supplier_id = Column(Integer, ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=True)
+    supplier_id = Column(Integer, ForeignKey("supplier.id", ondelete="SET NULL"), nullable=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
     original_price = Column(Integer, nullable=False)
@@ -14,10 +15,7 @@ class Product(Base, BaseModel):
     total_ratings = Column(Integer, default=0)
     rating_sum = Column(Integer, default=0)
     image_url = Column(String(255), nullable=True)
-    
-    categories = relationship("ProductCategory", back_populates="product")
-    variants = relationship("ProductVariant", back_populates="product")
-    supplier = relationship("Supplier", back_populates="products")
+
 
     def __repr__(self):
         return f"<Product(name={self.name}, selling_price={self.selling_price})>"
@@ -40,16 +38,21 @@ class Product(Base, BaseModel):
     def filter_by_price(cls, session, min_price=0, max_price=float("inf")):
         return session.query(cls).filter(cls.selling_price.between(min_price, max_price)).all()
 
+class ProductRaing(Base):
+    __tablename__ = "productrating"
+    __table_args__ = {"extend_existing": True}
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    rating = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=current_timestamp)
+
 class ProductVariant(Base, BaseModel):
-    __tablename__ = "product_variants"
+    __tablename__ = "productvariant"
     
-    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
-    description = Column(Text)
-    variant_id = Column(Integer, ForeignKey("variants.id", ondelete="CASCADE"), nullable=False)
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
+    variant_id = Column(Integer, ForeignKey("variant.id", ondelete="CASCADE"), nullable=False)
     stock_quantity = Column(Integer, default=0)
     image_url = Column(String(255), nullable=True)
-
-    product = relationship("Product", back_populates="variants")
     
     def __repr__(self):
         return f"<ProductVariant(variant_id={self.variant_id}, stock_quantity={self.stock_quantity})>"
@@ -58,16 +61,11 @@ class ProductVariant(Base, BaseModel):
     def filter_by_stock(cls, session, min_stock=0, max_stock=float("inf")):
         return session.query(cls).filter(cls.stock_quantity.between(min_stock, max_stock)).all()
 
-
-
 class ProductCategory(Base):
     __tablename__ = "product_categories"
     __table_args__ = {"extend_existing": True}
-    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False, primary_key=True)
-    category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, primary_key=True)
-    
-    product = relationship("Product", back_populates="categories")
-    category = relationship("Category", back_populates="products")
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    category_id = Column(Integer, ForeignKey("category.id", ondelete="CASCADE"), nullable=False, primary_key=True)
 
     def __repr__(self):
         return f"<ProductCategory(product_id={self.product_id}, category_id={self.category_id})>"
