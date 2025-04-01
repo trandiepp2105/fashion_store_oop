@@ -1,16 +1,16 @@
-from models.base import Base
+from models.base import Base, BaseModel
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-class Category(Base):
-    __tablename__ = "categories"
-    __table_args__ = {"extend_existing": True}
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), unique=True, nullable=False)
-    parent_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
+class Category(Base, BaseModel):
+    __tablename__ = "category"
+    name = Column(String(255), nullable=False)
+    description = Column(String(255), nullable=True)
+    icon_url = Column(String(255), default="https://resource-server/category-icon/default.png")
+    parent_id = Column(Integer, ForeignKey("category.id", ondelete="SET NULL"), nullable=True)
     
-    parent = relationship("Category", remote_side=[id], backref="subcategories")
-    products = relationship("ProductCategory", back_populates="category")
+    # parent = relationship("Category", remote_side=[id], backref="subcategories")
+    # products = relationship("ProductCategory", back_populates="category")
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}')>"
