@@ -64,8 +64,8 @@ class OrderItemReturn(Base):
     __tablename__ = "orderitemreturn"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
-    order_return_id = Column(Integer, ForeignKey("order_returns.id", ondelete="CASCADE"), nullable=False)
-    order_item_id = Column(Integer, ForeignKey("order_items.id", ondelete="CASCADE"), nullable=False)
+    order_return_id = Column(Integer, ForeignKey("orderreturn.id", ondelete="CASCADE"), nullable=False)
+    order_item_id = Column(Integer, ForeignKey("orderitem.id", ondelete="CASCADE"), nullable=False)
     quantity_returned = Column(Integer, nullable=False)
     refund_amount = Column(DECIMAL(10, 2), nullable=False)
     return_reason = Column(Text)
