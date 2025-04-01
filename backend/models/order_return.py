@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import current_timestamp
 
 class OrderReturn(Base):
     __tablename__ = "order_returns"
-    
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     total_refund = Column(DECIMAL(10, 2), nullable=False)
@@ -62,7 +62,7 @@ class OrderReturn(Base):
 # models/order_item_return.py
 class OrderItemReturn(Base):
     __tablename__ = "order_item_returns"
-    
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_return_id = Column(Integer, ForeignKey("order_returns.id", ondelete="CASCADE"), nullable=False)
     order_item_id = Column(Integer, ForeignKey("order_items.id", ondelete="CASCADE"), nullable=False)

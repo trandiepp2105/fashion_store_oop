@@ -22,7 +22,7 @@ class Sale(Base, BaseModel):
 
 class SaleProduct(Base):
     __tablename__ = "sale_products"
-    
+    __table_args__ = {"extend_existing": True}
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     sale_id = Column(Integer, ForeignKey("sales.id", ondelete="CASCADE"), nullable=False, primary_key=True)
 
@@ -43,7 +43,7 @@ class SaleProduct(Base):
 
 class SaleCategory(Base):
     __tablename__ = "sale_categories"
-    
+    __table_args__ = {"extend_existing": True}
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     sale_id = Column(Integer, ForeignKey("sales.id", ondelete="CASCADE"), nullable=False, primary_key=True)
 

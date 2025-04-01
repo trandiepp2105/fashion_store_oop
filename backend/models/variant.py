@@ -5,7 +5,7 @@ from enums.colors import FashionColor
 
 class Variant(Base):
     __tablename__ = "variants"
-    
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, autoincrement=True)
     color = Column(Enum(FashionColor), nullable=False)
     size = Column(Enum(BaseSizeEnum), nullable=False)

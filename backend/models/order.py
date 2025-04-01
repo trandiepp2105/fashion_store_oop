@@ -6,7 +6,7 @@ from enums.order_status import OrderStatus
 
 class Order(Base, BaseModel):
     __tablename__ = "orders"
-    
+
     user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     shipping_info_id = Column(Integer, ForeignKey("shipping_infos.id", ondelete="SET NULL"), nullable=True)
     total_amount = Column(Integer, nullable=False)
@@ -63,7 +63,7 @@ class Order(Base, BaseModel):
 
 class OrderItem(Base):
     __tablename__ = "order_items"
-    
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     variant_id = Column(Integer, ForeignKey("variants.id", ondelete="CASCADE"), nullable=False)
@@ -95,7 +95,7 @@ class OrderItem(Base):
 
 class OrderCoupon(Base):
     __tablename__ = "order_coupons"
-    
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     coupon_id = Column(Integer, ForeignKey("coupons.id", ondelete="CASCADE"), nullable=False)

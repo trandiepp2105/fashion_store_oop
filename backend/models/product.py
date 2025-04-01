@@ -62,7 +62,7 @@ class ProductVariant(Base, BaseModel):
 
 class ProductCategory(Base):
     __tablename__ = "product_categories"
-    
+    __table_args__ = {"extend_existing": True}
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     

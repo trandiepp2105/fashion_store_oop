@@ -5,6 +5,7 @@ from enums.role import Role
 
 class Role(Base):
     __tablename__ = "roles"
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Enum(Role), nullable=False)
     description = Column(Text)
