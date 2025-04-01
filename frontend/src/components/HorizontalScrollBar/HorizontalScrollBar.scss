@@ -1,0 +1,57 @@
+.horizontal-scroll-bar {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  height: fit-content;
+  .prev-product {
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%);
+    svg {
+      width: 30px;
+    }
+  }
+  .next-product {
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    transform: translateY(-50%);
+    svg {
+      width: 30px;
+    }
+  }
+
+  .prev-product,
+  .next-product {
+    cursor: pointer;
+    opacity: 0;
+    z-index: 10;
+    // &:hover {
+    //   opacity: 0.8;
+    // }
+  }
+
+  &:hover {
+    .prev-product,
+    .next-product {
+      opacity: 1;
+    }
+  }
+  .horizontal-scroll {
+    // transition: transform 0.3s ease-in-out;
+
+    width: 100%;
+    display: flex;
+    gap: 20px; // Set gap to 20px
+    // overflow: hidden;
+    padding: 3px 5px;
+    box-sizing: border-box;
+    .product-container {
+      flex: 0 0 calc((100% / 5) - (20px * 4 / 5)) !important; /* Adjust for new gap */
+      width: calc(
+        (100% / 5) - (20px * 4 / 5)
+      ) !important; /* Adjust for new gap */
+    }
+  }
+}

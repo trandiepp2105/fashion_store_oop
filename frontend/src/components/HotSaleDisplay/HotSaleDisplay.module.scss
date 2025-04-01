@@ -1,0 +1,138 @@
+.hotSaleOverlay {
+  border-radius: 16px;
+  overflow: hidden;
+  background: url(https://cdn2.cellphones.com.vn/x/media/wysiwyg/background-fs_1.png)
+    0% 0% / cover no-repeat;
+  margin-bottom: 10px;
+}
+
+.wrapperHotSale {
+  border-radius: 16px;
+  // height: 470px;
+  width: 100%;
+  padding: 2px;
+  background: linear-gradient(rgb(248, 62, 96), rgb(254, 80, 72)) 0% 0% / cover;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  .boxTitle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    width: 100%;
+
+    .titleImage {
+      height: 60px;
+      .titleImg {
+        height: 100%;
+      }
+    }
+
+    .boxCountdown {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-right: 10px;
+      .boxCountdownTitle {
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.125;
+        word-break: break-all;
+        margin-right: 5px;
+      }
+
+      .boxCountdownTime {
+        display: flex;
+
+        .unitOfTime {
+          display: flex;
+
+          .time {
+            box-sizing: border-box;
+            color: #222222;
+            background: #ffffff;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: 700;
+            height: 28px;
+            width: 28px;
+            padding: 2px 5px;
+            text-align: center;
+          }
+
+          .separate {
+            line-height: 26px;
+            margin: 0 5px;
+            color: #fff;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+
+  .boxContent {
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 0 10px;
+
+    .slidingProductList {
+      width: 100%;
+      padding: 8px 0;
+      overflow: hidden;
+      position: relative;
+      box-sizing: border-box;
+      .prevProduct {
+        position: absolute;
+        top: 50%;
+        left: 0px;
+        transform: translateY(-50%);
+        svg {
+          width: 30px;
+        }
+      }
+      .nextProduct {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        svg {
+          width: 30px;
+        }
+      }
+
+      .prevProduct,
+      .nextProduct {
+        cursor: pointer;
+        opacity: 0;
+        z-index: 10;
+        // &:hover {
+        //   opacity: 0.8;
+        // }
+      }
+
+      &:hover {
+        .prevProduct,
+        .nextProduct {
+          opacity: 1;
+        }
+      }
+      .slidingWrapper {
+        display: flex;
+        // width: 100%;
+        height: 100%;
+        gap: 20px;
+        padding-top: 2px;
+        flex-wrap: nowrap !important; /* Đảm bảo các slide không bẻ dòng */
+
+        .slide {
+          flex: 0 0 calc(25% - 20px) !important; /* Đặt kích thước cố định */
+
+          width: calc(25% - 20px);
+        }
+      }
+    }
+  }
+}

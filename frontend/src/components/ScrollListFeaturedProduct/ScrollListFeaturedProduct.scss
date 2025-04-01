@@ -1,0 +1,54 @@
+.scrollable-bar {
+  width: 100%;
+  position: relative;
+
+  .prev-product {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    svg {
+      width: 30px;
+    }
+  }
+  .next-product {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    svg {
+      width: 30px;
+    }
+  }
+
+  .prev-product,
+  .next-product {
+    cursor: pointer;
+    opacity: 0;
+    z-index: 10;
+    // &:hover {
+    //   opacity: 0.8;
+    // }
+  }
+
+  &:hover {
+    .prev-product,
+    .next-product {
+      opacity: 1;
+    }
+  }
+  .block-product-grid {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 5px;
+    .product-container {
+      width: 225px;
+      // flex: 0 0 calc((100% / 5) - (10px * 4 / 5)) !important; /* Đặt kích thước cố định */
+
+      // width: calc((100% / 5) - (10px * 4 / 5)) !important;
+    }
+  }
+}
