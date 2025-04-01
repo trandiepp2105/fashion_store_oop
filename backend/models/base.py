@@ -1,34 +1,10 @@
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
-from sqlalchemy.sql.functions import current_timestamp
 from database.metadata import database_metadata
 
 
 class Base(DeclarativeBase):
     metadata = database_metadata
-class BaseRepository:
-    def __init__(self, session: Session):
-        self.session = session
-
-    def save(self, instance):
-        self.session.add(instance)
-        self.session.commit()
-        self.session.refresh(instance)
-        return instance
-
-    def delete(self, instance):
-        self.session.delete(instance)
-        self.session.commit()
-
-    def get_by_id(self, model, id):
-        return self.session.query(model).filter_by(id=id).first()
-
-class BaseModel:
-    __table_args__ = {"extend_existing": True}
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=current_timestamp)
-    updated_at = Column(DateTime, default=current_timestamp, onupdate=current_timestamp)
-
     def save(self, session: Session):
         session.add(self)
         session.commit()
@@ -75,3 +51,10 @@ class BaseModel:
         session.add(instance)
         session.commit()
         return instance
+
+class BaseModel:
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp(), nullable=False)
+
