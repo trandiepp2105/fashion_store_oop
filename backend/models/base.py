@@ -1,9 +1,11 @@
 from sqlalchemy import Column, Integer, DateTime
-from sqlalchemy.orm import declarative_base, Session
+from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
 from sqlalchemy.sql.functions import current_timestamp
+from database.metadata import database_metadata
 
-Base = declarative_base()
 
+class Base(DeclarativeBase):
+    metadata = database_metadata
 class BaseRepository:
     def __init__(self, session: Session):
         self.session = session
@@ -22,6 +24,7 @@ class BaseRepository:
         return self.session.query(model).filter_by(id=id).first()
 
 class BaseModel:
+    __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=current_timestamp)
     updated_at = Column(DateTime, default=current_timestamp, onupdate=current_timestamp)
