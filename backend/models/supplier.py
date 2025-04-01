@@ -16,4 +16,15 @@ class Supplier(Base, BaseModel):
     status = Column(Enum(SupplierStatus), default=SupplierStatus.ACTIVE)
     started_at = Column(DateTime, nullable=False)
 
+    @classmethod
+    def filter_by_name(cls, session: Session, name: str):
+        return session.query(cls).filter(cls.company_name.ilike(f"%{name}%")).all()
     
+    
+    @classmethod
+    def filter_by_status(cls, session: Session, status: SupplierStatus):
+        return session.query(cls).filter_by(status=status).all()
+
+    @classmethod
+    def filter_by_email(cls, session: Session, email: str):
+        return session.query(cls).filter_by(email=email).first()

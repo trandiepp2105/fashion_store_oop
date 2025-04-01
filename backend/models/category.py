@@ -14,35 +14,48 @@ class Category(Base, BaseModel):
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}')>"
-
-    def add_subcategory(self, subcategory):
-        """Add a subcategory to the current category"""
-        if subcategory not in self.subcategories:
-            self.subcategories.append(subcategory)
-            subcategory.parent = self
-
-    def remove_subcategory(self, subcategory):
-        """Remove a subcategory from the current category"""
-        if subcategory in self.subcategories:
-            self.subcategories.remove(subcategory)
-            subcategory.parent = None
-
-    def get_subcategories(self):
-        """Returns a list of subcategories"""
-        return self.subcategories
-
-    def set_parent(self, parent_category):
-        """Update parent category"""
-        self.parent = parent_category
-
-    def get_products(self):
-        """Returns a list of products in the category"""
-        return [product_category.product for product_category in self.products]
+    
+    def add_category(self, session):
+        """Add a new category to the database."""
+        return self.add(session)
+    
+    def update_category(self, session, **kwargs):
+        """Update category details."""
+        return self.update_info(session, **kwargs)
+    
+    def delete_category(self, session):
+        """Delete category from the database."""
+        return self.delete(session)
+    
+    @classmethod
+    def get_category_by_name(cls, session, name):
+        """Retrieve a category by name."""
+        return session.query(cls).filter(cls.name == name).first()
+    
+    @classmethod
+    def get_all_categories(cls, session):
+        """Retrieve all categories."""
+        return cls.get_all(session)
+    
+    @classmethod
+    def get_category_by_id(cls, session, category_id):
+        """Retrieve a category by its ID."""
+        return cls.get_by_id(session, category_id)
+    
+    @classmethod
+    def filter_by_category_ids(cls, session, category_ids):
+        """Retrieve multiple categories by a list of IDs."""
+        return session.query(cls).filter(cls.id.in_(category_ids)).all()
+    
+    @classmethod
+    def filter_by_category_names(cls, session, category_names):
+        """Retrieve multiple categories by a list of names."""
+        return session.query(cls).filter(cls.name.in_(category_names)).all()
+    
+    def get_subcategories(self, session):
+        """Retrieve all subcategories for the current category."""
+        return session.query(Category).filter(Category.parent_id == self.id).all()
     
     def to_dict(self):
-        """Convert objects to dictionaries for easy handling"""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "parent_id": self.parent_id
-        }
+        """Convert objects to dictionaries for easy handling."""
+        return self.to_dict

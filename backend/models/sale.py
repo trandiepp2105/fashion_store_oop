@@ -18,6 +18,11 @@ class Sale(Base, BaseModel):
     def is_active(self):
         now = datetime.now(timezone.utc)
         return self.start_date <= now <= self.end_date
+    
+    @classmethod
+    def filter_by_type(cls, session, sale_type):
+        return session.query(cls).filter(cls.type == sale_type).all()
+
 
 
 class SaleProduct(Base):
@@ -30,6 +35,9 @@ class SaleProduct(Base):
         return f"<SaleProduct(product_id={self.product_id}, sale_id={self.sale_id})>"
     
     @classmethod
+    def filter_by_sale(cls, session, sale_id):
+        return session.query(cls).filter(cls.sale_id == sale_id).all()
+    
     def add_pro_to_sale(self, session, product_id):
         #Nếu đã tồn tại, trả về luôn
         if (sale_product := session.query(SaleProduct).filter_by(sale_id=self.id, product_id=product_id).first()):
@@ -51,6 +59,9 @@ class SaleCategory(Base):
         return f"<SaleCategory(category_id={self.category_id}, sale_id={self.sale_id})>"
     
     @classmethod
+    def filter_by_sale(cls, session, sale_id):
+        return session.query(cls).filter(cls.sale_id == sale_id).all()
+    
     def add_cate_to_sale(self, session, category_id):
         #Nếu đã tồn tại, trả về luôn
         if (sale_category := session.query(SaleCategory).filter_by(sale_id=self.id, category_id=category_id).first()):
@@ -81,6 +92,10 @@ class Coupon(Base, BaseModel):
         now = datetime.now(timezone.utc)
         return self.start_date <= now <= self.end_date
 
+    @classmethod
+    def filter_by_type(cls, session, coupon_type):
+        return session.query(cls).filter(cls.type == coupon_type).all()
+    
     def is_valid(self, order_value, usage_count):
         #Kiểm tra còn hiệu lực
         if not self.is_active():
