@@ -60,6 +60,8 @@ async def create_category(
     """
     Endpoint to create a new Category record.
     """
+
+    
     try:
         # Save the uploaded file to the server
         upload_dir = "d:/HK6/OOP_PROGRAMING/PROJECT/fashion_store_oop/backend/media/icons"

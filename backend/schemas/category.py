@@ -16,7 +16,7 @@ class CategorySchema(CategoryBase):
 
     # Cấu hình để Pydantic đọc dữ liệu từ ORM model
     # Pydantic V2:
-    model_config = ConfigDict(from_attributes=True)
+    # model_config = ConfigDict(from_attributes=True)
 
     # Pydantic V1:
     # class Config:
