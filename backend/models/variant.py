@@ -14,3 +14,11 @@ class Variant(Base):
 
     def __repr__(self):
         return f"<Variant(color={self.color.value}, size={self.size.value})>"
+
+    @classmethod
+    def filter_by_color(cls, session, color):
+        return session.query(cls).filter(cls.color == color).all()
+    
+    @classmethod
+    def filter_by_size(cls, session, size):
+        return session.query(cls).filter(cls.size == size).all()
