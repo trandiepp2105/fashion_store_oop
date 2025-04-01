@@ -76,14 +76,3 @@ class User(Base, BaseModel):
     def filter_by_role(cls, session, role):
         """Retrieve users filtered by role."""
         return session.query(cls).filter(cls.role == role).all()
-
-    @classmethod
-    def filter_by_role_relationship(cls, session, role_name):
-        """Retrieve users by role using the Role and UserRole tables."""
-         return (
-        session.query(cls)
-        .join(UserRole, User.id == UserRole.user_id)
-        .join(Role, UserRole.role_id == Role.id)
-        .filter(Role.name == role_name)
-        .all()
-    )
