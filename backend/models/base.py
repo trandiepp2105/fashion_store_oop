@@ -3,25 +3,12 @@ from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
 from sqlalchemy.sql.functions import current_timestamp
 from database.metadata import database_metadata
 
-
 class Base(DeclarativeBase):
     metadata = database_metadata
-class BaseRepository:
-    def __init__(self, session: Session):
-        self.session = session
-
-    def save(self, instance):
-        self.session.add(instance)
-        self.session.commit()
-        self.session.refresh(instance)
-        return instance
-
-    def delete(self, instance):
-        self.session.delete(instance)
-        self.session.commit()
-
-    def get_by_id(self, model, id):
-        return self.session.query(model).filter_by(id=id).first()
+    
+    @classmethod
+    def get_all(cls, session: Session):
+        return session.query(cls).all()
 
 class BaseModel:
     __table_args__ = {"extend_existing": True}

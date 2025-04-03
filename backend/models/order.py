@@ -66,7 +66,7 @@ class Order(Base, BaseModel):
         """Convert objects to dictionaries."""
         return self.to_dict
 
-class OrderItem(Base, BaseModel):
+class OrderItem(Base):
     __tablename__ = "orderitem"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
@@ -74,7 +74,6 @@ class OrderItem(Base, BaseModel):
     variant_id = Column(Integer, ForeignKey("variant.id", ondelete="SET NULL"), nullable=True)
     product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
     quantity = Column(Integer, nullable=False)
-    
 
     def update_quantity(self, session, new_quantity):
         """Update the quantity of products in the order."""
@@ -105,7 +104,7 @@ class OrderItem(Base, BaseModel):
         """Convert objects to dictionaries."""
         return self.to_dict
     
-class OrderCoupon(Base, BaseModel):
+class OrderCoupon(Base):
     __tablename__ = "ordercoupon"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
