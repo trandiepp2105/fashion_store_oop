@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import style from "./NavBar.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MainMenu from "../MainMenu/MainMenu";
 import productService from "../../services/productService";
 import ModalLogin from "../ModalLogin/ModalLogin";
@@ -11,7 +11,10 @@ import AlertPopup from "../AlertPopup/AlertPopup";
 import addTemporaryComponent from "../../utils/renderAlertPopup";
 import { AppContext } from "../../App";
 import paymentService from "../../services/paymentService";
+import SearchProductBox from "../SearchProductBox/SearchProductBox";
+
 const NavBar = () => {
+  const navigate = useNavigate();
   const { isUserLogin, setIsUserLogin, shoppingCart } = useContext(AppContext);
   const [shoppingCartQuantity, setShoppingCartQuantity] = useState(0);
   const handleCreatePayment = async (e) => {
@@ -68,32 +71,11 @@ const NavBar = () => {
     };
     fetchCategories();
   }, []);
-  // const getCartItemQuantity = () => {
-  //   if (!isUserLogin) {
-  //     return 0;
-  //   }
-  //   if (!shoppingCart.items) {
-  //     return 0;
-  //   }
-  //   const quantity = shoppingCart.items.length;
-
-  //   return quantity;
-  // };
   const logoPath = "/assets/logo/logo.png";
   const menuIconPath = "/assets/images/menu.svg";
   const searchIconPath = "/assets/images/search.svg";
   const memberIconPath = "/assets/images/member.svg";
   const headerItemData = [
-    {
-      iconPath: "/assets/images/phone.svg",
-      text: ["Gọi mua hàng", "1800.2079"],
-      to: "#",
-    },
-    {
-      iconPath: "/assets/images/delivery.svg",
-      text: ["Tra cứu đơn hàng"],
-      to: "#",
-    },
     {
       iconPath: "/assets/images/shopping-bag.svg",
       text: ["Giỏ hàng"],
@@ -101,10 +83,152 @@ const NavBar = () => {
     },
   ];
 
-  const [isOpenMenu, setIsOpenMenu] = useState(false);
+  const fakeCategory = [
+    {
+      name: "Men",
+      description: "Men Fashion",
+      icon_url: "https://resource-server/category-icon/default.png",
+      id: 1,
+      subcategories: [
+        {
+          name: "Tops & Shirts",
+          description: "Men Fashion",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 10,
+          subcategories: [
+            {
+              name: "Tops & Shirts",
+              description: "Men Fashion",
+              icon_url: "https://resource-server/category-icon/default.png",
+              id: 10,
+            },
+            {
+              name: "Pants & Bottoms",
+              description: "",
+              icon_url: "https://resource-server/category-icon/default.png",
+              id: 12,
+            },
+            {
+              name: "Accessories",
+              description: "",
+              icon_url: "https://resource-server/category-icon/default.png",
+              id: 12,
+            },
+          ],
+        },
+        {
+          name: "Pants & Bottoms",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+        {
+          name: "Accessories",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+      ],
+    },
+    {
+      name: "Women",
+      description: "Men Fashion",
+      icon_url: "https://resource-server/category-icon/default.png",
+      id: 1,
+      subcategories: [
+        {
+          name: "Tops & Shirts",
+          description: "Men Fashion",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 10,
+        },
+        {
+          name: "Pants & Bottoms",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+        {
+          name: "Accessories",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+      ],
+    },
+    {
+      name: "Kid",
+      description: "Men Fashion",
+      icon_url: "https://resource-server/category-icon/default.png",
+      id: 1,
+      subcategories: [
+        {
+          name: "Tops & Shirts",
+          description: "Men Fashion",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 10,
+        },
+        {
+          name: "Pants & Bottoms",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+        {
+          name: "Accessories",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+      ],
+    },
+    {
+      name: "Unisex",
+      description: "Men Fashion",
+      icon_url: "https://resource-server/category-icon/default.png",
+      id: 1,
+      subcategories: [
+        {
+          name: "Tops & Shirts",
+          description: "Men Fashion",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 10,
+        },
+        {
+          name: "Pants & Bottoms",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+        {
+          name: "Accessories",
+          description: "",
+          icon_url: "https://resource-server/category-icon/default.png",
+          id: 12,
+        },
+      ],
+    },
+  ];
 
-  const toggleMenu = () => {
-    setIsOpenMenu(!isOpenMenu);
+  const [onSearching, setOnSearching] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
+  const handleSearching = (e) => {
+    e.preventDefault();
+    setOnSearching(true);
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      navigate(`/catalogsearch?q=${searchValue}`);
+    }
+  };
+
+  const handleCloseSearching = () => {
+    setOnSearching(false);
+    setSearchValue("");
   };
   return (
     <div className={style.wrapperNavBar}>
@@ -118,29 +242,94 @@ const NavBar = () => {
           />
         )}
         <Link to={"/"} className={style.homeButton}>
-          <div className={style.logoDesktop}>
-            <img
-              src={process.env.PUBLIC_URL + logoPath}
-              alt="logo"
-              className={style.logoImg}
-            />
-          </div>
-          <div className={style.brandName}>viberstrore</div>
+          <div className={style.logoDesktop}></div>
+          <div className={style.brandName}>strore</div>
         </Link>
-        <div className={style.wrapperMainMenu}>
-          <button className={style.toggleSideBarBtn} onClick={toggleMenu}>
-            <div className={style.wrapperIcon}>
-              <img src={menuIconPath} alt="menu" />
+        <div className={style.wrapperMenu}>
+          <div className={style.mainMenu}>
+            <div className={style.wrapperMenuItem}>
+              <Link
+                className={style.menuItem}
+                to={"/collections?collection=ALL"}
+              >
+                <div className={style.menuItemContent}>
+                  <p>ALL</p>
+                </div>
+              </Link>
             </div>
-            <div className={style.wrapperContent}>Danh mục</div>
-            {isOpenMenu && (
-              <div className={style.warpperMainMenuPopup}>
-                <MainMenu toggleMenu={toggleMenu} categories={[]} />
-                {/* <div className={style.mainMenuOuter}></div> */}
+            <div className={style.wrapperMenuItem}>
+              <Link
+                className={style.menuItem}
+                to={"/collections?collection=NEW ARRIVAL"}
+              >
+                <div className={style.menuItemContent}>
+                  <p>NEW ARRIVAL</p>
+                </div>
+              </Link>
+            </div>
+            {fakeCategory.map((category, index) => (
+              <div key={index} className={style.wrapperMenuItem}>
+                <Link
+                  to={`/catalogsearch?cate=${category.id}`}
+                  className={style.menuItem}
+                >
+                  <div className={style.menuItemContent}>
+                    <p>{category.name.toUpperCase()}</p>
+                    <span className={style.wrapperIcon}>
+                      <svg
+                        width="20px"
+                        height="20px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g id="SVGRepo_bgCarrier" stroke-width="0" />
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <g id="SVGRepo_iconCarrier">
+                          <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M12.7071 14.7071C12.3166 15.0976 11.6834 15.0976 11.2929 14.7071L6.29289 9.70711C5.90237 9.31658 5.90237 8.68342 6.29289 8.29289C6.68342 7.90237 7.31658 7.90237 7.70711 8.29289L12 12.5858L16.2929 8.29289C16.6834 7.90237 17.3166 7.90237 17.7071 8.29289C18.0976 8.68342 18.0976 9.31658 17.7071 9.70711L12.7071 14.7071Z"
+                            fill="#000000"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                  </div>
+                  <div className={style.wrapperSubcategories}>
+                    {category?.subcategories?.map((subcate, index) => (
+                      <div className={style.subcateItem}>
+                        <Link
+                          to={`/catalogsearch?cate=${subcate.id}`}
+                          className={style.subcateItemLink}
+                        >
+                          {subcate.name}
+                        </Link>
+                        <div className={style.subCategoriesLevel2}>
+                          {subcate?.subcategories?.map((subcateLevel2) => (
+                            <div className={style.subcateItem}>
+                              <Link
+                                to={`/catalogsearch?cate=${subcateLevel2.id}`}
+                                className={style.subcateItemLink}
+                              >
+                                {subcateLevel2.name}
+                              </Link>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Link>
               </div>
-            )}
-          </button>
+            ))}
+          </div>
         </div>
+
         <form action="" className={style.headerSearchForm}>
           <div className={style.boxSearch}>
             <button type="submit" className={style.searchBtn}>
@@ -166,8 +355,20 @@ const NavBar = () => {
               placeholder="Bạn cần tìm gì?"
               autoComplete="off"
               className={style.inputSearch}
+              onChange={handleSearching}
+              value={searchValue}
+              onKeyDown={handleSearchSubmit}
+              onFocus={() => {
+                setOnSearching(true);
+              }}
+              onBlur={() => {
+                setTimeout(() => {
+                  handleCloseSearching();
+                }, 200);
+              }}
             />
           </div>
+          {onSearching && <SearchProductBox searchResult={searchResult} />}
         </form>
         {headerItemData.map((data, index) => (
           <Link key={index} to={data.to} className={style.headerItem}>
@@ -186,7 +387,6 @@ const NavBar = () => {
               />
             </div>
             <div className={style.headerItemContent}>
-              {" "}
               {data.text.length < 2 ? (
                 data.text[0]
               ) : (
@@ -301,8 +501,6 @@ const NavBar = () => {
               </li>
             </div>
           )}
-          {/* <img src={memberIconPath} alt="" />
-            <div className={style.loginBtnContent}>Đăng nhập</div> */}
           {isUserLogin ? (
             <svg
               width="44"

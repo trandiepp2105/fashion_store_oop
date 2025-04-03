@@ -203,9 +203,8 @@ const HomePage = ({
         </div> */}
         <div className="block-featured-product">
           <div className="product-list-title">
-            <Link to="/" className="title-link">
-              NEW ARRIVAL
-            </Link>
+            <div className="title-link">NEW ARRIVAL</div>
+            <p>Some description for this category</p>
           </div>
           <HorizontalScrollBar similarProducts={newArrivalProducts} />
         </div>

@@ -63,8 +63,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # --- Add Routers ---
-app.include_router(api_v1_router)
+app.include_router(api_v1_router) 
 
 # --- Application Entry Point ---
 if __name__ == "__main__":

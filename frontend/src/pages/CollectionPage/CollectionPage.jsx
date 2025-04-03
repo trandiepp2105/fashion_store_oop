@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import "./CatalogSearchPage.scss";
+import "./CollectionPage.scss";
 import { Link } from "react-router-dom";
 import ProductContainer from "../../components/ProductContainer/ProductContainer";
 import productService from "../../services/productService";
-const CatalogSearchPage = () => {
+const CollectionPage = () => {
   const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [category, setCategory] = useState("");
+  const [collection, setCollection] = useState("");
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const searchQueryParam = queryParams.get("q");
-    const categoryParam = queryParams.get("cate");
+    const collectionParam = queryParams.get("collection");
 
-    setSearchQuery(searchQueryParam);
-    setCategory(categoryParam);
-    console.log("searchQuery", searchQuery);
-    console.log("category", category);
+    setCollection(collectionParam);
+    console.log("collection", collection);
     // Logic xử lý khi query param thay đổi
   }, [location]); // Dependency là location
 
@@ -109,28 +105,12 @@ const CatalogSearchPage = () => {
         <Link className="navigator-item" to="/">
           Trang chủ
         </Link>
-        {searchQuery ? (
-          <div className="navigator-item">Search</div>
+        {collection ? (
+          <div className="navigator-item">{collection}</div>
         ) : (
-          <>
-            <Link className="navigator-item" to="/catalog">
-              Danh mục
-            </Link>
-            <Link className="navigator-item" to="/catalog/search">
-              T-Shirts
-            </Link>
-          </>
+          <></>
         )}
       </div>
-      {searchQuery && (
-        <div className="search-description">
-          <h1>Tìm kiếm</h1>
-          <p className="subtxt">Có 10 sản phẩm được tìm thấy</p>
-          <p className="subtxt-result">
-            Kết quả tìm kiếm cho <strong>{`"${searchQuery}"`}</strong>
-          </p>
-        </div>
-      )}
       <div className="filter-bar">
         <div className="wrapper-filter-box">
           <button className="toggle-filter-btn">
@@ -192,9 +172,9 @@ const CatalogSearchPage = () => {
             <span>Filter</span>
           </button>
         </div>
-        {category && (
+        {collection && (
           <div className="title">
-            <p>T-Shirts</p>
+            <p>{collection}</p>
           </div>
         )}
         <div className="wrapper-order-box">
@@ -251,4 +231,4 @@ const CatalogSearchPage = () => {
   );
 };
 
-export default CatalogSearchPage;
+export default CollectionPage;

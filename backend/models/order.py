@@ -107,7 +107,7 @@ class OrderItem(Base):
 class OrderCoupon(Base):
     __tablename__ = "ordercoupon"
     __table_args__ = {"extend_existing": True}
-       # id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     coupon_id = Column(Integer, ForeignKey("coupon.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     

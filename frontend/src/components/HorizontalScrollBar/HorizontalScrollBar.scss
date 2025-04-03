@@ -8,18 +8,18 @@
     top: 50%;
     left: -10px;
     transform: translateY(-50%);
-    svg {
-      width: 30px;
-    }
+    // svg {
+    //   width: 30px;
+    // }
   }
   .next-product {
     position: absolute;
     top: 50%;
-    right: -15px;
-    transform: translateY(-50%);
-    svg {
-      width: 30px;
-    }
+    right: -10px;
+    transform: translateY(-50%) rotate(180deg);
+    // svg {
+    //   width: 30px;
+    // }
   }
 
   .prev-product,

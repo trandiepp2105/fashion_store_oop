@@ -11,7 +11,7 @@ import { AppContext } from "../../App";
 const SignUpPage = () => {
   const navigate = useNavigate();
   const { onLoading, setOnLoading } = useContext(AppContext);
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [otpTitle, setOtpTitle] = useState(
     "Please check your email and enter the 6-degit OTP code below"
   );
@@ -172,7 +172,9 @@ const SignUpPage = () => {
       {/* <img src="/assets/images/orange-bg.png" alt="" className="overlay" /> */}
       {step === 1 && (
         <div className="sign-up-layout">
-          <div className="sign-up-image"></div>
+          <div className="sign-up-image">
+            <img src="/assets/images/signup-bg.jpg" alt="" />
+          </div>
           <form className="sign-up-form">
             <p className="sign-up-title">Create an account</p>
             <p className="login-link">
