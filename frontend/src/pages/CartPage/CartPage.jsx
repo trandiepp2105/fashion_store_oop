@@ -275,6 +275,20 @@ const CartPage = () => {
 
   return (
     <div className="page cart-page">
+      <div className="navigator">
+        <Link className="navigator-item" to="/">
+          Trang chủ
+        </Link>
+        <Link className="navigator-item" to="/catalog">
+          Giỏ hàng
+        </Link>
+      </div>
+      <div className="search-description">
+        <h1>Giỏ hàng của bạn</h1>
+        <p className="subtxt">
+          Có <strong>0 sản phẩm</strong> trong giỏ hàng của bạn
+        </p>
+      </div>
       {onAskingRemoveItem && (
         <AcceptancePopup
           handleClose={() => {
@@ -410,7 +424,7 @@ const CartPage = () => {
         </div>
       )}
 
-      {orderStep === 1 && shoppingCart?.items?.length === 0 && (
+      {orderStep === 1 && (!shoppingCart || shoppingCart.length === 0) && (
         <div className="empty-cart-page">
           <div className="empty-cart-container">
             <div className="left-side">
@@ -424,11 +438,6 @@ const CartPage = () => {
             </div>
             <div className="right-side">
               <img src="/assets/images/empty_cart.png" alt="" />
-            </div>
-          </div>
-          <div className="suggested-products">
-            <div className="hot-sale">
-              <HotSaleDisplay hotSaleProducts={hotSaleProducts} />
             </div>
           </div>
         </div>

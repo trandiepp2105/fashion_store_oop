@@ -14,9 +14,39 @@ import cartSurvice from "../../services/cartSurvice";
 import addTemporaryComponent from "../../utils/renderAlertPopup";
 
 import { Link } from "react-router-dom";
+import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
 const ProductDetailPage = () => {
+  const location = useLocation();
+  const { setOnLoading, isUserLogin } = useContext(AppContext);
+  const [product, setProduct] = useState({});
+  const [showAddToCartModal, setShowAddToCartModal] = useState(false);
+
+  // setOnLoading(true);
+  const [isOpenModalLogin, setIsOpenModalLogin] = useState(false);
+
+  const handleToggleModalLogin = () => {
+    setIsOpenModalLogin(!isOpenModalLogin);
+  };
+
+  const handleAddToCart = async () => {
+    if (!isUserLogin) {
+      handleToggleModalLogin();
+      return;
+    }
+    setOnLoading(true);
+  };
+
+  const [quantity, setQuantity] = useState(1);
+  const handleIncreaseQuantity = () => {
+    setQuantity((prevQuantity) => prevQuantity + 1);
+  };
+  const handleDecreaseQuantity = () => {
+    setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 1));
+  };
   return (
     <div className="page product-detail-page">
+      {showAddToCartModal && <AddToCartModal />}
+      {isOpenModalLogin && <ModalLogin handleClose={handleToggleModalLogin} />}
       <div className="navigator">
         <Link className="navigator-item" to="/">
           Trang chủ
@@ -80,21 +110,22 @@ const ProductDetailPage = () => {
               <input
                 type="button"
                 value="-"
-                onclick="minusQuantity()"
+                onClick={handleDecreaseQuantity}
                 className="qty-btn btn-left-quantity"
               />
               <input
                 type="text"
                 id="quantity"
                 name="quantity"
-                value="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
                 min="1"
                 className="quantity-selector"
               />
               <input
                 type="button"
                 value="+"
-                onclick="plusQuantity()"
+                onClick={handleIncreaseQuantity}
                 className="qty-btn btn-right-quantity"
               />
             </div>
@@ -104,6 +135,7 @@ const ProductDetailPage = () => {
                 id="add-to-cart"
                 className="btn-addtocart"
                 name="add"
+                onClick={handleAddToCart}
               >
                 Thêm vào giỏ
               </button>

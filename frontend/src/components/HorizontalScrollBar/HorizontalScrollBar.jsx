@@ -197,44 +197,104 @@ const HorizontalScrollBar = ({ similarProducts }) => {
     <div className="horizontal-scroll-bar">
       <span className="prev-product" onClick={goToPrevProduct}>
         <svg
-          width="49"
-          height="95"
-          viewBox="0 0 49 95"
-          fill="none"
+          fill="#000000"
+          width="40px"
+          height="40px"
+          viewBox="0 0 24 24"
+          id="left-circle-2"
+          data-name="Flat Line"
           xmlns="http://www.w3.org/2000/svg"
+          className="icon flat-line"
         >
-          <path
-            d="M48.5 47.5C48.5 73.7335 27.2335 95 1 95L1.00002 47.5L1 0C27.2335 0 48.5 21.2665 48.5 47.5Z"
-            fill="#D9D9D9"
+          <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+          <g
+            id="SVGRepo_tracerCarrier"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          <path
-            d="M26.0156 33.0469L11.5625 47.5L26.0156 61.9531"
-            stroke="black"
-            stroke-width="4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+          <g id="SVGRepo_iconCarrier">
+            <circle
+              id="secondary"
+              cx="12"
+              cy="12"
+              r="9"
+              style={{ fill: "#2ca9bc", strokeWidth: 2 }}
+            />
+            <polyline
+              id="primary"
+              points="10.5 14.5 8 12 10.5 9.5"
+              style={{
+                fill: "none",
+                stroke: "#000000",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+              }}
+            />
+            <path
+              id="primary-2"
+              data-name="primary"
+              d="M16,12H8M3,12a9,9,0,1,0,9-9A9,9,0,0,0,3,12Z"
+              style={{
+                fill: "none",
+                stroke: "#000000",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+              }}
+            />
+          </g>
         </svg>
       </span>
       <span className="next-product" onClick={goToNextProduct}>
         <svg
-          width="48"
-          height="95"
-          viewBox="0 0 48 95"
-          fill="none"
+          fill="#000000"
+          width="40px"
+          height="40px"
+          viewBox="0 0 24 24"
+          id="left-circle-2"
+          data-name="Flat Line"
           xmlns="http://www.w3.org/2000/svg"
+          className="icon flat-line"
         >
-          <path
-            d="M0.5 47.5C0.5 73.7335 21.7665 95 48 95L48 47.5L48 0C21.7665 0 0.5 21.2665 0.5 47.5Z"
-            fill="#D9D9D9"
+          <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+          <g
+            id="SVGRepo_tracerCarrier"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          <path
-            d="M21.9844 33.0469L36.4375 47.5L21.9844 61.9531"
-            stroke="black"
-            stroke-width="4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+          <g id="SVGRepo_iconCarrier">
+            <circle
+              id="secondary"
+              cx="12"
+              cy="12"
+              r="9"
+              style={{ fill: "#2ca9bc", strokeWidth: 2 }}
+            />
+            <polyline
+              id="primary"
+              points="10.5 14.5 8 12 10.5 9.5"
+              style={{
+                fill: "none",
+                stroke: "#000000",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+              }}
+            />
+            <path
+              id="primary-2"
+              data-name="primary"
+              d="M16,12H8M3,12a9,9,0,1,0,9-9A9,9,0,0,0,3,12Z"
+              style={{
+                fill: "none",
+                stroke: "#000000",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+              }}
+            />
+          </g>
         </svg>
       </span>
       <div

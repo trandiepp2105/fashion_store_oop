@@ -80,6 +80,8 @@
     .headerSearchForm {
       display: flex;
       justify-content: center;
+
+      position: relative;
     }
     .wrapperMenu {
       box-sizing: border-box;
@@ -183,10 +185,10 @@
     }
     .boxSearch {
       background-color: #fff;
-      border-radius: 20px;
+      border-radius: 10px;
       display: flex;
-      width: 270px;
-      margin-right: 10px;
+      width: 320px;
+      // margin-right: 10px;
 
       .searchBtn {
         background-color: #fff;

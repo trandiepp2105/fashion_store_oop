@@ -1,0 +1,17 @@
+client --- server
+
+client (request - lấy toàn bộ sản phẩm) --> server (query(product) ) 
+                         data           <--                  
+
+http methods: post, get, delete, patch, put
+
+post -> create
+get  -> get general - get detail
+delete -> delete
+patch -> update info (user(name, age, address) ) -> age 
+put -> update all info user(name = a, age = 18, address="ss") -> user(name="new name", age=18, address="ss")
+
+https://server
+https://server/products/
+https://server/categories/
+https://server/carts/

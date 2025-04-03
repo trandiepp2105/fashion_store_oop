@@ -23,6 +23,8 @@ import isLogin from "./utils/checkLoginStatus";
 import cartSurvice from "./services/cartSurvice";
 import WaitingOverlay from "./components/WaitingOverlay/WaitingOverlay";
 import WarningPopup from "./components/WarningPopup/WarningPopup";
+import AccountPage from "./pages/AccountPage/AccountPage";
+import CollectionPage from "./pages/CollectionPage/CollectionPage";
 export const AppContext = createContext();
 
 function App() {
@@ -154,6 +156,8 @@ function App() {
 
             <Route path="/cart" element={<CartPage />} />
             <Route path="/order" element={<OrderPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/collections" element={<CollectionPage />} />
           </Routes>
         </div>
         {!isHideHeaderFooter && (

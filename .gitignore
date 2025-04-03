@@ -4,9 +4,9 @@ node_modules
 *.pnp
 *.pnp.js
 
-# Ignore all files
-*
+# # Ignore all files
+# *
 
-# Track only .py files
-!*.py
+# # Track only .py files
+# !*.py
 
