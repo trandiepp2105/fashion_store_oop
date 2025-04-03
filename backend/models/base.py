@@ -1,10 +1,10 @@
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
-from sqlalchemy.sql.functions import current_timestamp
 from database.metadata import database_metadata
 
 class Base(DeclarativeBase):
     metadata = database_metadata
+<<<<<<< HEAD
     
     @classmethod
     def get_all(cls, session: Session):
@@ -16,6 +16,8 @@ class BaseModel:
     created_at = Column(DateTime, default=current_timestamp)
     updated_at = Column(DateTime, default=current_timestamp, onupdate=current_timestamp)
 
+=======
+>>>>>>> 0ea4a6b1b4a7b0cd42303119080f5f1105ae142a
     def save(self, session: Session):
         session.add(self)
         session.commit()
@@ -62,3 +64,10 @@ class BaseModel:
         session.add(instance)
         session.commit()
         return instance
+
+class BaseModel:
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp(), nullable=False)
+
