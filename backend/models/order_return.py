@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, DECIMAL, DateTime, Text, ForeignKey, Enu
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import current_timestamp
 
-class OrderReturn(Base, BaseModel):
+class OrderReturn(Base):
     __tablename__ = "orderreturn"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True, nullable=False)
@@ -71,7 +71,7 @@ class OrderReturn(Base, BaseModel):
         return self.to_dict
 
 # models/order_item_return.py
-class OrderItemReturn(Base, BaseModel):
+class OrderItemReturn(Base):
     __tablename__ = "orderitemreturn"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)

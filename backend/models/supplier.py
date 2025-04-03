@@ -17,14 +17,14 @@ class Supplier(Base, BaseModel):
     started_at = Column(DateTime, nullable=False)
 
     @classmethod
-    def filter_by_name(cls, session: Session, name: str):
+    def filter_by_name(cls, session, name: str):
         return session.query(cls).filter(cls.company_name.ilike(f"%{name}%")).all()
     
     
     @classmethod
-    def filter_by_status(cls, session: Session, status: SupplierStatus):
+    def filter_by_status(cls, session, status: SupplierStatus):
         return session.query(cls).filter_by(status=status).all()
 
     @classmethod
-    def filter_by_email(cls, session: Session, email: str):
+    def filter_by_email(cls, session, email: str):
         return session.query(cls).filter_by(email=email).first()

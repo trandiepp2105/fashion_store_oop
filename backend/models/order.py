@@ -74,7 +74,6 @@ class OrderItem(Base):
     variant_id = Column(Integer, ForeignKey("variant.id", ondelete="SET NULL"), nullable=True)
     product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
     quantity = Column(Integer, nullable=False)
-    
 
     def update_quantity(self, session, new_quantity):
         """Update the quantity of products in the order."""

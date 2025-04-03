@@ -11,10 +11,10 @@ class User(Base, BaseModel):
     password = Column(String(255), nullable=False)
     phone_number = Column(String(20), unique=True)
     active = Column(Boolean, default=True)
-    role = Column(String(50), default="customer")
+    #role = Column(String(50), default="customer")
 
-    shipping_infos = relationship("ShippingInfo", back_populates="user", cascade="all, delete-orphan")
-    user_roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
+    #shipping_infos = relationship("ShippingInfo", back_populates="user", cascade="all, delete-orphan")
+    #user_roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(email={self.email}, active={self.active})>"
@@ -28,15 +28,15 @@ class User(Base, BaseModel):
         return [order.get_info() for order in self.orders]
     
     def add_shipping_info(self, session, **kwargs):
-    """ Check if that address is default (is_default=True),
+        """ Check if that address is default (is_default=True),
         then other addresses should be converted to False"""
-    if kwargs.get("is_default", False):
-        for info in self.shipping_infos:
-            info.is_default = False
-    """Add a new shipping address."""
-    new_shipping_info = ShippingInfo(user_id=self.id, **kwargs)
-    session.add(new_shipping_info)
-    session.commit()
+        if kwargs.get("is_default", False):
+            for info in self.shipping_infos:
+                info.is_default = False
+        """Add a new shipping address."""
+        new_shipping_info = ShippingInfo(user_id=self.id, **kwargs)
+        session.add(new_shipping_info)
+        session.commit()
     
     def set_password(self, password):
         """Hash and set the user's password."""

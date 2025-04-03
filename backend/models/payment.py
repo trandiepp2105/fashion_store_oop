@@ -5,7 +5,7 @@ from enums.payment_method import PaymentMethod
 from enums.payment_status import PaymentStatus
 from datetime import datetime
 
-class Payment(Base, BaseModel):
+class Payment(Base):
     __tablename__ = "payment"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
