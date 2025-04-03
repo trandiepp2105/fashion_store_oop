@@ -4,20 +4,6 @@ from database.metadata import database_metadata
 
 class Base(DeclarativeBase):
     metadata = database_metadata
-<<<<<<< HEAD
-    
-    @classmethod
-    def get_all(cls, session: Session):
-        return session.query(cls).all()
-
-class BaseModel:
-    __table_args__ = {"extend_existing": True}
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=current_timestamp)
-    updated_at = Column(DateTime, default=current_timestamp, onupdate=current_timestamp)
-
-=======
->>>>>>> 0ea4a6b1b4a7b0cd42303119080f5f1105ae142a
     def save(self, session: Session):
         session.add(self)
         session.commit()

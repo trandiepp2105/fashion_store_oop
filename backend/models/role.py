@@ -18,11 +18,6 @@ class Role(Base):
     def get_role_by_name(cls, session, name):
         """Retrieve a role by name."""
         return session.query(cls).filter(cls.name == name).first()
-    
-    @classmethod
-    def get_all_roles(cls, session):
-        """Retrieve all roles."""
-        return session.query(cls).all()
 
 class UserRole(Base):
     __tablename__ = "userrole"
