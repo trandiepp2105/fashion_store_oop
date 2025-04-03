@@ -1,9 +1,21 @@
 from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
 from database.metadata import database_metadata
+from sqlalchemy.sql.functions import current_timestamp
 
 class Base(DeclarativeBase):
     metadata = database_metadata
+    
+    @classmethod
+    def get_all(cls, session: Session):
+        return session.query(cls).all()
+
+class BaseModel:
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=current_timestamp)
+    updated_at = Column(DateTime, default=current_timestamp, onupdate=current_timestamp)
+    
     def save(self, session: Session):
         session.add(self)
         session.commit()
