@@ -1,3 +1,4 @@
+# schemas/role.py
 from pydantic import BaseModel
 from typing import Optional
 from enums.role import Role

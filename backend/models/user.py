@@ -11,7 +11,7 @@ class User(Base, BaseModel):
     password = Column(String(255), nullable=False)
     phone_number = Column(String(20), unique=True)
     active = Column(Boolean, default=True)
-    role = Column(String(50), default="customer")
+    #role = Column(String(50), default="customer")
 
     #shipping_infos = relationship("ShippingInfo", back_populates="user", cascade="all, delete-orphan")
     #user_roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
