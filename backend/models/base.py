@@ -1,10 +1,15 @@
 from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.orm import declarative_base, Session, DeclarativeBase
 from database.metadata import database_metadata
-
+from sqlalchemy.sql.functions import current_timestamp
 
 class Base(DeclarativeBase):
     metadata = database_metadata
+    
+    @classmethod
+    def get_all(cls, session: Session):
+        return session.query(cls).all()
+    
     def save(self, session: Session):
         session.add(self)
         session.commit()
