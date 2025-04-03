@@ -63,7 +63,15 @@ const LoginPage = () => {
     }
   };
   return (
-    <div className="page login-page">
+    <div
+      className="page login-page"
+      // style={{
+      //   backgroundImage: `url('/assets/images/login-bg.jpg')`,
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center",
+      //   backgroundRepeat: "no-repeat",
+      // }}
+    >
       {loading && <WaitingOverlay />}
       <div className="login-layout">
         <form className="login-form">

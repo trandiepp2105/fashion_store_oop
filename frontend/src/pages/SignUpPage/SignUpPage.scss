@@ -129,7 +129,7 @@
   // background-image: url("/assets/images/orange-bg.png");
   .sign-up-layout {
     aspect-ratio: 1325 / 849 !important;
-    background-color: #ffc8bd;
+    background-color: #fdefe8;
     border-radius: 15px;
     display: flex;
     padding: 15px;
@@ -141,8 +141,14 @@
       height: 100%;
       //   aspect-ratio: 624 / 800;
       width: 45%;
-      background-color: red;
       border-radius: 15px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+      }
     }
 
     .sign-up-form {
