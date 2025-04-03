@@ -1,6 +1,7 @@
 # schemas/category.py
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
+from fastapi import UploadFile
 
 class CategoryBase(BaseModel):
     """Schema cơ bản, bao gồm các trường có thể có khi tạo/cập nhật."""
@@ -15,7 +16,7 @@ class CategorySchema(CategoryBase):
 
     # Cấu hình để Pydantic đọc dữ liệu từ ORM model
     # Pydantic V2:
-    model_config = ConfigDict(from_attributes=True)
+    # model_config = ConfigDict(from_attributes=True)
 
     # Pydantic V1:
     # class Config:
