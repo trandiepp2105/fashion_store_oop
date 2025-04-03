@@ -6,7 +6,7 @@ from enums.order_status import OrderStatus
 
 class Order(Base, BaseModel):
     __tablename__ = "orders"
-
+    
     user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
     shipping_info_id = Column(Integer, ForeignKey("shippinginfo.id", ondelete="SET NULL"), nullable=False)
     total_amount = Column(Integer, nullable=False)
@@ -66,7 +66,7 @@ class Order(Base, BaseModel):
         """Convert objects to dictionaries."""
         return self.to_dict
 
-class OrderItem(Base, BaseModel):
+class OrderItem(Base):
     __tablename__ = "orderitem"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
@@ -105,7 +105,7 @@ class OrderItem(Base, BaseModel):
         """Convert objects to dictionaries."""
         return self.to_dict
     
-class OrderCoupon(Base, BaseModel):
+class OrderCoupon(Base):
     __tablename__ = "ordercoupon"
     __table_args__ = {"extend_existing": True}
     # id = Column(Integer, primary_key=True, index=True)
