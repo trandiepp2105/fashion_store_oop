@@ -10,7 +10,6 @@ class Role(Base):
     name = Column(Enum(Role), nullable=False)
     description = Column(Text)
 
-    
     def __repr__(self):
         return f"<Role(name={self.name})>"
     

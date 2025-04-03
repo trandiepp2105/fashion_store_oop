@@ -108,9 +108,9 @@ class OrderItem(Base, BaseModel):
 class OrderCoupon(Base, BaseModel):
     __tablename__ = "ordercoupon"
     __table_args__ = {"extend_existing": True}
-    id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
-    coupon_id = Column(Integer, ForeignKey("coupon.id", ondelete="CASCADE"), nullable=False)
+    # id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    coupon_id = Column(Integer, ForeignKey("coupon.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     
     def apply_coupon(self, session):
         """Apply discount code to order."""
