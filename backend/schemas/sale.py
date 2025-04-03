@@ -8,18 +8,19 @@ class SaleCreate(BaseModel):
     description: Optional[str] = None
     type: SaleType
     value: Optional[int] = None
-    start_date: str 
-    end_date: str  
-
-    @field_validator("start_date", "end_date", mode="before")
-    @classmethod
-    def to_datetime(cls, value: str) -> datetime:
-        try:
-            return datetime.fromisoformat(value)  
-        except ValueError:
-            raise ValueError
+    start_date: datetime 
+    end_date: datetime  
 
 class SaleResponse(SaleCreate):
     id: int
     is_active: bool
+
+class SaleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    type: Optional[SaleType] = None
+    value: Optional[int] = None
+    start_date: Optional[datetime] = None 
+    end_date: Optional[datetime] = None  
+    is_active: Optional[bool] = None
 

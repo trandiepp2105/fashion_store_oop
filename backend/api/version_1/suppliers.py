@@ -6,7 +6,7 @@ from fastapi import Request
 # Import necessary components
 from database.session import get_db
 from models.supplier import Supplier
-from schemas.supplier import SupplierCreate, SupplierResponse
+from schemas.supplier import SupplierCreate, SupplierResponse, SupplierUpdate
 import os
 import shutil
 import logging
@@ -67,3 +67,34 @@ async def create_supplier(
     except Exception as e:
         logger.error(f"Error creating sale: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error while creating product: {e}")
+    
+@router.get("/{supplier_id}", response_model=SupplierResponse, summary="Retrieve a supplier by ID")
+def get_supplier(supplier_id: int, session: Session = Depends(get_db)):
+    supplier = session.query(Supplier).filter(Supplier.id == supplier_id).first()
+    if not supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    return supplier
+
+@router.patch("/{supplier_id}", response_model=SupplierResponse, summary="Update a supplier by ID")
+def update_supplier(supplier_id: int, supplier_data: SupplierUpdate, session: Session = Depends(get_db)):
+    supplier = session.query(Supplier).filter(Supplier.id == supplier_id).first()
+    if not supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    
+    update_data = supplier_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(supplier, key, value)
+    
+    session.commit()
+    session.refresh(supplier)
+    return supplier
+
+@router.delete("/{supplier_id}", summary="Delete a supplier by ID")
+def delete_supplier(supplier_id: int, session: Session = Depends(get_db)):
+    supplier = session.query(Supplier).filter(Supplier.id == supplier_id).first()
+    if not supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    
+    session.delete(supplier)
+    session.commit()
+    return {"detail": "Supplier deleted successfully"}

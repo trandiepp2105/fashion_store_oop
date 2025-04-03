@@ -12,7 +12,7 @@ class Product(Base, BaseModel):
     description = Column(Text)
     original_price = Column(Integer, nullable=False)
     selling_price = Column(Integer, nullable=False)
-    total_ratings = Column(Integer, default=0)
+    total_rating = Column(Integer, default=0)
     rating_sum = Column(Integer, default=0)
     image_url = Column(String(255), nullable=True)
 

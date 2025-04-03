@@ -33,3 +33,23 @@ def get_all_returns(
         # Log the error and raise an HTTP exception
         print(f"Error fetching orders_reuturn: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while querying categories.")
+    
+@router.post(
+    "/",
+    response_model=OrderReturnSchema,
+    summary="Create a new order return",
+    description="This API endpoint allows creating a new order return."
+)
+def create_order_return(
+    order_return_data: OrderReturnSchema,
+    db: Session = Depends(get_db)
+):
+    """
+    Endpoint to create a new order return.
+    """
+    try:
+        new_order_return = OrderReturn.create(db, order_return_data)
+        return new_order_return
+    except Exception as e:
+        print(f"Error creating order return: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while creating order return.")

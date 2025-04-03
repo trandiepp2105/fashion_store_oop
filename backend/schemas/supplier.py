@@ -16,3 +16,14 @@ class SupplierCreate(BaseModel):
 
 class SupplierResponse(SupplierCreate):
     id: int
+
+class SupplierUpdate(BaseModel):
+    company_name: Optional[str] = None
+    contact_person: Optional[str] = None
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
+    tax_id: Optional[str] = None
+    website: Optional[str] = None
+    status: Optional[SupplierStatus] = None
+    started_at: Optional[datetime] = None
