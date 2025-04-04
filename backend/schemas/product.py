@@ -10,9 +10,15 @@ class ProductCreate(BaseModel):
     rating_sum: Optional[int] = 0
     image_url: str            
 
-class ProductResponse(ProductCreate):
+class ProductResponse(BaseModel):
     id: int
-    supplier_id: Optional[int] = None
+    name: str
+    selling_price: int
+    image_url: Optional[str] = None
+    rating: Optional[float] = None
+    discount_price: Optional[float] = None
+    stock: int
+    supplier: Optional[dict] = None
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None

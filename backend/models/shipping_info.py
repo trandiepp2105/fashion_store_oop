@@ -14,23 +14,24 @@ class ShippingInfo(Base):
     ward_commune = Column(String(255), nullable=False)
     specific_address = Column(Text, nullable=False)
 
-    user = relationship("User", back_populates="shipping_infos")
+    # user = relationship("User", back_populates="shipping_infos")
     
-    def get_shipping_info(self):
-        """Retrieve shipping information details."""
-        return {
-            "recipient_name": self.recipient_name,
-            "phone_number": self.phone_number,
-            "province_city": self.province_city,
-            "district": self.district,
-            "ward_commune": self.ward_commune,
-            "specific_address": self.specific_address,
-            "is_default": self.is_default
-        }
+    # def get_shipping_info(self):
+    #     """Retrieve shipping information details."""
+    #     return {
+    #         "recipient_name": self.recipient_name,
+    #         "phone_number": self.phone_number,
+    #         "province_city": self.province_city,
+    #         "district": self.district,
+    #         "ward_commune": self.ward_commune,
+    #         "specific_address": self.specific_address,
+    #         "is_default": self.is_default
+    #     }
     
     def set_default(self, session):
         """Set this shipping information as the default one."""
-        for info in self.user.shipping_infos:
+        shipping_infos = session.query(ShippingInfo).filter_by(user_id=self.user_id).all()
+        for info in shipping_infos:
             info.is_default = False
         self.is_default = True
         session.commit()

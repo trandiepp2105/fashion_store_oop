@@ -97,13 +97,13 @@ const NavBar = () => {
           id: 10,
           subcategories: [
             {
-              name: "Tops & Shirts",
+              name: "T-Shirts",
               description: "Men Fashion",
               icon_url: "https://resource-server/category-icon/default.png",
               id: 10,
             },
             {
-              name: "Pants & Bottoms",
+              name: "Shirts",
               description: "",
               icon_url: "https://resource-server/category-icon/default.png",
               id: 12,

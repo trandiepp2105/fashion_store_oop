@@ -130,3 +130,17 @@ class Category(Base, BaseModel):
         """
         return session.query(Category).filter(Category.parent_id == self.id).all()
     
+    def to_nested_dict(self, session):
+        """
+        Convert the category and its subcategories into a nested dictionary.
+        """
+        subcategories = getattr(self, "subcategories", [])
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "parent_id": self.parent_id,
+            "icon_url": self.icon_url,
+            "subcategories": [subcategory.to_nested_dict(session) for subcategory in subcategories]
+        }
+

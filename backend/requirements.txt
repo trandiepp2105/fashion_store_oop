@@ -5,3 +5,4 @@ uvicorn[standard]
 sqlalchemy==2.0.39
 alembic==1.15.1
 mysql-connector-python
+werkzeug

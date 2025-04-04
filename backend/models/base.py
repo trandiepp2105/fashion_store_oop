@@ -35,7 +35,7 @@ class Base(DeclarativeBase):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
     @classmethod
-    def get_by_id(cls, session: Session, record_id):
+    def get_by_id(cls, session: Session, record_id: int):
         return session.query(cls).filter_by(id=record_id).first()
     
     @classmethod

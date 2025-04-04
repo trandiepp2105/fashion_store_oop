@@ -3,6 +3,8 @@ from sqlalchemy import Column, String, Text, Integer, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from sqlalchemy.sql.functions import current_timestamp
+from models.sale import Sale, SaleProduct
+from enums.sale_type import SaleType
 class Product(Base, BaseModel):
     __tablename__ = "product"
 
@@ -21,8 +23,8 @@ class Product(Base, BaseModel):
 
     #Tính đánh giá trung bình
     def get_average_rating(self):
-        if self.total_ratings > 0:
-            return self.rating_sum / self.total_ratings
+        if self.total_rating > 0:
+            return self.rating_sum / self.total_rating
         return None
     
     @classmethod
@@ -36,6 +38,58 @@ class Product(Base, BaseModel):
     @classmethod
     def filter_by_price(cls, session, min_price=0, max_price=float("inf")):
         return session.query(cls).filter(cls.selling_price.between(min_price, max_price)).all()
+
+    @classmethod
+    def filter_by_category(cls, session, category_id):
+        return session.query(cls).join(ProductCategory).filter(ProductCategory.category_id == category_id).all()
+
+    @classmethod
+    def filter_by_stock(cls, session, min_stock=0, max_stock=float("inf")):
+        from sqlalchemy.sql import func
+        stock_subquery = (
+            session.query(ProductVariant.product_id, func.sum(ProductVariant.stock_quantity).label("total_stock"))
+            .group_by(ProductVariant.product_id)
+            .subquery()
+        )
+        return (
+            session.query(cls)
+            .join(stock_subquery, cls.id == stock_subquery.c.product_id)
+            .filter(stock_subquery.c.total_stock.between(min_stock, max_stock))
+            .all()
+        )
+
+    @classmethod
+    def get_variants(cls, session, product_id):
+        return session.query(ProductVariant).filter_by(product_id=product_id).all()
+
+    def get_total_stock(self, session):
+        from sqlalchemy.sql import func
+        stock_subquery = (
+            session.query(func.sum(ProductVariant.stock_quantity).label("total_stock"))
+            .filter(ProductVariant.product_id == self.id)
+            .scalar()
+        )
+        return stock_subquery or 0
+
+    def get_discount_price(self, session):
+
+        sale_product = session.query(SaleProduct).join(Sale).filter(
+            SaleProduct.product_id == self.id,
+            Sale.type == SaleType.PERCENTAGE,
+            Sale.start_date <= datetime.now(),
+            Sale.end_date >= datetime.now()
+        ).first()
+
+        if sale_product:
+            sale = session.query(Sale).filter(Sale.id == sale_product.sale_id).first()
+            if sale:
+                discount = (self.selling_price * sale.value) / 100
+                return max(0, self.selling_price - discount)
+        return self.selling_price
+
+    def get_supplier(self, session):
+        from models.supplier import Supplier
+        return session.query(Supplier).filter(Supplier.id == self.supplier_id).first()
 
 class ProductRaing(Base):
     __tablename__ = "productrating"
@@ -63,7 +117,7 @@ class ProductVariant(Base):
         return session.query(cls).filter(cls.stock_quantity.between(min_stock, max_stock)).all()
 
 class ProductCategory(Base):
-    __tablename__ = "product_categories"
+    __tablename__ = "productcategory"
     __table_args__ = {"extend_existing": True}
     product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False, primary_key=True)
     category_id = Column(Integer, ForeignKey("category.id", ondelete="CASCADE"), nullable=False, primary_key=True)

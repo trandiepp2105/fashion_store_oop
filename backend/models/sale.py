@@ -23,8 +23,6 @@ class Sale(Base, BaseModel):
     def filter_by_type(cls, session, sale_type):
         return session.query(cls).filter(cls.type == sale_type).all()
 
-
-
 class SaleProduct(Base):
     __tablename__ = "saleproduct"
     __table_args__ = {"extend_existing": True}
@@ -47,7 +45,6 @@ class SaleProduct(Base):
         session.add(sale_product)
         session.commit()
         return sale_product
-
 
 class SaleCategory(Base):
     __tablename__ = "salecategory"
@@ -73,7 +70,6 @@ class SaleCategory(Base):
         session.commit()
         return sale_category
 
-
 class Coupon(Base, BaseModel):
     __tablename__ = "coupon"
     
@@ -96,7 +92,7 @@ class Coupon(Base, BaseModel):
     def filter_by_type(cls, session, coupon_type):
         return session.query(cls).filter(cls.type == coupon_type).all()
     
-    def is_valid(self, order_value, usage_count):
+    def is_valid(self, order_value):
         #Kiểm tra còn hiệu lực
         if not self.is_active():
             return False
@@ -105,9 +101,6 @@ class Coupon(Base, BaseModel):
         if order_value < self.min_order_value:
             return False
         
-        #Kiểm tra số lần sử dụng
-        if self.usage_limit is not None and usage_count >= self.usage_limit:
-            return False
         return True
 
 

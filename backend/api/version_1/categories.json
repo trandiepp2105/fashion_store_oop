@@ -1,0 +1,804 @@
+[
+  {
+    "id": 1,
+    "name": "Men",
+    "description": "Men Fashion",
+    "parent_id": null,
+    "icon_url": "https://resource-server/category-icon/default.png",
+    "subcategories": [
+      {
+        "id": 2,
+        "name": "Tops & Shirts",
+        "description": "Men Tops and Shirts",
+        "parent_id": 1,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 6,
+            "name": "T-Shirts",
+            "description": "Men Casual T-Shirts",
+            "parent_id": 2,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 7,
+            "name": "Shirts",
+            "description": "Men Formal and Casual Shirts",
+            "parent_id": 2,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 8,
+            "name": "Jackets",
+            "description": "Men Outerwear Jackets",
+            "parent_id": 2,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 9,
+            "name": "Sweaters",
+            "description": "Men Knitwear and Sweaters",
+            "parent_id": 2,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 10,
+            "name": "Blazers",
+            "description": "Men Blazers and Sport Coats",
+            "parent_id": 2,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Pants & Bottoms",
+        "description": "Men Pants and Bottoms",
+        "parent_id": 1,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 11,
+            "name": "Jeans",
+            "description": "Men Denim Jeans Collection",
+            "parent_id": 3,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 12,
+            "name": "Trousers",
+            "description": "Men Formal and Casual Trousers",
+            "parent_id": 3,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 13,
+            "name": "Shorts",
+            "description": "Men Casual Shorts",
+            "parent_id": 3,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 14,
+            "name": "Joggers",
+            "description": "Men Athletic and Casual Joggers",
+            "parent_id": 3,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "name": "Footwear",
+        "description": "Men Footwear",
+        "parent_id": 1,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 15,
+            "name": "Sneakers",
+            "description": "Men Casual and Athletic Sneakers",
+            "parent_id": 4,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 16,
+            "name": "Dress Shoes",
+            "description": "Men Formal Dress Shoes",
+            "parent_id": 4,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 17,
+            "name": "Sandals",
+            "description": "Men Casual Sandals",
+            "parent_id": 4,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "name": "Accessories",
+        "description": "Men Accessories",
+        "parent_id": 1,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 18,
+            "name": "Belts",
+            "description": "Men Leather and Casual Belts",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 19,
+            "name": "Wallets",
+            "description": "Men Wallets and Cardholders",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 20,
+            "name": "Hats",
+            "description": "Men Hats and Caps",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 21,
+            "name": "Sunglasses",
+            "description": "Men Fashion Sunglasses",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 22,
+            "name": "Watches",
+            "description": "Men Wristwatches",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 23,
+            "name": "Socks",
+            "description": "Men Dress and Casual Socks",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 24,
+            "name": "Ties",
+            "description": "Men Neckties and Bow Ties",
+            "parent_id": 5,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Women",
+    "description": "Women Fashion",
+    "parent_id": null,
+    "icon_url": "https://resource-server/category-icon/default.png",
+    "subcategories": [
+      {
+        "id": 26,
+        "name": "Tops & Shirts",
+        "description": "Women Tops and Shirts",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 32,
+            "name": "T-Shirts",
+            "description": "Women Casual T-Shirts",
+            "parent_id": 26,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 33,
+            "name": "Shirts",
+            "description": "Women Formal and Casual Shirts",
+            "parent_id": 26,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 34,
+            "name": "Jackets",
+            "description": "Women Outerwear Jackets",
+            "parent_id": 26,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 35,
+            "name": "Sweaters",
+            "description": "Women Knitwear and Sweaters",
+            "parent_id": 26,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 36,
+            "name": "Blouses",
+            "description": "Women Fashion Blouses",
+            "parent_id": 26,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "name": "Dresses & Skirts",
+        "description": "Women Dresses and Skirts",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 37,
+            "name": "Office Dresses",
+            "description": "Women Dresses suitable for Work",
+            "parent_id": 27,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 38,
+            "name": "Casual Dresses",
+            "description": "Women Everyday Casual Dresses",
+            "parent_id": 27,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 39,
+            "name": "Skirts",
+            "description": "Women Fashion Skirts",
+            "parent_id": 27,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "name": "Pants & Bottoms",
+        "description": "Women Pants and Bottoms",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 40,
+            "name": "Jeans",
+            "description": "Women Denim Jeans Collection",
+            "parent_id": 28,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 41,
+            "name": "Shorts",
+            "description": "Women Casual Shorts",
+            "parent_id": 28,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 42,
+            "name": "Wide-Leg Pants",
+            "description": "Women Trendy Wide-Leg Pants",
+            "parent_id": 28,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 43,
+            "name": "Leggings",
+            "description": "Women Leggings and Jeggings",
+            "parent_id": 28,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "name": "Footwear",
+        "description": "Women Footwear",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 44,
+            "name": "High Heels",
+            "description": "Women High-Heeled Shoes",
+            "parent_id": 29,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 45,
+            "name": "Sneakers",
+            "description": "Women Casual and Athletic Sneakers",
+            "parent_id": 29,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 46,
+            "name": "Sandals",
+            "description": "Women Casual and Dress Sandals",
+            "parent_id": 29,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 47,
+            "name": "Boots",
+            "description": "Women Ankle and Knee-High Boots",
+            "parent_id": 29,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "name": "Bags",
+        "description": "Women Bags",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 31,
+        "name": "Accessories",
+        "description": "Women Accessories",
+        "parent_id": 25,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 48,
+            "name": "Hats",
+            "description": "Women Hats and Headwear",
+            "parent_id": 31,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 49,
+            "name": "Sunglasses",
+            "description": "Women Fashion Sunglasses",
+            "parent_id": 31,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 50,
+            "name": "Jewelry",
+            "description": "Women Fashion Jewelry Collection",
+            "parent_id": 31,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 51,
+            "name": "Socks",
+            "description": "Women Casual and Novelty Socks",
+            "parent_id": 31,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "name": "Unisex",
+    "description": "Unisex Fashion",
+    "parent_id": null,
+    "icon_url": "https://resource-server/category-icon/default.png",
+    "subcategories": [
+      {
+        "id": 53,
+        "name": "Unisex T-Shirts",
+        "description": "T-Shirts designed for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 54,
+        "name": "Hoodies",
+        "description": "Hoodies suitable for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 55,
+        "name": "Sweaters",
+        "description": "Sweaters suitable for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 56,
+        "name": "Joggers",
+        "description": "Joggers suitable for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 57,
+        "name": "Shorts",
+        "description": "Shorts suitable for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 58,
+        "name": "Sneakers",
+        "description": "Sneakers suitable for all genders",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      },
+      {
+        "id": 59,
+        "name": "Unisex Accessories",
+        "description": "Accessories suitable for all genders (e.g., beanies, scarves)",
+        "parent_id": 52,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "name": "Kids",
+    "description": "Kids Fashion and Apparel",
+    "parent_id": null,
+    "icon_url": "https://resource-server/category-icon/default.png",
+    "subcategories": [
+      {
+        "id": 61,
+        "name": "Boys",
+        "description": "Boys Clothing and Accessories (Ages 4+)",
+        "parent_id": 60,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 66,
+            "name": "Tops & T-Shirts",
+            "description": "T-Shirts, Polos, and Tops for Boys",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 67,
+            "name": "Shirts",
+            "description": "Casual and Formal Shirts for Boys",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 68,
+            "name": "Hoodies & Sweatshirts",
+            "description": "Boys Hoodies and Sweatshirts",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 69,
+            "name": "Pants & Jeans",
+            "description": "Trousers, Jeans, and Pants for Boys",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 70,
+            "name": "Shorts",
+            "description": "Casual and Athletic Shorts for Boys",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 71,
+            "name": "Outerwear",
+            "description": "Jackets and Coats for Boys",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 72,
+            "name": "Swimwear",
+            "description": "Boys Swim Trunks and Rashguards",
+            "parent_id": 61,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 62,
+        "name": "Girls",
+        "description": "Girls Clothing and Accessories (Ages 4+)",
+        "parent_id": 60,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 73,
+            "name": "Tops & T-Shirts",
+            "description": "T-Shirts, Blouses, and Tops for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 74,
+            "name": "Dresses",
+            "description": "Casual and Party Dresses for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 75,
+            "name": "Skirts",
+            "description": "Fashion Skirts for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 76,
+            "name": "Hoodies & Sweatshirts",
+            "description": "Girls Hoodies and Sweatshirts",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 77,
+            "name": "Pants & Leggings",
+            "description": "Trousers, Leggings, and Pants for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 78,
+            "name": "Shorts",
+            "description": "Casual Shorts and Skorts for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 79,
+            "name": "Outerwear",
+            "description": "Jackets and Coats for Girls",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 80,
+            "name": "Swimwear",
+            "description": "Girls Swimsuits and Cover-ups",
+            "parent_id": 62,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 63,
+        "name": "Baby & Toddler",
+        "description": "Apparel for Babies and Toddlers (0-4 Years)",
+        "parent_id": 60,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 81,
+            "name": "Bodysuits & Onesies",
+            "description": "Essential Bodysuits for Babies (0-24m)",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 82,
+            "name": "Sets",
+            "description": "Coordinated Clothing Sets for Babies and Toddlers",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 83,
+            "name": "Tops",
+            "description": "Baby and Toddler Tops",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 84,
+            "name": "Bottoms",
+            "description": "Baby and Toddler Pants, Leggings, Shorts",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 85,
+            "name": "Dresses & Rompers",
+            "description": "Baby Dresses and All-in-One Rompers",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 86,
+            "name": "Sleepwear",
+            "description": "Pajamas and Sleep Sacks for Babies/Toddlers",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 87,
+            "name": "Outerwear",
+            "description": "Baby Jackets, Pramsuits, Snowsuits",
+            "parent_id": 63,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 64,
+        "name": "Kids Footwear",
+        "description": "Shoes and Footwear for all Kids",
+        "parent_id": 60,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 88,
+            "name": "Sneakers",
+            "description": "Casual and Athletic Sneakers for Kids",
+            "parent_id": 64,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 89,
+            "name": "Sandals",
+            "description": "Summer Sandals and Flip-flops for Kids",
+            "parent_id": 64,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 90,
+            "name": "Boots",
+            "description": "Winter and Rain Boots for Kids",
+            "parent_id": 64,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 91,
+            "name": "School Shoes",
+            "description": "Shoes suitable for School Uniforms",
+            "parent_id": 64,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 92,
+            "name": "Baby Shoes",
+            "description": "Soft-soled and First Walker Shoes (0-24m)",
+            "parent_id": 64,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      },
+      {
+        "id": 65,
+        "name": "Kids Accessories",
+        "description": "Accessories for all Kids",
+        "parent_id": 60,
+        "icon_url": "https://resource-server/category-icon/default.png",
+        "subcategories": [
+          {
+            "id": 93,
+            "name": "Hats & Caps",
+            "description": "Sun Hats, Beanies, Caps for Kids",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 94,
+            "name": "Socks & Tights",
+            "description": "Socks and Tights for Boys and Girls",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 95,
+            "name": "Belts",
+            "description": "Belts for Kids Trousers and Jeans",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 96,
+            "name": "Hair Accessories",
+            "description": "Hairbands, Clips, Bows for Girls",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 97,
+            "name": "Bags",
+            "description": "Backpacks and Small Bags for Kids",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          },
+          {
+            "id": 98,
+            "name": "Bibs & Muslins",
+            "description": "Essential Bibs for Babies",
+            "parent_id": 65,
+            "icon_url": "https://resource-server/category-icon/default.png",
+            "subcategories": []
+          }
+        ]
+      }
+    ]
+  }
+]

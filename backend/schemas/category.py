@@ -25,3 +25,28 @@ class CategorySchema(CategoryBase):
 # Tùy chọn: Schema cho response dạng list
 class CategoryListResponse(BaseModel):
      data: List[CategorySchema]
+
+class NestedCategorySchema(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    parent_id: Optional[int]
+    icon_url: Optional[str]
+    subcategories: List['NestedCategorySchema'] = []  # Recursive definition
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+
+class CreateCategorySchema(BaseModel):
+    name: str
+    parent_id: Optional[int] = None
+    description: Optional[str] = None
+    icon_url: Optional[str] = "https://resource-server/category-icon/default.png"  # Default icon URL
+
+class UpdateCategorySchema(BaseModel):
+    name: str
+    description: str
+
+    class Config:
+        orm_mode = True
