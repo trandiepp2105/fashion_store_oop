@@ -49,7 +49,13 @@ const CustomSelect = ({
         </div>
       </div>
 
-      {isOpenOptions && <Options options={options} optionName={optionName} />}
+      {isOpenOptions && (
+        <Options
+          handleSelect={handleSelectOption}
+          options={options}
+          optionName={optionName}
+        />
+      )}
     </div>
   );
 };

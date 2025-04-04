@@ -244,7 +244,7 @@ const ProductDetailPage = () => {
       color: "Red",
       stock: 10,
       image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
+        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
     },
     {
       id: 2,
@@ -252,7 +252,7 @@ const ProductDetailPage = () => {
       color: "Red",
       stock: 10,
       image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
+        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
     },
     {
       id: 3,
@@ -260,7 +260,7 @@ const ProductDetailPage = () => {
       color: "Red",
       stock: 10,
       image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
+        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
     },
     {
       id: 4,
@@ -268,78 +268,78 @@ const ProductDetailPage = () => {
       color: "Red",
       stock: 10,
       image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 5,
-      size: "S",
-      color: "Black",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 6,
-      size: "M",
-      color: "Black",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 7,
-      size: "L",
-      color: "Black",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 8,
-      size: "XL",
-      color: "Black",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 9,
-      size: "S",
-      color: "White",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 10,
-      size: "M",
-      color: "White",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 11,
-      size: "L",
-      color: "White",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
-    },
-    {
-      id: 12,
-      size: "XL",
-      color: "White",
-      stock: 10,
-      image_url:
-        "https://i.pinimg.com/736x/75/aa/c7/75aac75973bfaefd1bdece6f1c10f410.jpg",
+        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
     },
   ];
 
   const paginationModel = { page: 0, pageSize: 10 };
 
-  const [mainCategories, setMainCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
+  const [mainCategories, setMainCategories] = useState([
+    {
+      id: 1,
+      name: "Men fashion",
+    },
+    {
+      id: 2,
+      name: "Women fashion",
+    },
+    {
+      id: 3,
+      name: "Kid fashion",
+    },
+    {
+      id: 4,
+      name: "Unisex fashion",
+    },
+  ]);
+
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
+  const handleSelectMainCategory = (option) => {
+    setSelectedMainCategory(option);
+  };
+  const [subCategories, setSubCategories] = useState([
+    {
+      id: 1,
+      name: "Tops and Shirts",
+    },
+    {
+      id: 2,
+      name: "Pants & Bottoms",
+    },
+    {
+      id: 3,
+      name: "Accessories",
+    },
+  ]);
+
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const handleSelectSubCategory = (option) => {
+    setSelectedSubCategory(option);
+  };
+
+  const [subCategoriesLevel2, setSubCategoriesLevel2] = useState([
+    {
+      id: 1,
+      name: "T-Shirts",
+    },
+    {
+      id: 2,
+      name: "Outerwear Jackets",
+    },
+    {
+      id: 3,
+      name: "Polo Shirts",
+    },
+    {
+      id: 4,
+      name: "Hoodies & Sweatshirts",
+    },
+  ]);
+  const [selectedSubCategoryLevel2, setSelectedSubCategoryLevel2] =
+    useState(null);
+  const handleSelectSubCategoryLevel2 = (option) => {
+    setSelectedSubCategoryLevel2(option);
+  };
   const [isOpenCreateVariant, setIsOpenCreateVariant] = useState(false);
   const handleToggleCreateVariant = () => {
     setIsOpenCreateVariant(!isOpenCreateVariant);
@@ -451,6 +451,8 @@ const ProductDetailPage = () => {
                   <CustomSelect
                     options={mainCategories}
                     optionName="main category"
+                    handleSelectOption={handleSelectMainCategory}
+                    selectedOption={selectedMainCategory}
                   />
                 </div>
 
@@ -459,6 +461,17 @@ const ProductDetailPage = () => {
                   <CustomSelect
                     options={subCategories}
                     optionName="sub category"
+                    handleSelectOption={handleSelectSubCategory}
+                    selectedOption={selectedSubCategory}
+                  />
+                </div>
+                <div className="info-item">
+                  <p className="info-title">Subcategory level 2</p>
+                  <CustomSelect
+                    options={subCategoriesLevel2}
+                    optionName="sub category"
+                    handleSelectOption={handleSelectSubCategoryLevel2}
+                    selectedOption={selectedSubCategoryLevel2}
                   />
                 </div>
               </div>
@@ -469,7 +482,7 @@ const ProductDetailPage = () => {
                   <div className="preview-image-list">
                     <div className="preview-image-item">
                       <img
-                        src="/assets/dien-thoai-xiaomi-redmi-note-14.png"
+                        src="https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg"
                         alt=""
                       />
                     </div>
@@ -526,7 +539,7 @@ const ProductDetailPage = () => {
                         id=""
                         className="info-input"
                         // disabled={true}
-                        value="Xiaomi Redmi Note 14"
+                        value="Puzzle Tee"
                       />
                     </div>
                   </div>
@@ -542,7 +555,7 @@ const ProductDetailPage = () => {
                         id=""
                         className="info-input"
                         // disabled={true}
-                        value="2000000"
+                        value="100000"
                       />
                     </div>
                   </div>
@@ -558,7 +571,7 @@ const ProductDetailPage = () => {
                         name="selling_price"
                         id="selling_price"
                         className="info-input"
-                        value="2000000"
+                        value="500000"
                       />
                     </label>
                   </div>

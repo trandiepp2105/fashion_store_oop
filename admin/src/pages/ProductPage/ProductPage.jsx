@@ -154,81 +154,78 @@ const ProductPage = () => {
   const rows = [
     {
       id: 1,
-      product_name: "Iphone 13",
-      image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
-      supplier: "Electronics",
-      selling_price: 1000000,
+      product_name: "Lovemotion Shirt",
+      image_url: "/assets/images/product-1.png",
+      supplier: "TSUN",
+      selling_price: 200000,
       stock: 10,
     },
     {
       id: 2,
-      product_name: "Samsung Galaxy S21",
+      product_name: "Oversize Shirt",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
-
-      supplier: "Electronics",
-      selling_price: 800,
+        "https://product.hstatic.net/1000321269/product/ban_sao_cua_dsc_3621_d8abc7303213493693686cc8f7e7dfba_1024x1024.jpg",
+      supplier: "TSUN",
+      selling_price: 300000,
       stock: 20,
     },
     {
       id: 3,
-      product_name: "Macbook Pro 2021",
+      product_name: "2 Panel Polo Shirt",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
+        "https://product.hstatic.net/1000321269/product/polo2w_75dea7fcba004e6182d401c0df2c28f7_master.jpg",
 
-      supplier: "Electronics",
-      selling_price: 2000,
+      supplier: "TSUN",
+      selling_price: 200000,
       stock: 5,
     },
     {
       id: 4,
-      product_name: "Nike Air Force 1",
+      product_name: "Emotions Tee",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
+        "https://product.hstatic.net/1000321269/product/mockup_website_f0426a4d9e9349c6ab637dd016b29ab9_1024x1024.jpg",
 
-      supplier: "Shoes",
-      selling_price: 100,
+      supplier: "TSUN",
+      selling_price: 100000,
       stock: 50,
     },
     {
       id: 5,
-      product_name: "Adidas Yeezy",
+      product_name: "Shy Teddy Woo Tee",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
+        "https://product.hstatic.net/1000321269/product/f28ffa40d2826bdc329331_2c91583b19034f6c8c3992a8fdc56750_master.jpg",
 
-      supplier: "Shoes",
-      selling_price: 200,
+      supplier: "TSUN",
+      selling_price: 400000,
       stock: 30,
     },
     {
       id: 6,
-      product_name: "H&M T-shirt",
+      product_name: "Aurora Tee",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
+        "https://product.hstatic.net/1000321269/product/ban_sao_cua_122_2__33b52599222244109ea8d53f057a613f_1024x1024.jpg",
 
-      supplier: "Clothing",
-      selling_price: 20,
+      supplier: "TSUN",
+      selling_price: 250000,
       stock: 100,
     },
     {
       id: 7,
-      product_name: "Zara Jeans",
+      product_name: "Big Teddy Tee",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
+        "https://product.hstatic.net/1000321269/product/ban_sao_cua_251_2__405e3d3e74984072882e4324b2db94f0_master.jpg",
 
-      supplier: "Clothing",
-      selling_price: 50,
+      supplier: "TSUN",
+      selling_price: 500000,
       stock: 80,
     },
     {
       id: 8,
-      product_name: "Rayban Sunglasses",
+      product_name: "Puzzle Tee",
       image_url:
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT8LUT8SIu5vVnSCBMbDVMyZiPaWMg0MRVHEwmbGB3wPBsGny_wq65uHenAsV13GpfmElqJsetk5NI6nzbBbJRRZ9Y9DcGQvM_XhKIt31Q&usqp=CAE",
-
+        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_1024x1024.jpg",
       supplier: "Accessories",
-      selling_price: 150,
+      selling_price: 150000,
       stock: 40,
     },
   ];
