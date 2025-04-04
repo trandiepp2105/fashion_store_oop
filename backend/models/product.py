@@ -1,9 +1,8 @@
 from models.base import Base, BaseModel
-from sqlalchemy import Column, String, Text, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, String, Text, Integer, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from sqlalchemy.sql.functions import current_timestamp
-
 class Product(Base, BaseModel):
     __tablename__ = "product"
 
@@ -46,14 +45,16 @@ class ProductRaing(Base):
     rating = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=current_timestamp)
 
-class ProductVariant(Base, BaseModel):
+class ProductVariant(Base):
     __tablename__ = "productvariant"
-    
-    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
-    variant_id = Column(Integer, ForeignKey("variant.id", ondelete="CASCADE"), nullable=False)
+    __table_args__ = {"extend_existing": True}
+    product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    variant_id = Column(Integer, ForeignKey("variant.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     stock_quantity = Column(Integer, default=0)
     image_url = Column(String(255), nullable=True)
-    
+    created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp(), nullable=False)
+
     def __repr__(self):
         return f"<ProductVariant(variant_id={self.variant_id}, stock_quantity={self.stock_quantity})>"
     
