@@ -8,7 +8,9 @@ import json  # Import json module for parsing category string
 from database.session import get_db
 from models.product import Product, ProductCategory  # Import ProductCategory model
 from models.supplier import Supplier  # Import Supplier model
-from schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from schemas.product import ProductCreate, ProductResponse, ProductUpdate, ProductDetail  # Import the new ProductDetail schema
+from models.variant import Variant  # Import Variant model
+from models.category import Category  # Import Category model
 import os
 import shutil
 import logging
@@ -139,12 +141,64 @@ async def create_product(
         print(f"Error creating product: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error while creating product. {e}")
 
-@router.get("/{product_id}", response_model=ProductResponse, summary="Retrieve a product by ID")
+@router.get("/{product_id}", response_model=ProductDetail, summary="Retrieve detailed product information")
 def get_product_detail(product_id: int, session: Session = Depends(get_db)):
     product = session.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    return product
+
+    # Get supplier details
+    supplier = product.get_supplier(session)
+    supplier_info = {
+        "id": supplier.id,
+        "company_name": supplier.company_name
+    } if supplier else None
+
+    # Get category hierarchy
+    def get_category_hierarchy(category_id):
+        category = session.query(Category).filter(Category.id == category_id).first()
+        if not category:
+            return {}
+        subcategory = session.query(ProductCategory).filter(ProductCategory.product_id == product.id, ProductCategory.category_id == category_id).first()
+        return {
+            "id": category.id,
+            "subcategory": get_category_hierarchy(subcategory.category_id) if subcategory else {}
+        }
+
+    categories = session.query(ProductCategory).filter(ProductCategory.product_id == product.id).all()
+    category_hierarchy = {}
+    if categories:
+        root_category = categories[0].category_id
+        category_hierarchy = get_category_hierarchy(root_category)
+
+    # Get variants
+    variants = product.get_variants(session)
+    variant_details = []
+    for variant in variants:
+        variant_info = session.query(Variant).filter(Variant.id == variant.variant_id).first()
+        if variant_info:
+            variant_details.append({
+                "id": variant.variant_id,  # ID of the product variant
+                "size": variant_info.size.value,
+                "color": variant_info.color.value,
+                "stock": variant.stock_quantity,
+                "image_url": variant.image_url
+            })
+
+    # Construct the response
+    return ProductDetail(
+        id=product.id,
+        name=product.name,
+        original_price=product.original_price,
+        selling_price=product.selling_price,
+        description=product.description,
+        image_url=product.image_url,
+        rating=product.get_average_rating(),
+        stock=product.get_total_stock(session),
+        supplier=supplier_info,
+        category=category_hierarchy,
+        variants=variant_details
+    )
 
 @router.patch("/{product_id}", response_model=ProductResponse, summary="Update a product by ID")
 def update_product(product_id: int, product_data: ProductUpdate, session: Session = Depends(get_db)):

@@ -40,18 +40,21 @@ def create_user(
     user_data: UserCreate, session: Session = Depends(get_db)
 ):
     try:
-        # Sử dụng create_or_get để tìm người dùng theo email hoặc tạo mới nếu không có
-        new_user = User.create_or_get(session, email=user_data.email)
-        
-        if not new_user:
-            # Nếu không tìm thấy người dùng, tạo một người dùng mới
-            new_user = User(**user_data.dict())
-            new_user.set_password(user_data.password)
-            new_user.save(session)
-        
+        # Kiểm tra xem người dùng đã tồn tại chưa
+        existing_user = User.filter_by_email(session, user_data.email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User already exists")
+        # Tạo một người dùng mới
+        new_user = User(
+            user_data.name,
+            user_data.email,
+            user_data.password,
+            user_data.phone_number,
+        )
+        new_user.save(session)
         return new_user
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail=f"user data: {user_data}. Error creating user: {e}")
 
 # GET /users/{id} - Lấy thông tin người dùng theo ID
 @router.get(

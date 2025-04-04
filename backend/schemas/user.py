@@ -8,9 +8,7 @@ class UserCreate(BaseModel):
     name: str
     email: str
     password: str
-    phone_number: Optional[str] = None
-    #role: Role
-    description: Optional[str] = None
+    phone_number: str
 
 # Schema dùng để trả về thông tin người dùng
 class UserResponse(BaseModel):
@@ -18,7 +16,6 @@ class UserResponse(BaseModel):
     name: str
     email: str
     #role: Role
-    description: Optional[str] = None
 
     class Config:
         orm_mode = True

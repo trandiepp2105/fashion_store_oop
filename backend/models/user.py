@@ -27,7 +27,7 @@ class User(Base, BaseModel):
     phone_number = Column(String(20), unique=True)
     active = Column(Boolean, default=True)
 
-    def __init__(self, name, email, password):
+    def __init__(self, name, email, password, phone_number):
         """
         Initialize a new User instance with hashed password.
 
@@ -38,8 +38,9 @@ class User(Base, BaseModel):
         """
         self.name = name
         self.email = email
-        self.password_hash = generate_password_hash(password)
-
+        self.password = generate_password_hash(password)
+        self.phone_number =phone_number
+        self.active = True
     def __repr__(self):
         """
         Return a string representation of the User instance.

@@ -42,7 +42,6 @@ class Base(DeclarativeBase):
     def get_all(cls, session: Session):
         return session.query(cls).all()
     
-    #Thêm Variant cho Product
     @classmethod
     def create_or_get(cls, session: Session, **kwargs):
         instance = session.query(cls).filter_by(**kwargs).first()
