@@ -9,6 +9,8 @@ from models.order import Order
 from models.user import User
 from models.role import Role
 from schemas.order import OrderSchema
+from models.product import Product
+from schemas.cart import CartItemsList
 
 router = APIRouter()
 
@@ -63,15 +65,43 @@ def get_order_categories(Session: Session = Depends(get_db)):
     description="This API endpoint allows creating a new order."
 )
 def add_order(
-    order_data: OrderSchema,
+    user_id: int,
+    shipping_info_id: int,
+    cart_items: CartItemsList,
     db: Session = Depends(get_db)
 ):
     """
     Endpoint to create a new order.
+    Tính toán total_amount từ giỏ hàng và tạo đơn hàng.
     """
     try:
-        new_order = Order.create(db, order_data)
+        # Tính tổng số tiền từ giỏ hàng
+        total_amount = 0
+        for item in cart_items.items:
+            product = db.query(Product).filter_by(id=item.product_id).first()
+            if not product:
+                raise HTTPException(status_code=404, detail="Product not found")
+
+            # Tính giá trị của mục trong giỏ hàng
+            total_amount += product.price * item.quantity
+
+        # Tạo một đơn hàng mới với tổng tiền đã tính
+        new_order = Order(
+            user_id=user_id,
+            shipping_info_id=shipping_info_id,
+            total_amount=total_amount,
+            final_amount=total_amount,  # Có thể thêm logic giảm giá nếu cần
+            order_date = "",  # Hoặc bất kỳ cách định dạng thời gian nào bạn cần
+            status= "PENDING"  # Ví dụ mặc định là "PENDING"
+        )
+        
+        # Thêm đơn hàng vào cơ sở dữ liệu
+        db.add(new_order)
+        db.commit()
+        db.refresh(new_order)
+        
         return new_order
+    
     except Exception as e:
         print(f"Error creating order: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while creating order.")
