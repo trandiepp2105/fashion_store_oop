@@ -7,6 +7,10 @@ from models.cart import CartItem
 from models.order import Order
 from models.role import UserRole, Role
 from werkzeug.security import generate_password_hash, check_password_hash
+from core.security import verify_token
+from fastapi import Depends, HTTPException, status, Request
+from database.session import get_db
+from config import settings
 
 class User(Base, BaseModel):
     """
@@ -180,3 +184,75 @@ class User(Base, BaseModel):
             list[User]: A list of users with the specified role.
         """
         return session.query(cls).join(UserRole).filter(UserRole.role_id == role_id).all()
+    @classmethod
+    def get_by_email(cls, session, email):
+        """
+        Retrieve a user by their email address.
+
+        Args:
+            session (Session): The database session.
+            email (str): The email address of the user.
+
+        Returns:
+            User: The user with the specified email, or None if not found.
+        """
+        return session.query(cls).filter_by(email=email).first()
+    
+    @classmethod
+    def verify_token(cls, session, token):
+        """
+        Verify a token and return the corresponding user.
+
+        Args:
+            session (Session): The database session.
+            token (str): The token to verify.
+
+        Returns:
+            User: The user associated with the token, or None if not found.
+        """
+        try:
+            print(token)
+            email = verify_token(token, credentials_exception=None)
+            if email:
+                user = session.query(cls).filter_by(email=email).first()
+                if user:
+                    return user
+            return None
+        except Exception as e:
+            print(f"Token verification failed: {e}")
+            return None
+
+    @classmethod
+    def get_current_user(cls, request: Request, session=Depends(get_db)):
+        """
+        Retrieve the currently authenticated user based on the token in the request.
+
+        Args:
+            request (Request): The HTTP request object to extract the token.
+            session (Session): The database session.
+
+        Returns:
+            User: The authenticated user.
+
+        Raises:
+            HTTPException: If the token is missing, invalid, or the user does not exist.
+        """
+        # Extract token from cookies
+        token = request.cookies.get(settings.ACCESS_TOKEN_COOKIE_NAME)
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication token is missing.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        # Verify token and retrieve user
+        user = cls.verify_token(session, token)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired token.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        return user

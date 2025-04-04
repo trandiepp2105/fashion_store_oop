@@ -1,7 +1,5 @@
 from models.base import Base
-from sqlalchemy import Column, Integer, Enum, UniqueConstraint
-from enums.sizes import BaseSizeEnum
-from enums.colors import FashionColor
+from sqlalchemy import Column, Integer, String, UniqueConstraint
 
 class Variant(Base):
     __tablename__ = "variant"
@@ -10,12 +8,11 @@ class Variant(Base):
         {"extend_existing": True}
     )
     id = Column(Integer, primary_key=True, autoincrement=True)
-    color = Column(Enum(FashionColor), nullable=False)
-    size = Column(Enum(BaseSizeEnum), nullable=False)
-
+    color = Column(String(20), nullable=False)
+    size = Column(String(20), nullable=False)
 
     def __repr__(self):
-        return f"<Variant(color={self.color.value}, size={self.size.value})>"
+        return f"<Variant(id={self.id}, color={self.color}, size={self.size})>"
 
     @classmethod
     def filter_by_color(cls, session, color):

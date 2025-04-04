@@ -58,9 +58,8 @@ class Product(Base, BaseModel):
             .all()
         )
 
-    @classmethod
-    def get_variants(cls, session, product_id):
-        return session.query(ProductVariant).filter_by(product_id=product_id).all()
+    def get_variants(self, session):
+        return session.query(ProductVariant).filter_by(product_id=self.id).all()
 
     def get_total_stock(self, session):
         from sqlalchemy.sql import func
@@ -89,7 +88,24 @@ class Product(Base, BaseModel):
 
     def get_supplier(self, session):
         from models.supplier import Supplier
-        return session.query(Supplier).filter(Supplier.id == self.supplier_id).first()
+        supplier = session.query(Supplier).filter(Supplier.id == self.supplier_id).first()
+        if supplier:
+            supplier.id = str(supplier.id)  # Ensure supplier.id is a string
+        return supplier
+
+    @classmethod
+    def add_variant(cls, session, product_id, variant_id, stock, image_url):
+        product_variant = session.query(ProductVariant).filter_by(product_id=product_id, variant_id=variant_id).first()
+        if product_variant:
+            raise ValueError("Variant already exists for this product")
+        product_variant = ProductVariant(
+            product_id=product_id,
+            variant_id=variant_id,
+            stock_quantity=stock,
+            image_url=image_url
+        )
+        session.add(product_variant)
+        return product_variant
 
 class ProductRaing(Base):
     __tablename__ = "productrating"

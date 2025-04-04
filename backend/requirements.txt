@@ -6,3 +6,7 @@ sqlalchemy==2.0.39
 alembic==1.15.1
 mysql-connector-python
 werkzeug
+python-jose[cryptography] 
+pydantic-settings 
+python-dotenv 
+passlib[bcrypt]

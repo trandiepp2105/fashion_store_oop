@@ -1,6 +1,6 @@
 from models.base import Base
 from models.product import ProductVariant
-from sqlalchemy import Column, Integer, DECIMAL, DateTime, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, DECIMAL, DateTime, String, ForeignKey, Enum, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import current_timestamp
 from enums.order_status import OrderStatus
@@ -12,7 +12,7 @@ class CartItem(Base):
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     product_id = Column(Integer, ForeignKey("product.id", ondelete="CASCADE"), nullable=False)
     variant_id = Column(Integer, ForeignKey("variant.id", ondelete="CASCADE"), nullable=False)
-    added_at = Column(DateTime, default=current_timestamp)
+    added_at = Column(DateTime, server_default=func.current_timestamp())  # Use server_default instead of default
     quantity = Column(Integer, default=1)
     
     def __repr__(self):

@@ -1,28 +1,50 @@
 # schemas/order.py
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from pydantic import BaseModel
+from typing import List, Optional
 
-class OrderBase(BaseModel):
-    """Schema cơ bản, bao gồm các trường có thể có khi tạo/cập nhật."""
-    user_id: int
-    shipping_info_id: int
-    total_amount: Optional[int] = None  # Không cần phải gửi từ client
-    final_amount: Optional[int] = None  # Không cần phải gửi từ client
-    order_date: Optional[int] = None  # Không cần phải gửi từ client
-    status: Optional[str] = "PENDING"  # Mặc định là PENDING
-
-class OrderSchema(OrderBase):
-    """Schema để đọc dữ liệu Order, bao gồm id."""
+class VariantSchema(BaseModel):
+    """Schema for product variant details."""
     id: int
+    color: str
+    size: str
 
-    # Cấu hình để Pydantic đọc dữ liệu từ ORM model
-    # Pydantic V2:
-    #model_config = ConfigDict(from_attributes=True)
+class OrderItemSchema(BaseModel):
+    """Schema for an order item."""
+    product_id: int
+    variant: VariantSchema
+    selling_price: float
+    discount_price: Optional[float] = None
+    quantity: int
 
-    # Pydantic V1:
+class ShippingInfoSchema(BaseModel):
+    """Schema for shipping information."""
+    id: int
+    recipient_name: str
+    phone_number: str
+    province_city: str
+    district: str
+    ward_commune: str
+    specific_address: str
+    is_default: bool
+
+class OrderCreate(BaseModel):
+    """Schema for creating a new order."""
+    shipping_info_id: int
+    cart_item_ids: List[int]
+
+class OrderSchema(BaseModel):
+    """Schema for reading order data."""
+    id: int
+    user_id: int
+    shipping_info: ShippingInfoSchema
+    status: str
+    total_amount: float
+    final_amount: float
+    order_items: List[OrderItemSchema]
+
     class Config:
         orm_mode = True
 
-# Tùy chọn: Schema cho response dạng list
 class OrderListResponse(BaseModel):
-     data: List[OrderSchema]
+    """Schema for a list of orders."""
+    data: List[OrderSchema]

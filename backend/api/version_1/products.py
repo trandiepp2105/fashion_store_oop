@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from fastapi import Request
 import json  # Import json module for parsing category string
+import uuid  # Import uuid for generating unique file names
 
 # Import necessary components
 from database.session import get_db
@@ -11,6 +12,7 @@ from models.supplier import Supplier  # Import Supplier model
 from schemas.product import ProductCreate, ProductResponse, ProductUpdate, ProductDetail  # Import the new ProductDetail schema
 from models.variant import Variant  # Import Variant model
 from models.category import Category  # Import Category model
+from models.product import ProductVariant  # Import ProductVariant model
 import os
 import shutil
 import logging
@@ -19,6 +21,25 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+def save_file_with_unique_name(upload_dir: str, file: UploadFile) -> str:
+    """
+    Save a file to the specified directory with a unique name if a file with the same name already exists.
+    """
+    os.makedirs(upload_dir, exist_ok=True)
+    file_name = file.filename
+    file_path = os.path.join(upload_dir, file_name)
+
+    # Generate a unique name if the file already exists
+    while os.path.exists(file_path):
+        name, ext = os.path.splitext(file_name)
+        file_name = f"{name}_{uuid.uuid4().hex[:8]}{ext}"
+        file_path = os.path.join(upload_dir, file_name)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return file_path
 
 @router.get(
     "/", 
@@ -73,12 +94,9 @@ async def create_product(
 ):
     try:
         upload_dir = "./media/products"
-        os.makedirs(upload_dir, exist_ok=True)
-        file_path = os.path.join(upload_dir, image_file.filename)
-        
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(image_file.file, buffer)
-        image_url = f"/media/products/{image_file.filename}"
+        file_path = save_file_with_unique_name(upload_dir, image_file)
+        image_url = f"/media/products/{os.path.basename(file_path)}"
+
         with session.begin():  # Start a transaction
             if supplier_id:
                 supplier = session.query(Supplier).filter(Supplier.id == supplier_id).first()
@@ -154,22 +172,43 @@ def get_product_detail(product_id: int, session: Session = Depends(get_db)):
         "company_name": supplier.company_name
     } if supplier else None
 
-    # Get category hierarchy
-    def get_category_hierarchy(category_id):
-        category = session.query(Category).filter(Category.id == category_id).first()
-        if not category:
-            return {}
-        subcategory = session.query(ProductCategory).filter(ProductCategory.product_id == product.id, ProductCategory.category_id == category_id).first()
-        return {
-            "id": category.id,
-            "subcategory": get_category_hierarchy(subcategory.category_id) if subcategory else {}
-        }
-
+    # Get category hierarchy as a tree
     categories = session.query(ProductCategory).filter(ProductCategory.product_id == product.id).all()
     category_hierarchy = {}
+
     if categories:
-        root_category = categories[0].category_id
-        category_hierarchy = get_category_hierarchy(root_category)
+        # Retrieve all associated categories
+        category_ids = [cat.category_id for cat in categories]
+        all_categories = session.query(Category).filter(Category.id.in_(category_ids)).all()
+
+        # Build a mapping of category ID to category object
+        category_map = {category.id: category for category in all_categories}
+
+        # Build the tree structure
+        def build_category_tree(category_id):
+            category = category_map.get(category_id)
+            if not category:
+                return None
+            subcategories = [
+                build_category_tree(sub.id)
+                for sub in all_categories
+                if sub.parent_id == category_id
+            ]
+            return {
+                "id": category.id,
+                "name": category.name,
+                "subcategory": [sub for sub in subcategories if sub]
+            }
+
+        # Find root categories (categories without a parent in the list)
+        root_categories = [
+            category for category in all_categories
+            if category.parent_id not in category_map
+        ]
+
+        # Build the hierarchy starting from the first root category
+        if root_categories:
+            category_hierarchy = build_category_tree(root_categories[0].id)
 
     # Get variants
     variants = product.get_variants(session)
@@ -178,9 +217,9 @@ def get_product_detail(product_id: int, session: Session = Depends(get_db)):
         variant_info = session.query(Variant).filter(Variant.id == variant.variant_id).first()
         if variant_info:
             variant_details.append({
-                "id": variant.variant_id,  # ID of the product variant
-                "size": variant_info.size.value,
-                "color": variant_info.color.value,
+                "variant_id": variant.variant_id,
+                "size": variant_info.size,
+                "color": variant_info.color,
                 "stock": variant.stock_quantity,
                 "image_url": variant.image_url
             })
@@ -195,6 +234,7 @@ def get_product_detail(product_id: int, session: Session = Depends(get_db)):
         image_url=product.image_url,
         rating=product.get_average_rating(),
         stock=product.get_total_stock(session),
+        discount_price=product.get_discount_price(session),
         supplier=supplier_info,
         category=category_hierarchy,
         variants=variant_details
@@ -206,20 +246,122 @@ def update_product(product_id: int, product_data: ProductUpdate, session: Sessio
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    update_data = product_data.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(product, key, value)
+    # Use the update_info method from the Base class
+    product.update_info(session, **product_data.model_dump(exclude_unset=True))
     
-    session.commit()
-    session.refresh(product)
-    return product
+    return ProductResponse(
+        id=product.id,
+        name=product.name,
+        selling_price=product.selling_price,
+        image_url=product.image_url,
+        rating=product.get_average_rating(),
+        discount_price=product.get_discount_price(session),
+        stock=product.get_total_stock(session),
+        supplier={
+            "id": product.supplier_id,
+            "company_name": product.get_supplier(session).company_name if product.get_supplier(session) else None
+        } if product.supplier_id else None
+    )
 
 @router.delete("/{product_id}", summary="Delete a product by ID")
 def delete_product(product_id: int, session: Session = Depends(get_db)):
-    product = session.query(Product).filter(Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    session.delete(product)
-    session.commit()
-    return {"detail": "Product deleted successfully"}
+    try:
+        product = session.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        # Delete associated product variants
+        product_variants = session.query(ProductVariant).filter(ProductVariant.product_id == product_id).all()
+        for variant in product_variants:
+            session.delete(variant)
+        
+        # Delete the product
+        session.delete(product)
+
+        image_path = os.path.join("./media/products", product.image_url.split("/")[-1])
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        shutil.rmtree("./media/products", ignore_errors=True)
+        session.commit()
+        return {"message": "Product deleted successfully"}
+
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal server error while deleting product: {e}")
+
+@router.post(
+    "/{product_id}/add-variant",
+    summary="Add a variant to a product",
+    description="This API allows adding a variant (size, color, stock, image) to a product."
+)
+async def add_variant_to_product(
+    product_id: int,
+    size: str = Form(...),
+    color: str = Form(...),
+    stock: int = Form(...),
+    image_file: UploadFile = Form(...),
+    session: Session = Depends(get_db)
+):
+    try:
+        # Check if the product exists
+        product = session.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+
+        # Use get_or_create for Variant
+        variant, created = Variant.get_or_create(session, size=size, color=color)
+
+        # Check if the product-variant association exists
+        product_variant, created = ProductVariant.get_or_create(
+            session,
+            product_id=product_id,
+            variant_id=variant.id
+        )
+        if not created:
+            raise HTTPException(status_code=400, detail="Variant already exists for this product")
+
+        # Save the image file
+        upload_dir = "./media/variants"
+        file_path = save_file_with_unique_name(upload_dir, image_file)
+        image_url = f"/media/variants/{os.path.basename(file_path)}"
+
+        # Update the product-variant with stock and image_url
+        product_variant.stock_quantity = stock
+        product_variant.image_url = image_url
+        session.commit()
+
+        return {"message": "Variant added successfully", "variant_id": variant.id, "product_id": product_variant.product_id}
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal server error while adding variant: {e}")
+
+@router.delete(
+    "/{product_id}/add-variant/{variant_id}",
+    summary="Delete a product variant",
+    description="This API deletes a product variant using the composite key (product_id, variant_id)."
+)
+def delete_product_variant(
+    product_id: int,
+    variant_id: int,
+    session: Session = Depends(get_db)
+):
+    try:
+        # Find the product variant
+        product_variant = session.query(ProductVariant).filter_by(product_id=product_id, variant_id=variant_id).first()
+        if not product_variant:
+            raise HTTPException(status_code=404, detail="Product variant not found")
+
+        # Delete the image file if it exists
+        if product_variant.image_url:
+            image_path = os.path.join(".", product_variant.image_url.lstrip("/"))
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+        # Use the delete method from the Base class
+        product_variant.delete(session)
+
+        return {"message": "Product variant deleted successfully"}
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal server error while deleting product variant: {e}")
+

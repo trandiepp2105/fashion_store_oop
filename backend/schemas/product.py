@@ -25,12 +25,10 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     original_price: Optional[int] = None
     selling_price: Optional[int] = None
-    total_ratings: Optional[int] = 0
-    rating_sum: Optional[int] = 0
-    image_url: Optional[str] = None
+
 
 class VariantResponse(BaseModel):
-    id: int  # ID of the product variant
+    variant_id: int  # ID of the product variant
     size: str
     color: str
     stock: int
@@ -44,6 +42,7 @@ class ProductDetail(BaseModel):
     name: str
     original_price: int
     selling_price: int
+    discount_price: int
     description: Optional[str]
     image_url: Optional[str]
     rating: Optional[float]

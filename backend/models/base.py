@@ -36,25 +36,27 @@ class Base(DeclarativeBase):
     
     @classmethod
     def get_by_id(cls, session: Session, record_id: int):
-        return session.query(cls).filter_by(id=record_id).first()
+        instance = session.query(cls).filter_by(id=record_id).first()
+        if not instance:
+            raise ValueError(f"{cls.__name__} with ID {record_id} not found.")
+        return instance
     
     @classmethod
     def get_all(cls, session: Session):
         return session.query(cls).all()
     
     @classmethod
-    def create_or_get(cls, session: Session, **kwargs):
+    def get_or_create(cls, session: Session, **kwargs):
         instance = session.query(cls).filter_by(**kwargs).first()
-        
-        #Nếu đã có thì trả về luôn
         if instance:
-            return instance  
+            return instance, False  # Return the instance and False (not created)
         
-        #Nếu chưa có thì tạo mới
+        # Create a new instance if it doesn't exist
         instance = cls(**kwargs)
         session.add(instance)
         session.commit()
-        return instance
+        session.refresh(instance)  # Refresh to get the latest state
+        return instance, True  # Return the instance and True (created)
 
 class BaseModel:
     __table_args__ = {"extend_existing": True}

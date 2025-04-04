@@ -11,3 +11,15 @@ class CartItemSchema(BaseModel):
 
 class CartItemsList(BaseModel):
     items: List[CartItemSchema]
+
+class CartItemResponse(BaseModel):
+    id: int  # Add the cart item ID
+    product_id: int
+    product_name: str
+    variant_id: int
+    size: str
+    color: str
+    quantity: int
+
+    class Config:
+        orm_mode = True
