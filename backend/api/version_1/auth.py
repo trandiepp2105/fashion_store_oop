@@ -73,10 +73,10 @@ def login(
         max_age=int(access_token_expires.total_seconds()), # Thời gian sống của cookie (giây)
         expires=int(access_token_expires.total_seconds()), # Tương thích trình duyệt cũ
         path="/", # Cookie có hiệu lực trên toàn bộ site
-        domain=None, # Đặt domain nếu cần chia sẻ cookie giữa các subdomain
-        secure=settings.SECURE_COOKIE, # True nếu dùng HTTPS
+        domain=None,  # Để None nếu không cần chia sẻ cookie giữa các subdomain
+        secure=settings.SECURE_COOKIE,  # False nếu đang phát triển trên localhost
         httponly=settings.HTTP_ONLY_COOKIE, # Ngăn JS truy cập
-        samesite=settings.SAME_SITE_COOKIE, # Bảo vệ CSRF ('lax' hoặc 'strict')
+        samesite=settings.SAME_SITE_COOKIE,  # 'lax' nếu không dùng HTTPS
     )
 
     # 6. Trả về phản hồi thành công

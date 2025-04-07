@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import "./PopupVariant.scss";
-
+import productService from "../../services/productService";
+// toast
+import { toast } from "react-toastify";
 const PopupVariant = ({
   handleToggle,
-  parentCaregoryId,
   action = "CREATE",
   variantInfo = null,
+  productId = null,
+  fetchProductData,
 }) => {
   const [variantTempInfo, setVariantTempInfo] = useState(
     variantInfo ? variantInfo : {}
@@ -29,17 +32,36 @@ const PopupVariant = ({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("variant-stock", variantTempInfo.stock);
-    formData.append("variant-color", variantTempInfo.color);
-    formData.append("variant-size", variantTempInfo.size);
+    formData.append("stock", variantTempInfo.stock);
+    formData.append("color", variantTempInfo.color);
+    formData.append("size", variantTempInfo.size);
 
     if (variantImage) {
-      formData.append("variant-image", variantImage);
+      formData.append("image_file", variantImage);
     }
-
+    try {
+      if (action === "CREATE") {
+        await productService.addVariant(productId, formData);
+        fetchProductData();
+        toast.success("Create variant successfully!");
+      } else if (action === "EDIT") {
+        await productService.updateVariant(
+          variantTempInfo.productId,
+          variantTempInfo.id,
+          formData
+        );
+        fetchProductData();
+        toast.success("Update variant successfully!");
+      }
+    } catch (error) {
+      console.error("Error submitting form data:", error);
+      toast.error("Error submitting form data");
+    } finally {
+      handleToggle();
+    }
     // Gửi formData đi (Ví dụ: fetch API hoặc axios)
     console.log("FormData submitted!");
     for (let pair of formData.entries()) {
@@ -48,9 +70,9 @@ const PopupVariant = ({
   };
 
   return (
-    <div className="create-category-popup">
+    <div className="create-variant-popup">
       <div className="container">
-        <form className="popup" onSubmit={handleSubmit}>
+        <form className="popup-variant" onSubmit={handleSubmit}>
           <h3 className="title">
             {action === "CREATE" ? "Create Variant" : "Edit Variant"}
           </h3>
@@ -109,6 +131,15 @@ const PopupVariant = ({
             <div className="input-container">
               <p className="input-title">Variant Image</p>
               <div className="wrapper-select-variant-iamge">
+                <div className="wrapper-variant-image">
+                  {variantImagePreview && (
+                    <img
+                      src={variantImagePreview}
+                      alt="Category Icon"
+                      className="preview-variant-image"
+                    />
+                  )}
+                </div>
                 <input
                   type="file"
                   name="cate-icon-file"
@@ -166,15 +197,6 @@ const PopupVariant = ({
                   </svg>
                   Upload
                 </label>
-                <div className="wrapper-variant-image">
-                  {variantImagePreview && (
-                    <img
-                      src={variantImagePreview}
-                      alt="Category Icon"
-                      className="preview-variant-image"
-                    />
-                  )}
-                </div>
               </div>
             </div>
           </div>

@@ -1,6 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 
+class ProductSchema(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    original_price: int
+    selling_price: int
+    total_rating: Optional[int] = 0
+    rating_sum: Optional[int] = 0
+    image_url: str
+    class Config:
+        orm_mode = True
+
 class ProductCreate(BaseModel):
     name: str
     description: Optional[str] = None

@@ -89,6 +89,7 @@
         }
       }
 
+      .wrapper-color-variants,
       .wrapper-variants {
         padding: 10px 0;
         width: 100%;
@@ -123,6 +124,41 @@
               // border: 1px solid #ccc;
               cursor: pointer;
             }
+          }
+        }
+      }
+
+      .wrapper-color-variants {
+        .variants {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          .variant-color-item {
+            cursor: pointer;
+            height: 40px;
+            // width: 120px;
+            // background-color: red;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            font-weight: 500;
+            padding-right: 10px;
+            border: #000 solid 1px;
+
+            &:hover {
+              border-color: #f7b881;
+            }
+            .color-image {
+              height: 100%;
+              object-fit: cover;
+              margin-right: 20px;
+            }
+          }
+
+          .variant-color-item.selected {
+            border-color: #94292a;
+            background-color: #f7b881;
           }
         }
       }

@@ -8,11 +8,23 @@ import Rating from "@mui/material/Rating";
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
+import userService from "../../services/userService";
+// toastify
+import { toast } from "react-toastify";
 const UserPage = () => {
   const listProductRef = useRef(null);
   const [distanceListProductToBottom, setDistanceListProductToBottom] =
     useState(0);
-
+  const [users, setUsers] = useState([]);
+  const fetchUsers = async () => {
+    try {
+      const users = await userService.getAllUsers();
+      console.log("users", users);
+      setUsers(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
   useEffect(() => {
     const updatePosition = () => {
       if (listProductRef.current) {
@@ -33,7 +45,20 @@ const UserPage = () => {
   const toggleFilter = () => {
     setOpenFilter(!openFilter);
   };
+  const [selectedUser, setSelectedUser] = useState(null);
 
+  const handleDeleteUser = async () => {
+    try {
+      await userService.deleteUser(selectedUser.id);
+
+      toast.success("Delete user successfully");
+      fetchUsers();
+      handleToggleDeleteUserPopup();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Error deleting user");
+    }
+  };
   const userColumns = [
     { field: "id", headerName: "ID", width: 0 },
     {
@@ -60,7 +85,7 @@ const UserPage = () => {
       flex: 1.5,
     },
     {
-      field: "active",
+      field: "status",
       headerName: "Status",
       // width: 100,
       flex: 1,
@@ -78,43 +103,42 @@ const UserPage = () => {
           <div className="wrapper-status">
             <p
               className={`status ${
-                params.row.active ? "status--active" : "status--inactive"
+                params.row.status ? "status--active" : "status--inactive"
               }`}
             >
-              {params.row.active ? "Active" : "Inactive"}
+              {params.row.status ? "Active" : "Inactive"}
             </p>
           </div>
         </Box>
       ),
     },
-    {
-      field: "role",
-      headerName: "Role",
-      // width: 100,
-      flex: 1,
-      justifyContent: "center",
-      sortable: false, // Không cần sắp xếp
-      filterable: false, // Không cần lọc
-      renderCell: (params) => (
-        <Box
-          width={"100%"}
-          height={"100%"}
-          display="flex"
-          alignItems={"center"}
-          gap={1}
-        >
-          <div className="wrapper-role">
-            <p
-              className={`role ${
-                params.row.role === "admin" ? "role--admin" : "role--customer"
-              }`}
-            >
-              {params.row.role}
-            </p>
-          </div>
-        </Box>
-      ),
-    },
+    // {
+    //   field: "role",
+    //   headerName: "Role",
+    //   width: 0,
+    //   justifyContent: "center",
+    //   sortable: false, // Không cần sắp xếp
+    //   filterable: false, // Không cần lọc
+    //   renderCell: (params) => (
+    //     <Box
+    //       width={"100%"}
+    //       height={"100%"}
+    //       display="flex"
+    //       alignItems={"center"}
+    //       gap={1}
+    //     >
+    //       <div className="wrapper-role">
+    //         <p
+    //           className={`role ${
+    //             params.row.role === "admin" ? "role--admin" : "role--customer"
+    //           }`}
+    //         >
+    //           {params.row.role}
+    //         </p>
+    //       </div>
+    //     </Box>
+    //   ),
+    // },
     {
       field: "action",
       headerName: "Action",
@@ -247,52 +271,54 @@ const UserPage = () => {
     },
   ];
 
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      phone_number: "1234567890",
-      email: "email@gmail.com",
-      active: false,
-      role: "admin",
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      phone_number: "1234567890",
-      email: "email@gmail.com",
-      active: true,
-      role: "customer",
-    },
-    {
-      id: 3,
-      name: "John Doe",
-      phone_number: "1234567890",
-      email: "email@gmail.com",
-      active: true,
-      role: "admin",
-    },
-    {
-      id: 4,
-      name: "John Doe",
-      phone_number: "1234567890",
-      email: "email@gmail.com",
-      active: true,
-      role: "customer",
-    },
-    {
-      id: 5,
-      name: "John Doe",
-      phone_number: "1234567890",
-      email: "email@gmail.com",
-      active: true,
-      role: "customer",
-    },
-  ];
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+  // const users = [
+  //   {
+  //     id: 1,
+  //     name: "John Doe",
+  //     phone_number: "1234567890",
+  //     email: "email@gmail.com",
+  //     active: false,
+  //     role: "admin",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "John Doe",
+  //     phone_number: "1234567890",
+  //     email: "email@gmail.com",
+  //     active: true,
+  //     role: "customer",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "John Doe",
+  //     phone_number: "1234567890",
+  //     email: "email@gmail.com",
+  //     active: true,
+  //     role: "admin",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "John Doe",
+  //     phone_number: "1234567890",
+  //     email: "email@gmail.com",
+  //     active: true,
+  //     role: "customer",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "John Doe",
+  //     phone_number: "1234567890",
+  //     email: "email@gmail.com",
+  //     active: true,
+  //     role: "customer",
+  //   },
+  // ];
 
   const paginationModel = { page: 0, pageSize: 6 };
 
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isOpenDeleteUserPopup, setIsOpenDeleteUserPopup] = useState(false);
 
   const handleToggleDeleteUserPopup = () => {
@@ -304,6 +330,7 @@ const UserPage = () => {
         <AcceptancePopup
           description="Are you sure you want to delete this user?"
           handleClose={handleToggleDeleteUserPopup}
+          handleAccept={handleDeleteUser}
         />
       )}
       <div className="page-content">

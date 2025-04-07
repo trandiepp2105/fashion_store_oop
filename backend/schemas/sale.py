@@ -11,9 +11,18 @@ class SaleCreate(BaseModel):
     start_date: datetime 
     end_date: datetime  
 
-class SaleResponse(SaleCreate):
+class SaleResponse(BaseModel):
+    """Schema for a sale."""
     id: int
-    is_active: bool
+    name: str
+    description: str
+    type: str
+    value: int
+    start_date: datetime
+    end_date: datetime
+
+    class Config:
+        orm_mode = True
 
 class SaleUpdate(BaseModel):
     name: Optional[str] = None

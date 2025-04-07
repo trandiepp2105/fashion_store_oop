@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict
 
 # Import necessary components
 from database.session import get_db
@@ -16,7 +16,7 @@ router = APIRouter()
     "/",
     response_model=list[UserResponse],
     summary="Retrieve all users",
-    description="This API returns a list of all users, including descriptions and icon URLs."
+    description="This API returns a list of all users with their roles and statuses."
 )
 def get_all_users(
     session: Session = Depends(get_db)
@@ -25,7 +25,28 @@ def get_all_users(
         users = User.get_all(session)
         if not users:
             return []
-        return users
+
+        user_list = []
+        for user in users:
+            # Get roles for the user
+            user_roles = UserRole.get_roles_by_user(session, user.id)
+            roles = [
+                {"id": str(role.role_id), "name": session.query(Role).get(role.role_id).name}
+                for role in user_roles
+            ]
+
+            # Map user data to the response schema
+            user_list.append({
+                "id": user.id,
+                "name": user.name,
+                "phone_number": user.phone_number,
+                "email": user.email,
+                "status": user.active,
+                "roles": roles,
+                "join_date": user.created_at.strftime("%d/%m/%Y") if user.created_at else None
+            })
+
+        return user_list
     except Exception as e:
          # Log the error and raise an HTTP exception
          print(f"Error fetching users: {e}")
@@ -34,19 +55,26 @@ def get_all_users(
 # POST /users - Tạo người dùng mới
 @router.post(
     "/",
-    response_model=UserResponse,
+    # response_model=UserResponse,
     summary="Create a new user",
     description="This API creates a new user and assigns the CUSTOMER role."
 )
 def create_user(
     user_data: UserCreate, session: Session = Depends(get_db)
 ):
+    print(f"[DEBUG] Creating user: {user_data}")
+
     try:
         # Check if the user already exists
         existing_user = User.filter_by_email(session, user_data.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="User already exists")
-
+        
+        # Check if the phone number already exists
+        existing_phone = User.filter_by_phone_number(session, user_data.phone_number)
+        if existing_phone:
+            raise HTTPException(status_code=400, detail="Phone number already exists")
+        
         # Create a new user
         new_user = User(
             user_data.name,
@@ -55,16 +83,21 @@ def create_user(
             user_data.phone_number,
         )
         new_user.save(session)
+        session.commit()  # Commit sau khi lưu user
 
         # Get or create the CUSTOMER role
         customer_role, _ = Role.get_or_create(session, name=RoleEnum.CUSTOMER.value)
+        session.commit()  # Commit sau khi lấy role
 
         # Assign the CUSTOMER role to the new user
         UserRole.assign_role_to_user(session, user_id=new_user.id, role_id=customer_role.id)
+        session.commit()  # Commit sau khi gán role
 
-        return new_user
+        return new_user.to_dict()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"user data: {user_data}. Error creating user: {e}")
+        print(f"[DEBUG] Error in create_user: {repr(e)}")
+        session.rollback()  # Rollback nếu có lỗi
+        raise HTTPException(status_code=500, detail=f"Error creating user: {repr(e)}")
 
 # POST /users/admin - Tạo admin user
 @router.post(
@@ -136,6 +169,29 @@ def create_staff_user(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"user data: {user_data}. Error creating staff user: {e}")
 
+# UPDATED: GET /me - Retrieve the current authenticated user's information
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Get current user info",
+    description="Retrieve the authenticated user's information using current user dependency."
+)
+def get_current_user_info(session: Session = Depends(get_db), current_user: User = Depends(User.get_current_user)):
+    user_roles = UserRole.get_roles_by_user(session, current_user.id)
+    roles = [
+        {"id": str(role.role_id), "name": session.query(Role).get(role.role_id).name}
+        for role in user_roles
+    ]
+    
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "phone_number": current_user.phone_number,
+        "email": current_user.email,
+        "status": current_user.active,
+        "roles": roles,
+        "join_date": current_user.created_at.strftime("%d/%m/%Y") if hasattr(current_user, "created_at") and current_user.created_at else None
+    }
 # GET /users/{id} - Lấy thông tin người dùng theo ID
 @router.get(
     "/{id}",
@@ -143,13 +199,30 @@ def create_staff_user(
     summary="Retrieve all users",
     description="This API returns a list of all users, including descriptions and icon URLs."
 )
-def get_user_by_id(
+def get_user_detail(
     id: int, session: Session = Depends(get_db)
 ):
     user = User.get_by_id(session, id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+    # Get roles for the user
+    user_roles = UserRole.get_roles_by_user(session, user.id)
+    roles = [
+        {"id": str(role.role_id), "name": session.query(Role).get(role.role_id).name}
+        for role in user_roles
+    ]
+
+    # Map user data to the response schema
+    return {
+        "id": user.id,
+        "name": user.name,
+        "phone_number": user.phone_number,
+        "email": user.email,
+        "status": user.active,
+        "roles": roles,
+        "join_date": user.created_at.strftime("%d/%m/%Y") if user.created_at else None
+    }
 
 # PATCH /users/{id} - Cập nhật thông tin người dùng
 @router.patch(
@@ -175,11 +248,15 @@ def update_user(
     description="This API returns a list of all users, including descriptions and icon URLs."
 )
 def delete_user(
-    id: int, session: Session = Depends(get_db)
+    id: int, session: Session = Depends(get_db),
+    current_user: User = Depends(User.get_current_user)
 ):
     user = User.get_by_id(session, id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
     
     user.delete(session)
     return {"message": "User deleted successfully"}
+

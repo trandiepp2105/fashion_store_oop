@@ -35,13 +35,12 @@ const ModalLogin = ({ handleClose }) => {
             </g>
           </svg>
         </button>
-        <span className="title">Vmember</span>
+        <span className="title">vmember</span>
         <div className="wrapper-assistant-logo">
           <img src="/assets/images/assistant-non-bg.png" alt="" />
         </div>
         <p className="description">
-          Vui lòng đăng nhập tài khoản Vmember để xem ưu đãi và thanh toán dễ
-          dàng hơn.
+          Please log in to your account to view offers and make payments easier.{" "}
         </p>
         <div className="group-login-btn">
           <Link
@@ -49,7 +48,7 @@ const ModalLogin = ({ handleClose }) => {
             className="link-button register-btn"
             onClick={handleClose}
           >
-            Đăng ký
+            Register
           </Link>
 
           <Link
@@ -57,7 +56,7 @@ const ModalLogin = ({ handleClose }) => {
             className="link-button login-btn"
             onClick={handleClose}
           >
-            Đăng nhập
+            Login
           </Link>
         </div>
       </div>

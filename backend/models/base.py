@@ -36,14 +36,10 @@ class Base(DeclarativeBase):
     
     @classmethod
     def get_by_id(cls, session: Session, record_id: int):
-        instance = session.query(cls).filter_by(id=record_id).first()
+        instance = session.get(cls, record_id)
         if not instance:
             raise ValueError(f"{cls.__name__} with ID {record_id} not found.")
         return instance
-    
-    @classmethod
-    def get_all(cls, session: Session):
-        return session.query(cls).all()
     
     @classmethod
     def get_or_create(cls, session: Session, **kwargs):

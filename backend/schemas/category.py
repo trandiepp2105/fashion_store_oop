@@ -40,8 +40,8 @@ class NestedCategorySchema(BaseModel):
 
 class CreateCategorySchema(BaseModel):
     name: str
-    parent_id: Optional[int] = None
     description: Optional[str] = None
+    parent_id: Optional[int] = None
     icon_url: Optional[str] = "https://resource-server/category-icon/default.png"  # Default icon URL
 
 class UpdateCategorySchema(BaseModel):

@@ -25,6 +25,9 @@ import WaitingOverlay from "./components/WaitingOverlay/WaitingOverlay";
 import WarningPopup from "./components/WarningPopup/WarningPopup";
 import AccountPage from "./pages/AccountPage/AccountPage";
 import CollectionPage from "./pages/CollectionPage/CollectionPage";
+// toast
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 export const AppContext = createContext();
 
 function App() {
@@ -54,10 +57,13 @@ function App() {
   }, [shoppingCart]);
 
   useEffect(() => {
-    const loginStatus = isLogin();
-    setIsUserLogin(loginStatus);
+    const checkLoginStatus = async () => {
+      const loginStatus = await isLogin();
+      setIsUserLogin(loginStatus);
+      console.log("isUserLogin", loginStatus);
+    };
+    checkLoginStatus();
     getShoppingCart();
-    console.log("isUserLogin", loginStatus);
     if (headerRef.current) {
       const headerElement = headerRef.current;
       const height = headerElement.offsetHeight;
@@ -111,12 +117,14 @@ function App() {
         setIsUserLogin,
         shoppingCart,
         setShoppingCart,
+        getShoppingCart,
         onLoading,
         setOnLoading,
         setIsShowWarningPopup,
       }}
     >
       <div className="App" ref={appRef}>
+        <ToastContainer />
         {onLoading && <WaitingOverlay />}
         {isShowWarningPopup && (
           <WarningPopup handleClose={() => setIsShowWarningPopup(false)} />
@@ -147,10 +155,7 @@ function App() {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/recover-password" element={<RecoverPasswordPage />} />
-            <Route
-              path="/productdetail/:slug"
-              element={<ProductDetailPage />}
-            />
+            <Route path="/productdetail/:id" element={<ProductDetailPage />} />
             <Route path="/catalogsearch/" element={<CatalogSearchPage />} />
             {/* <Route path="/cate/" element={<CatalogSearchPage />} /> */}
 
@@ -160,11 +165,11 @@ function App() {
             <Route path="/collections" element={<CollectionPage />} />
           </Routes>
         </div>
-        {!isHideHeaderFooter && (
+        {/* {!isHideHeaderFooter && (
           <div className="footer" ref={footerRef}>
             <Footer />
           </div>
-        )}
+        )} */}
 
         <BackToTopButton
           handleClick={() => {

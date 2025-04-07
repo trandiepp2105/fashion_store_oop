@@ -11,6 +11,7 @@ from sqlalchemy.exc import OperationalError
 from config import settings
 from config.settings import get_mysql_connection_url
 from api.main import api_v1_router
+from fastapi.staticfiles import StaticFiles
 
 # Basic logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -54,13 +55,26 @@ app = FastAPI(
     docs_url="/docs",
 )
 
+# mount static files (if any)
+app.mount("/media", StaticFiles(directory="media"), name="media")
+
+
 from fastapi.middleware.cors import CORSMiddleware
+origins = [
+    "http://localhost:3000",  
+    "http://127.0.0.1:3000",  
+    "http://26.178.178.33:3000",
+    "http://26.178.178.33",
+    "http://26.178.178.33:3001",
+    
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,                # KHÔNG được dùng ["*"] nếu allow_credentials=True
+    allow_credentials=True,               # Cho phép gửi cookies/session
+    allow_methods=["*"],                  # Cho phép tất cả method như GET, POST
+    allow_headers=["*"],                  # Cho phép tất cả headers
 )
 
 

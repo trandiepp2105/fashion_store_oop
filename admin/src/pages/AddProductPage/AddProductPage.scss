@@ -73,6 +73,10 @@
           .save-product-btn {
             background-color: #85f7b8;
           }
+
+          .add-supplier-btn {
+            background-color: #f7e185;
+          }
         }
       }
     }
@@ -191,6 +195,7 @@
                 border-radius: 5px;
                 border: 1px solid #c4c2c2;
                 padding: 7px 15px;
+                width: fit-content;
               }
             }
           }

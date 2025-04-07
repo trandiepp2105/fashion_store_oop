@@ -293,7 +293,7 @@ const NavBar = () => {
         </Link>
         <span className="divider"></span>
 
-        <Link
+        {/* <Link
           className={`navigation-link ${
             location.pathname.includes("notifications") ? "active" : ""
           }`}
@@ -323,12 +323,13 @@ const NavBar = () => {
             </g>
           </svg>
           Notifications
-        </Link>
+        </Link> */}
         <Link
           className={`navigation-link ${
             location.pathname.includes("settings") ? "active" : ""
           }`}
-          to="/settings"
+          to="/account"
+          style={{ marginTop: "auto" }}
         >
           <svg
             width="18px"
@@ -367,7 +368,7 @@ const NavBar = () => {
               />{" "}
             </g>
           </svg>
-          Settings
+          Account
         </Link>
       </ul>
     </div>

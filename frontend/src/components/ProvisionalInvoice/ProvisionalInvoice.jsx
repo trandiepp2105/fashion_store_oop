@@ -51,7 +51,7 @@ const ProvisionalInvoice = ({
                 </clipPath>
               </defs>
             </svg>
-            <p>Chọn hoặc nhập ưu đãi</p>
+            <p>Select or enter an offer</p>
           </div>
           <div className="box-discount__content">
             <svg
@@ -73,7 +73,7 @@ const ProvisionalInvoice = ({
               <div className="overlay"></div>
               <div className="block-choose-discount-inner">
                 <div className="block-choose-discount__title">
-                  <p>Khuyến mãi và ưu đãi</p>
+                  <p>Promotions and offers</p>
                   <button
                     className="close-btn"
                     onClick={(event) => {
@@ -94,7 +94,7 @@ const ProvisionalInvoice = ({
                   </button>
                 </div>
                 <div className="block-enter-discount-code">
-                  <div className="title">Mã giảm giá</div>
+                  <div className="title">Coupon</div>
                   <button className="toggle-block-verify-discount-code-btn">
                     <div className="left-side">
                       <svg
@@ -116,7 +116,7 @@ const ProvisionalInvoice = ({
                           </clipPath>
                         </defs>
                       </svg>
-                      <p>Nhập mã giảm giá của bạn ở đây nhé</p>
+                      <p>Enter your coupon here</p>
                     </div>
                     <div className="right-side">
                       <svg
@@ -136,7 +136,7 @@ const ProvisionalInvoice = ({
                 </div>
                 <div className="list-discount-item"></div>
                 <p className="quantity-discount">
-                  Đã chọn 0 khuyễn mãi và ưu đãi
+                  0 promotions and offers selected
                 </p>
                 <div className="total-discount">
                   <div className="total-discount__calculation">
@@ -144,10 +144,10 @@ const ProvisionalInvoice = ({
                       <span>0 đ</span>
                     </p>
                     <p className="discount-percent">
-                      Tiết kiệm: <span>0 đ</span>
+                      Saved <span>0 đ</span>
                     </p>
                   </div>
-                  <butotn className="verify-btn">Xác nhận</butotn>
+                  <butotn className="verify-btn">Confirm</butotn>
                 </div>
               </div>
             </div>
@@ -380,10 +380,10 @@ const ProvisionalInvoice = ({
               </clipPath>
             </defs>
           </svg>
-          <div className="member-score">Đổi 0 điểm (~0đ)</div>
+          <div className="member-score">0 points exchanged (~0đ)</div>
           <button
             className="member-score-discription"
-            title="bạn cần đăng nhập để đổi điểm"
+            title="Member score description"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -403,31 +403,21 @@ const ProvisionalInvoice = ({
         <div className="cart-info">
           <p className="cart-info__title">Thông tin đơn hàng</p>
           <div className="block-price block-total-cart-price">
-            <p>Tổng tiền</p>
+            <p>Total amount</p>
             <p className="total-price total-cart-price">
-              {(receipt && formatCurrencyVN(receipt.total_price)) || "0 đ"}
+              {(receipt && formatCurrencyVN(receipt.original_total)) || "0 đ"}
             </p>
           </div>
           <div className="block-price block-total-discount">
-            <p>Tổng khuyến mãi</p>
+            <p>Discounted total</p>
             <p className="total-price total-discount">
-              {(receipt &&
-                formatCurrencyVN(
-                  ((receipt &&
-                    receipt.discount &&
-                    receipt.discount.product_discount) ||
-                    0) +
-                    (receipt &&
-                      receipt.discount &&
-                      receipt.discount.voucher_discount) || 0
-                )) ||
-                "0 đ"}
+              {receipt && (formatCurrencyVN(receipt.discount_amount) || "0 đ")}
             </p>
           </div>
           {showDiscountDetail && (
             <ul className="discount-detail">
               <li className="discount-item">
-                <p>Giảm giá sản phẩm</p>
+                <p>Product discounts</p>
                 <p className="discount-value">
                   {(receipt &&
                     receipt.discount &&
@@ -449,20 +439,20 @@ const ProvisionalInvoice = ({
 
           {deliveryFeeVisible && (
             <div className="block-delivery-fee">
-              <p>Phí vận chuyển</p>
-              <p>Miễn phí</p>
+              <p>Delivery fee</p>
+              <p>free</p>
             </div>
           )}
 
           <div className="block-final-price">
             <div className="first-line block-price">
-              <p>Cần thanh toán</p>
+              <p>Amount payable</p>
               <p className="total-price final-price">
-                {(receipt && formatCurrencyVN(receipt.payable_price)) || "0 đ"}
+                {(receipt && formatCurrencyVN(receipt.final_total)) || "0 đ"}
               </p>
             </div>
             <div className="second-line block-price">
-              <p>Điểm thưởng</p>
+              <p>Number of points accumulated</p>
               <p className="member-score">
                 <svg
                   width={20}
@@ -720,7 +710,7 @@ const ProvisionalInvoice = ({
             className="invoice-detail-button"
             onClick={() => setShowDiscountDetail(!showDiscountDetail)}
           >
-            Xem chi tiết
+            Detail
             <svg
               width="16"
               height="17"

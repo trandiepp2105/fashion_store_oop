@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import "./PopupCreateCategory.scss";
-
-const PopupCreateCategory = ({ handleToggle, parentCaregoryId }) => {
+import categoryService from "../../services/categoryService";
+// toast
+import { toast } from "react-toastify";
+const PopupCreateCategory = ({
+  handleToggle,
+  fetchCategory,
+  parentCaregoryId = 0,
+}) => {
   const [categoryName, setCategoryName] = useState("");
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState(null);
@@ -28,28 +34,47 @@ const PopupCreateCategory = ({ handleToggle, parentCaregoryId }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("category-name", categoryName);
-    formData.append("category-description", description);
-    if (icon) {
-      formData.append("cate-icon-file", icon);
+
+    const categoryData = {
+      name: categoryName,
+      description: description,
+      parent_id: parentCaregoryId,
+    };
+
+    try {
+      const response = await categoryService.createCategory(categoryData);
+      await fetchCategory();
+      toast.success("Category created successfully!");
+      console.log("Category created successfully:", response);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      toast.error("Failed to create category. Please try again.");
+    } finally {
+      handleToggle();
     }
 
-    formData.append("parent-category-id", parentCaregoryId);
+    // const formData = new FormData();
+    // formData.append("category-name", categoryName);
+    // formData.append("category-description", description);
+    // if (icon) {
+    //   formData.append("cate-icon-file", icon);
+    // }
 
-    // Gửi formData đi (Ví dụ: fetch API hoặc axios)
-    console.log("FormData submitted!");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
+    // formData.append("parent-category-id", parentCaregoryId);
+
+    // // Gửi formData đi (Ví dụ: fetch API hoặc axios)
+    // console.log("FormData submitted!");
+    // for (let pair of formData.entries()) {
+    //   console.log(pair[0] + ": " + pair[1]);
+    // }
   };
 
   return (
     <div className="create-category-popup">
       <div className="container">
-        <form className="popup" onSubmit={handleSubmit}>
+        <form className="popup-category" onSubmit={handleSubmit}>
           <h3 className="title">Create Category</h3>
           <div className="popup-content">
             {/* Category Name */}
@@ -84,7 +109,7 @@ const PopupCreateCategory = ({ handleToggle, parentCaregoryId }) => {
             </div>
 
             {/* Upload Icon */}
-            <div className="input-container">
+            {/* <div className="input-container">
               <p className="input-title">Icon category</p>
               <div className="wrapper-select-icon">
                 <input
@@ -154,7 +179,7 @@ const PopupCreateCategory = ({ handleToggle, parentCaregoryId }) => {
                   )}
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Buttons */}

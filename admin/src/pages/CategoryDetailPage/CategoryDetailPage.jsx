@@ -11,8 +11,108 @@ import { useParams } from "react-router-dom";
 
 import PopupCreateCategory from "../../components/PopupCreateCategory/PopupCreateCategory";
 import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
+import categoryService from "../../services/categoryService";
+import { useNavigate } from "react-router-dom";
+// toast
+import { toast } from "react-toastify";
 const CategoryDetailPage = () => {
   const { id } = useParams(); // Lấy id từ URL
+  const navigate = useNavigate();
+  const [category, setCategory] = useState(null);
+  const [temporaryCategory, setTemporaryCategory] = useState({});
+  const fetchCategory = async () => {
+    try {
+      const response = await categoryService.getCategory(id);
+
+      setTemporaryCategory({
+        name: response.name,
+        description: response.description,
+      });
+      setCategory(response);
+    } catch (error) {
+      console.error("Error fetching category:", error);
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    // if (!temporaryCategory.name) {
+    //   alert("Please enter a category name");
+    //   return;
+    // }
+    // if (!temporaryCategory.description) {
+    //   alert("Please enter a category description");
+    //   return;
+    // }
+
+    // if (
+    //   temporaryCategory.name === category.name &&
+    //   temporaryCategory.description === category.description
+    // ) {
+    //   alert("Category has not changed");
+    //   return;
+    // }
+
+    if (
+      temporaryCategory.name === category.name &&
+      temporaryCategory.description === category.description
+    ) {
+      toast.error("Category has not changed");
+      return;
+    }
+    if (!temporaryCategory.name) {
+      toast.error("Please enter a category name");
+      return;
+    }
+    if (!temporaryCategory.description) {
+      toast.error("Please enter a category description");
+      return;
+    }
+    try {
+      const response = await categoryService.updateCategory(id, {
+        name: temporaryCategory.name,
+        description: temporaryCategory.description,
+      });
+      if (response) {
+        setTemporaryCategory({
+          name: response.name,
+          description: response.description,
+        });
+        fetchCategory();
+        toast.success("Category updated successfully");
+      }
+      console.log("Category updated successfully:", response);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      toast.error("Error updating category");
+    }
+  };
+
+  const handleDeleteMainCategory = async () => {
+    try {
+      await categoryService.deleteCategory(id);
+      toast.success("Category deleted successfully");
+      navigate("/categories");
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast.error("Error deleting category");
+    }
+  };
+
+  const handleDeleteSubCategory = async (subCategoryId) => {
+    try {
+      await categoryService.deleteCategory(subCategoryId);
+      toast.success("Subcategory deleted successfully");
+      fetchCategory();
+    } catch (error) {
+      console.error("Error deleting subcategory:", error);
+      toast.error("Error deleting subcategory");
+    } finally {
+      handleToggleDeleteSubCategoryPopup();
+    }
+  };
+  useEffect(() => {
+    fetchCategory();
+  }, [id]);
 
   const listCategoryRef = useRef(null);
   const [distanceListProductToBottom, setDistanceListProductToBottom] =
@@ -44,39 +144,39 @@ const CategoryDetailPage = () => {
       valueFormatter: (params) => `#${params}`,
     },
     { field: "name", headerName: "Category Name", flex: 1.5 },
-    {
-      field: "icon_url",
-      headerName: "Icon Category",
-      //   width: 150,
-      flex: 1,
-      justifyContent: "center",
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <Box
-          width={"100%"}
-          height={"100%"}
-          display="flex"
-          alignItems={"center"}
-          gap={1}
-        >
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <span className="wrapper-cate-icon">
-              <img src="/assets/kid-svgrepo-com.svg" alt="" />
-            </span>
-          </div>
-        </Box>
-      ),
-    },
+    // {
+    //   field: "icon_url",
+    //   headerName: "Icon Category",
+    //   //   width: 150,
+    //   flex: 1,
+    //   justifyContent: "center",
+    //   sortable: false,
+    //   filterable: false,
+    //   renderCell: (params) => (
+    //     <Box
+    //       width={"100%"}
+    //       height={"100%"}
+    //       display="flex"
+    //       alignItems={"center"}
+    //       gap={1}
+    //     >
+    //       <div
+    //         style={{
+    //           width: "100%",
+    //           height: "100%",
+    //           display: "flex",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //           gap: "10px",
+    //         }}
+    //       >
+    //         <span className="wrapper-cate-icon">
+    //           <img src="/assets/kid-svgrepo-com.svg" alt="" />
+    //         </span>
+    //       </div>
+    //     </Box>
+    //   ),
+    // },
     { field: "description", headerName: "Description", flex: 3 },
     {
       field: "action",
@@ -134,7 +234,10 @@ const CategoryDetailPage = () => {
           </Link>
           <button
             className="action-detail-link delete-btn"
-            onClick={handleToggleDeleteSubCategoryPopup}
+            onClick={() => {
+              setSelectedSubCategory(params.row);
+              handleToggleDeleteSubCategoryPopup();
+            }}
             style={{
               color: "#733ab0",
               border: "none",
@@ -203,37 +306,6 @@ const CategoryDetailPage = () => {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      name: "Men's Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Men's Fashion category offers a wide range of stylish, sophisticated, and trendy clothing and accessories for men. Whether you need casual outfits, professional attire, or statement pieces, you'll find the perfect selection here.",
-    },
-    {
-      id: 2,
-      name: "Women's Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Women's Fashion category offers a diverse collection of stylish, elegant, and trendy clothing and accessories for women. Whether you're looking for everyday wear, professional outfits, or glamorous evening attire, this category has it all.",
-    },
-    {
-      id: 3,
-      name: "Kids' Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Kids' Fashion category features a wide selection of adorable, comfortable, and stylish clothing and accessories for children. Whether you're shopping for babies, toddlers, or older kids, you'll find the perfect outfits here.",
-    },
-    {
-      id: 4,
-      name: "Seasonal Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Seasonal Fashion category offers a variety of clothing and accessories designed for specific seasons and occasions. Whether you're shopping for summer, winter, spring, or fall, you'll find the perfect outfits here.",
-    },
-  ];
-
   const paginationModel = { page: 0, pageSize: 6 };
 
   const [isOpenCreateCategoryModal, setIsOpenCreateCategoryModal] =
@@ -255,12 +327,15 @@ const CategoryDetailPage = () => {
   const handleToggleDeleteSubCategoryPopup = () => {
     setIsOpenDeleteSubCategoryPopup(!isOpenDeleteSubCategoryPopup);
   };
+
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   return (
     <div className="category-detail-page">
       {isOpenCreateCategoryModal && (
         <PopupCreateCategory
           parentCaregoryId={id}
           handleToggle={handleToggleCreateCategoryModal}
+          fetchCategory={fetchCategory}
         />
       )}
 
@@ -268,6 +343,11 @@ const CategoryDetailPage = () => {
         <AcceptancePopup
           description="Are you sure you want to delete this product category? All products in this category will be deleted."
           handleClose={handleToggleDeleteCategoryPopup}
+          handleAccept={() => {
+            handleDeleteMainCategory();
+            handleToggleDeleteCategoryPopup();
+            navigate("/categories");
+          }}
         />
       )}
 
@@ -275,6 +355,7 @@ const CategoryDetailPage = () => {
         <AcceptancePopup
           description="Are you sure you want to delete this product subcategory? All products in this subcategory will be deleted."
           handleClose={handleToggleDeleteSubCategoryPopup}
+          handleAccept={() => handleDeleteSubCategory(selectedSubCategory.id)}
         />
       )}
       <div className="page-content">
@@ -319,6 +400,9 @@ const CategoryDetailPage = () => {
             </p>
           </div>
           <div className="right-side">
+            <button className="save-btn" onClick={handleUpdateCategory}>
+              SAVE
+            </button>
             <button
               className="delete-btn"
               onClick={handleToggleDeleteCategoryPopup}
@@ -327,62 +411,7 @@ const CategoryDetailPage = () => {
             </button>
           </div>
         </div>
-        {/* <div className="statistics-side">
-          <div className="categories-statistics">
-            <div className="category-statistics-item">
-              <div className="wrapper-cate-icon">
-                <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
-                </div>
-              </div>
-              <p className="cate-name">Total Men's Fashsion</p>
-              <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
-                <Link
-                  to={`/products?category_id=${1}`}
-                  className="show-products-link"
-                >
-                  Show Products
-                </Link>
-              </div>
-            </div>
-            <div className="category-statistics-item">
-              <div className="wrapper-cate-icon">
-                <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
-                </div>
-              </div>
-              <p className="cate-name">Total Men's Fashsion</p>
-              <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
-                <Link
-                  to={`/products?category_id=${1}`}
-                  className="show-products-link"
-                >
-                  Show Products
-                </Link>
-              </div>
-            </div>
 
-            <div className="category-statistics-item">
-              <div className="wrapper-cate-icon">
-                <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
-                </div>
-              </div>
-              <p className="cate-name">Total Men's Fashsion</p>
-              <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
-                <Link
-                  to={`/products?category_id=${1}`}
-                  className="show-products-link"
-                >
-                  Show Products
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div> */}
         <div className="category-info">
           <div className="wrapper-info-item three-column">
             <div className="info-item">
@@ -393,12 +422,17 @@ const CategoryDetailPage = () => {
                   name=""
                   id=""
                   className="info-input"
-                  disabled={true}
-                  value="Xiaomi Redmi Note 14"
+                  value={temporaryCategory ? temporaryCategory.name : ""}
+                  onChange={(e) =>
+                    setTemporaryCategory({
+                      ...temporaryCategory,
+                      name: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
-            <div className="info-item">
+            {/* <div className="info-item">
               <p className="info-title">Icon Category</p>
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
@@ -461,7 +495,7 @@ const CategoryDetailPage = () => {
                   Change Icon
                 </label>
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="wrapper-info-item">
             <div className="info-item">
@@ -472,8 +506,13 @@ const CategoryDetailPage = () => {
                   name=""
                   id=""
                   className="info-input"
-                  disabled={true}
-                  value="Xiaomi Redmi Note 14"
+                  value={temporaryCategory ? temporaryCategory.description : ""}
+                  onChange={(e) =>
+                    setTemporaryCategory({
+                      ...temporaryCategory,
+                      description: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -569,7 +608,7 @@ const CategoryDetailPage = () => {
             }}
           >
             <DataGrid
-              rows={rows}
+              rows={category ? category.subcategories : []}
               columns={columns}
               initialState={{
                 pagination: { paginationModel },

@@ -9,8 +9,22 @@ import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import PopupCreateCategory from "../../components/PopupCreateCategory/PopupCreateCategory";
 import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
+import categoryService from "../../services/categoryService";
 const CategoryPage = () => {
   const listCategoryRef = useRef(null);
+  const [categories, setCategories] = useState([]);
+  const fetchCategories = async () => {
+    try {
+      const response = await categoryService.getCategories();
+      setCategories(response);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   const [distanceListProductToBottom, setDistanceListProductToBottom] =
     useState(0);
 
@@ -42,39 +56,39 @@ const CategoryPage = () => {
       valueFormatter: (params) => `#${params}`,
     },
     { field: "name", headerName: "Category Name", flex: 1.5 },
-    {
-      field: "icon_url",
-      headerName: "Icon Category",
-      //   width: 150,
-      flex: 1,
-      justifyContent: "center",
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <Box
-          width={"100%"}
-          height={"100%"}
-          display="flex"
-          alignItems={"center"}
-          gap={1}
-        >
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <span className="wrapper-cate-icon">
-              <img src="/assets/kid-svgrepo-com.svg" alt="" />
-            </span>
-          </div>
-        </Box>
-      ),
-    },
+    // {
+    //   field: "icon_url",
+    //   headerName: "Icon Category",
+    //   //   width: 150,
+    //   flex: 1,
+    //   justifyContent: "center",
+    //   sortable: false,
+    //   filterable: false,
+    //   renderCell: (params) => (
+    //     <Box
+    //       width={"100%"}
+    //       height={"100%"}
+    //       display="flex"
+    //       alignItems={"center"}
+    //       gap={1}
+    //     >
+    //       <div
+    //         style={{
+    //           width: "100%",
+    //           height: "100%",
+    //           display: "flex",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //           gap: "10px",
+    //         }}
+    //       >
+    //         <span className="wrapper-cate-icon">
+    //           <img src="/assets/kid-svgrepo-com.svg" alt="" />
+    //         </span>
+    //       </div>
+    //     </Box>
+    //   ),
+    // },
     { field: "description", headerName: "Description", flex: 3 },
     {
       field: "action",
@@ -138,6 +152,7 @@ const CategoryPage = () => {
             onClick={(e) => {
               e.stopPropagation();
               handleToggleDeleteCategoryPopup();
+              setSelectedCategory(params.row);
             }}
             style={{
               color: "#733ab0",
@@ -207,37 +222,6 @@ const CategoryPage = () => {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      name: "Men's Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Men's Fashion category offers a wide range of stylish, sophisticated, and trendy clothing and accessories for men. Whether you need casual outfits, professional attire, or statement pieces, you'll find the perfect selection here.",
-    },
-    {
-      id: 2,
-      name: "Women's Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Women's Fashion category offers a diverse collection of stylish, elegant, and trendy clothing and accessories for women. Whether you're looking for everyday wear, professional outfits, or glamorous evening attire, this category has it all.",
-    },
-    {
-      id: 3,
-      name: "Kids' Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Kids' Fashion category features a wide selection of adorable, comfortable, and stylish clothing and accessories for children. Whether you're shopping for babies, toddlers, or older kids, you'll find the perfect outfits here.",
-    },
-    {
-      id: 4,
-      name: "Seasonal Fashion",
-      icon_url: "https://cdn-icons-png.flaticon.com/512/116/116350.png",
-      description:
-        "The Seasonal Fashion category offers a variety of clothing and accessories designed for specific seasons and occasions. Whether you're shopping for summer, winter, spring, or fall, you'll find the perfect outfits here.",
-    },
-  ];
-
   const paginationModel = { page: 0, pageSize: 6 };
 
   const [isOpenCreateCategoryPopup, setIsOpenCreateCategoryPopup] =
@@ -253,16 +237,34 @@ const CategoryPage = () => {
   const handleToggleDeleteCategoryPopup = () => {
     setIsOpenDeleteCategoryPopup(!isOpenDeleteCategoryPopup);
   };
+
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const hanleDeleteCategory = async () => {
+    try {
+      await categoryService.deleteCategory(selectedCategory.id);
+      fetchCategories();
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
+  };
   return (
     <div className="category-page">
       {isOpenCreateCategoryPopup && (
-        <PopupCreateCategory handleToggle={handleToggleCreateCategoryPopup} />
+        <PopupCreateCategory
+          handleToggle={handleToggleCreateCategoryPopup}
+          fetchCategory={fetchCategories}
+        />
       )}
 
       {isOpenDeleteCategoryPopup && (
         <AcceptancePopup
           description="Are you sure you want to delete this product category? All products in this category will be deleted."
           handleClose={handleToggleDeleteCategoryPopup}
+          handleAccept={() => {
+            hanleDeleteCategory();
+            handleToggleDeleteCategoryPopup();
+          }}
         />
       )}
       <div className="page-content">
@@ -279,12 +281,29 @@ const CategoryPage = () => {
             <div className="category-statistics-item">
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
+                  <img src="/assets/men-fashion.svg" alt="" />
                 </div>
               </div>
               <p className="cate-name">Total Men's Fashsion</p>
               <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
+                <p className="product-count">70</p>
+                <Link
+                  to={`/products?category_id=${1}`}
+                  className="show-products-link"
+                >
+                  Show Products
+                </Link>
+              </div>
+            </div>
+            <div className="category-statistics-item">
+              <div className="wrapper-cate-icon">
+                <div className="cate-icon">
+                  <img src="/assets/women-fashion.svg" alt="" />
+                </div>
+              </div>
+              <p className="cate-name">Total Women's Fashsion</p>
+              <div className="category-statistics-item__footer">
+                <p className="product-count">100</p>
                 <Link
                   to={`/products?category_id=${1}`}
                   className="show-products-link"
@@ -299,50 +318,12 @@ const CategoryPage = () => {
                   <img src="/assets/kid-svgrepo-com.svg" alt="" />
                 </div>
               </div>
-              <p className="cate-name">Total Men's Fashsion</p>
+              <p className="cate-name">Total Kid's Fashsion</p>
               <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
+                <p className="product-count">150</p>
                 <Link
                   to={`/products?category_id=${1}`}
                   className="show-products-link"
-                >
-                  Show Products
-                </Link>
-              </div>
-            </div>
-            <div className="category-statistics-item">
-              <div className="wrapper-cate-icon">
-                <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
-                </div>
-              </div>
-              <p className="cate-name">Total Men's Fashsion</p>
-              <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
-                <Link
-                  to={`/products?category_id=${1}`}
-                  className="show-products-link"
-                >
-                  Show Products
-                </Link>
-              </div>
-            </div>
-            <div className="category-statistics-item">
-              <div className="wrapper-cate-icon">
-                <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
-                </div>
-              </div>
-              <p className="cate-name">Total Men's Fashsion</p>
-              <div className="category-statistics-item__footer">
-                <p className="product-count">250</p>
-                <Link
-                  to={`/products?category_id=${1}`}
-                  className="show-products-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log("Show products");
-                  }}
                 >
                   Show Products
                 </Link>
@@ -491,7 +472,7 @@ const CategoryPage = () => {
             }}
           >
             <DataGrid
-              rows={rows}
+              rows={categories}
               columns={columns}
               initialState={{
                 pagination: { paginationModel },

@@ -45,7 +45,7 @@ const CustomSelect = ({
         </svg>
         {/* <div className="place-holder">Product Category</div> */}
         <div className="current-option">
-          {selectedOption?.name || "Select option"}
+          {selectedOption?.name || `Select ${optionName || "option"}`}
         </div>
       </div>
 

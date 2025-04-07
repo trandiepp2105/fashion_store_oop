@@ -156,7 +156,20 @@ class User(Base, BaseModel):
             list[User]: A list of users with the specified email.
         """
         return session.query(cls).filter_by(email=email).all()
-    
+
+    @classmethod
+    def filter_by_phone_number(cls, session, phone_number):
+        """
+        Filter users by phone number.
+
+        Args:
+            session (Session): The database session.
+            phone_number (str): The phone number to filter by.
+
+        Returns:
+            list[User]: A list of users with the specified phone number.
+        """
+        return session.query(cls).filter_by(phone_number=phone_number).all()
     @classmethod
     def filter_by_status(cls, session, active):
         """
@@ -256,3 +269,15 @@ class User(Base, BaseModel):
             )
 
         return user
+    
+    def get_roles(self, session):
+        """
+        Retrieve all roles associated with this user.
+
+        Args:
+            session (Session): The database session.
+
+        Returns:
+            list[Role]: A list of roles for this user.
+        """
+        return session.query(Role).join(UserRole).filter(UserRole.user_id == self.id).all()

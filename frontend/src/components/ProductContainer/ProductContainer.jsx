@@ -4,6 +4,8 @@ import styles from "./ProductContainer.module.scss";
 import formatCurrencyVN from "../../utils/formatCurrencyVN";
 import generateSlug from "../../utils/generateSlug";
 import { Link, useNavigate } from "react-router-dom";
+const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
+
 const ProductContainer = ({ className, productGeneralInfo }) => {
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ const ProductContainer = ({ className, productGeneralInfo }) => {
         <div className={styles.productLink}>
           <div className={styles.productImage}>
             <img
-              src={productGeneralInfo.image_url}
+              src={`${HOST}${productGeneralInfo.image_url}`}
               alt={productGeneralInfo.name}
               class={styles.productImg}
             />

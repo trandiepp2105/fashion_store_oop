@@ -1,7 +1,6 @@
 from models.base import Base, BaseModel
-from sqlalchemy import Column, Integer, DECIMAL, DateTime, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, DECIMAL, DateTime, String, ForeignKey, Enum, func
 from sqlalchemy.orm import relationship, Session
-from sqlalchemy.sql.functions import current_timestamp
 from enums.order_status import OrderStatus
 from models.cart import CartItem
 from models.product import Product
@@ -27,7 +26,7 @@ class Order(Base, BaseModel):
     shipping_info_id = Column(Integer, ForeignKey("shippinginfo.id", ondelete="SET NULL"), nullable=False)
     total_amount = Column(Integer, nullable=False)
     final_amount = Column(Integer, nullable=False)
-    order_date = Column(DateTime, default=current_timestamp)
+    order_date = Column(DateTime, default=func.current_timestamp())  # updated default to use func
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
 
     def __init__(self, session: Session, user_id: int, shipping_info_id: int, cart_item_ids: list, coupon_id: int = None):

@@ -3,7 +3,7 @@ import apiClient from "./apiClient";
 const cartSurvice = {
   getShoppingCart: async () => {
     try {
-      const response = await apiClient.get("cart/cart");
+      const response = await apiClient.get("/cart");
       return response.data;
     } catch (error) {
       console.error("Error while fetching categories", error);
@@ -13,7 +13,7 @@ const cartSurvice = {
 
   addProductToCart: async (productId, quantity, variantId = NaN) => {
     try {
-      const response = await apiClient.post("cart/cart", {
+      const response = await apiClient.post("/cart", {
         product_id: productId,
         quantity: quantity,
         variant_id: variantId,
@@ -25,24 +25,21 @@ const cartSurvice = {
     }
   },
 
-  adjustCartItemInformation: async (cartItemId, quantity, variantId = NaN) => {
+  removeCartItem: async (cartItemId) => {
     try {
-      const response = await apiClient.patch(`cart/cart/${cartItemId}`, {
-        quantity: quantity,
-        variant_id: variantId,
-      });
+      const response = await apiClient.delete(`/cart/${cartItemId}`);
       return response.data;
     } catch (error) {
-      console.error("Error while adjusting cart item quantity", error);
+      console.error("Error while removing cart item", error);
       return;
     }
   },
 
-  removeCartItem: async (cartItemIds) => {
+  removeCartItems: async (cartItemIds) => {
     try {
-      const response = await apiClient.delete("cart/cart", {
+      const response = await apiClient.delete("/cart/bulk-delete", {
         data: {
-          cart_item_id: cartItemIds,
+          cart_item_ids: cartItemIds,
         },
       });
       return response.data;

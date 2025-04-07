@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ProductDetailPage.scss";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -13,36 +13,102 @@ import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import PopupVariant from "../../components/PopupVariant/PopupVariant";
 import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
-const ProductDetailPage = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+import productService from "../../services/productService";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-  const [suppliers, setSuppliers] = useState([
-    { id: 1, name: "Supplier 1" },
-    { id: 2, name: "Supplier 2" },
-    { id: 3, name: "Supplier 3" },
-    { id: 4, name: "Supplier 4" },
-    { id: 5, name: "Supplier 5" },
-    { id: 6, name: "Supplier 6" },
-    { id: 7, name: "Supplier 7" },
-    { id: 8, name: "Supplier 8" },
-    { id: 9, name: "Supplier 9" },
-    { id: 10, name: "Supplier 10" },
-    { id: 11, name: "Supplier 11" },
-    { id: 12, name: "Supplier 12" },
-    { id: 13, name: "Supplier 13" },
-    { id: 14, name: "Supplier 14" },
-    { id: 15, name: "Supplier 15" },
-    { id: 16, name: "Supplier 16" },
-    { id: 17, name: "Supplier 17" },
-    { id: 18, name: "Supplier 18" },
-    { id: 19, name: "Supplier 19" },
-    { id: 20, name: "Supplier 20" },
-  ]);
+const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
+
+const ProductDetailPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [productId, setProductId] = useState(null);
+  const { openVariant } = location.state || {};
+
+  useEffect(() => {
+    const pathSegments = location.pathname.split("/");
+    const id = pathSegments[pathSegments.length - 1];
+    setProductId(id);
+
+    // Clear the state after accessing it
+    if (location.state) {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
+
+  const [tempProductData, setTempProductData] = useState({});
+  const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [isOpenSupplierOption, setIsOpenSupplierOption] = useState(false);
+  const [mainCategories, setMainCategories] = useState([]);
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
+  const [subCategories, setSubCategories] = useState([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [isOpenCreateVariant, setIsOpenCreateVariant] = useState(openVariant);
+  const handleToggleCreateVariant = () => {
+    setIsOpenCreateVariant(!isOpenCreateVariant);
+  };
+  const fetchProductData = async () => {
+    try {
+      const response = await productService.getProduct(productId);
+      if (response) {
+        setTempProductData(response);
+        setVariants(response.variants);
+        setSuppliers([response.suppliers]);
+        setMainCategories([response.category]);
+        setSelectedMainCategory(response.category);
+        setSubCategories(response.category.subcategory);
+        setSelectedSubCategory(response.category.subcategory[0]);
+        setSelectedSupplier(response.supplier);
+
+        // Fetch the image and convert it to a File object
+        // const imageUrl = `${HOST}${response.image_url}`;
+        // const imageResponse = await fetch(imageUrl, {
+        //   mode: "no-cors",
+        // });
+        // const imageBlob = await imageResponse.blob();
+        // const fileName = imageUrl.split("/").pop();
+        // const imageFile = new File([imageBlob], fileName, {
+        //   type: imageBlob.type,
+        // });
+        // setImageFile(imageFile);
+      }
+      console.log("Product data:", response);
+    } catch (error) {
+      console.error("Error fetching product data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (productId) {
+      fetchProductData();
+    }
+  }, [productId]);
+  // handle delete product
+  const handleDeleteProduct = async () => {
+    try {
+      const response = await productService.deleteProduct(productId);
+      if (response) {
+        console.log("Product deleted successfully");
+        toast.success("Product deleted successfully");
+      }
+      handleToggleDeleteProductPopup();
+      navigate("/products");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("Error deleting product");
+      handleToggleDeleteProductPopup();
+    }
+  };
+
   const handleSelectSupplier = (option) => {
     setSelectedSupplier(option);
   };
-  const [isOpenSupplierOption, setIsOpenSupplierOption] = useState(false);
 
   const handleToggleSupplierOption = () => {
     setIsOpenSupplierOption(!isOpenSupplierOption);
@@ -50,7 +116,8 @@ const ProductDetailPage = () => {
 
   const columns = [
     {
-      field: "id",
+      field: "variant_id",
+      headerName: "Variant ID",
       width: 0,
       sortable: false,
       hidable: false,
@@ -95,7 +162,7 @@ const ProductDetailPage = () => {
       renderCell: (params) => (
         <Box width={"100%"} height={"100%"} display="flex" gap={1}>
           <div className="wrapper-variant-image">
-            <img src={params.row.image_url} alt="" />
+            <img src={`${HOST}${params.row.image_url}`} alt="" />
           </div>
         </Box>
       ),
@@ -237,120 +304,20 @@ const ProductDetailPage = () => {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      size: "S",
-      color: "Red",
-      stock: 10,
-      image_url:
-        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
-    },
-    {
-      id: 2,
-      size: "M",
-      color: "Red",
-      stock: 10,
-      image_url:
-        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
-    },
-    {
-      id: 3,
-      size: "L",
-      color: "Red",
-      stock: 10,
-      image_url:
-        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
-    },
-    {
-      id: 4,
-      size: "XL",
-      color: "Red",
-      stock: 10,
-      image_url:
-        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg",
-    },
-  ];
-
   const paginationModel = { page: 0, pageSize: 10 };
 
-  const [mainCategories, setMainCategories] = useState([
-    {
-      id: 1,
-      name: "Men fashion",
-    },
-    {
-      id: 2,
-      name: "Women fashion",
-    },
-    {
-      id: 3,
-      name: "Kid fashion",
-    },
-    {
-      id: 4,
-      name: "Unisex fashion",
-    },
-  ]);
-
-  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
   const handleSelectMainCategory = (option) => {
     setSelectedMainCategory(option);
   };
-  const [subCategories, setSubCategories] = useState([
-    {
-      id: 1,
-      name: "Tops and Shirts",
-    },
-    {
-      id: 2,
-      name: "Pants & Bottoms",
-    },
-    {
-      id: 3,
-      name: "Accessories",
-    },
-  ]);
 
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const handleSelectSubCategory = (option) => {
     setSelectedSubCategory(option);
-  };
-
-  const [subCategoriesLevel2, setSubCategoriesLevel2] = useState([
-    {
-      id: 1,
-      name: "T-Shirts",
-    },
-    {
-      id: 2,
-      name: "Outerwear Jackets",
-    },
-    {
-      id: 3,
-      name: "Polo Shirts",
-    },
-    {
-      id: 4,
-      name: "Hoodies & Sweatshirts",
-    },
-  ]);
-  const [selectedSubCategoryLevel2, setSelectedSubCategoryLevel2] =
-    useState(null);
-  const handleSelectSubCategoryLevel2 = (option) => {
-    setSelectedSubCategoryLevel2(option);
-  };
-  const [isOpenCreateVariant, setIsOpenCreateVariant] = useState(false);
-  const handleToggleCreateVariant = () => {
-    setIsOpenCreateVariant(!isOpenCreateVariant);
   };
 
   const [isOpenEditVariant, setIsOpenEditVariant] = useState(false);
   const handleToggleEditVariant = () => {
     setIsOpenEditVariant(!isOpenEditVariant);
   };
-
-  const [selectedVariant, setSelectedVariant] = useState(null);
 
   const [isOpenDeleteProductPopup, setIsOpenDeleteProductPopup] =
     useState(false);
@@ -364,10 +331,37 @@ const ProductDetailPage = () => {
   const handleToggleDeleteVariantPopup = () => {
     setIsOpenDeleteVariantPopup(!isOpenDeleteVariantPopup);
   };
+
+  const handleUpdateProductInfo = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("name", tempProductData.name);
+      formData.append("description", tempProductData.description);
+      if (imageFile) {
+        formData.append("image_file", imageFile);
+      }
+
+      formData.append("supplier_id", selectedSupplier.id);
+
+      const response = await productService.updateProduct(productId, formData);
+      if (response) {
+        console.log("Product updated successfully");
+        toast.success("Product updated successfully");
+        fetchProductData();
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      toast.error("Error updating product");
+    }
+  };
   return (
     <div className="page product-detail-page">
       {isOpenCreateVariant && (
-        <PopupVariant handleToggle={handleToggleCreateVariant} />
+        <PopupVariant
+          productId={productId}
+          handleToggle={handleToggleCreateVariant}
+          fetchProductData={fetchProductData}
+        />
       )}
 
       {isOpenEditVariant && (
@@ -382,6 +376,7 @@ const ProductDetailPage = () => {
         <AcceptancePopup
           description="Are you sure you want to delete this product?"
           handleClose={handleToggleDeleteProductPopup}
+          handleAccept={handleDeleteProduct}
         />
       )}
 
@@ -425,7 +420,9 @@ const ProductDetailPage = () => {
             </button>
             <div className="title">
               <h5 className="back-description">Back to list</h5>
-              <h2 className="product-name">{"Product Name"}</h2>
+              <h2 className="product-name">
+                {tempProductData?.name || "Product Name"}
+              </h2>
             </div>
           </div>
           <div className="right-side">
@@ -436,7 +433,12 @@ const ProductDetailPage = () => {
               >
                 Deltete Product
               </button>
-              <button className="btn quick-btn save-product-btn">Save</button>
+              <button
+                className="btn quick-btn save-product-btn"
+                onClick={handleUpdateProductInfo}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -465,15 +467,6 @@ const ProductDetailPage = () => {
                     selectedOption={selectedSubCategory}
                   />
                 </div>
-                <div className="info-item">
-                  <p className="info-title">Subcategory level 2</p>
-                  <CustomSelect
-                    options={subCategoriesLevel2}
-                    optionName="sub category"
-                    handleSelectOption={handleSelectSubCategoryLevel2}
-                    selectedOption={selectedSubCategoryLevel2}
-                  />
-                </div>
               </div>
               <div className="info-container">
                 <p className="title">Product image</p>
@@ -481,13 +474,32 @@ const ProductDetailPage = () => {
                 <div className="preview-image-section">
                   <div className="preview-image-list">
                     <div className="preview-image-item">
-                      <img
-                        src="https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_master.jpg"
-                        alt=""
-                      />
+                      {imageFile ? (
+                        <img
+                          src={URL.createObjectURL(imageFile)}
+                          alt="Preview"
+                        />
+                      ) : (
+                        <img
+                          src={`${HOST}${tempProductData?.image_url}`}
+                          alt="Preview"
+                          className="preview-image"
+                        />
+                      )}
                     </div>
                   </div>
-                  <button className="add-new-image-btn">
+                  <input
+                    type="file"
+                    name="image_file"
+                    id="image_file"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setImageFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <label htmlFor="image_file" className="add-new-image-btn">
                     <svg
                       width="25px"
                       height="25px"
@@ -521,8 +533,8 @@ const ProductDetailPage = () => {
                         />{" "}
                       </g>
                     </svg>
-                    Add Another Image
-                  </button>
+                    Add Image
+                  </label>
                 </div>
               </div>
             </div>
@@ -539,7 +551,13 @@ const ProductDetailPage = () => {
                         id=""
                         className="info-input"
                         // disabled={true}
-                        value="Puzzle Tee"
+                        value={tempProductData?.name}
+                        onChange={(e) =>
+                          setTempProductData({
+                            ...tempProductData,
+                            name: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -598,7 +616,13 @@ const ProductDetailPage = () => {
                         name="description"
                         id=""
                         className="info-input"
-                        value="Something about the product"
+                        value={tempProductData?.description}
+                        onChange={(e) =>
+                          setTempProductData({
+                            ...tempProductData,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -651,7 +675,7 @@ const ProductDetailPage = () => {
                     >
                       <div className="wrapper-options">
                         <div className="selected-value">
-                          {selectedSupplier?.name || "Select supplier"}
+                          {selectedSupplier?.company_name || "Select supplier"}
                         </div>
                         <svg
                           width="25px"
@@ -680,13 +704,13 @@ const ProductDetailPage = () => {
                           </g>
                         </svg>
                       </div>
-                      {isOpenSupplierOption && (
+                      {/* {isOpenSupplierOption && (
                         <Options
                           options={suppliers}
                           selectedOption={selectedSupplier}
                           handleSelect={handleSelectSupplier}
                         />
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
@@ -762,8 +786,9 @@ const ProductDetailPage = () => {
                 <div className="list-variant">
                   <Paper sx={{ height: "100%", width: "100%" }}>
                     <DataGrid
-                      rows={rows}
+                      rows={variants}
                       columns={columns}
+                      getRowId={(row) => row.variant_id} // dùng variant_id làm id
                       initialState={{ pagination: { paginationModel } }}
                       //   pageSizeOptions={[6, 10]}
                       checkboxSelection

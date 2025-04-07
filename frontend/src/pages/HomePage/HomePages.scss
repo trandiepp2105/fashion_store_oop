@@ -111,12 +111,13 @@
         .list-product {
           width: 100%;
           display: flex;
-          gap: 35px 20px;
+          gap: 40px 20px; /* Increase column gap to 40px */
           flex-wrap: wrap;
+          justify-content: space-between;
           .product-contaner {
-            flex: 0 0 calc((100% / 5) - (20px * 4 / 5)) !important; /* Adjust for new gap */
+            flex: 0 0 calc((100% / 4) - (40px * 3 / 4)) !important; /* Adjust for new gap */
             width: calc(
-              (100% / 5) - (20px * 4 / 5)
+              (100% / 4) - (40px * 3 / 4)
             ) !important; /* Adjust for new gap */
           }
         }

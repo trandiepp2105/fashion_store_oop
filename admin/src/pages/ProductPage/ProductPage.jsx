@@ -7,11 +7,30 @@ import Rating from "@mui/material/Rating";
 
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
+import productService from "../../services/productService";
+import { toast } from "react-toastify";
+import categoryService from "../../services/categoryService";
+const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
 const ProductPage = () => {
   const listProductRef = useRef(null);
   const [distanceListProductToBottom, setDistanceListProductToBottom] =
     useState(0);
+  const [mainCategories, setMainCategories] = useState([]);
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
 
+  // Hàm lấy danh sách danh mục chính
+  const fetchMainCategories = async () => {
+    try {
+      const response = await categoryService.getCategories();
+      setMainCategories(response);
+    } catch (error) {
+      console.error("Error fetching main categories:", error);
+    }
+  };
+
+  const handleSelectMainCategory = (category) => {
+    setSelectedMainCategory(category);
+  };
   useEffect(() => {
     const updatePosition = () => {
       if (listProductRef.current) {
@@ -37,10 +56,10 @@ const ProductPage = () => {
     { field: "id", headerName: "ID", width: 50 },
     // { field: "product_name", headerName: "Product Name", width: 170 },
     {
-      field: "product_name",
+      field: "name",
       headerName: "Product Name",
       // width: 180,
-      flex: 1.5,
+      flex: 2,
       justifyContent: "center",
       sortable: false, // Không cần sắp xếp
       filterable: false, // Không cần lọc
@@ -63,26 +82,41 @@ const ProductPage = () => {
             }}
           >
             <img
-              src={params.row.image_url}
+              src={`${HOST}${params.row.image_url}`}
               alt=""
               style={{
                 height: "50%",
                 borderRadius: "5px",
               }}
             />
-            <p>{params.row.product_name}</p>
+            <p>{params.row.name}</p>
           </div>
         </Box>
       ),
     },
-    { field: "supplier", headerName: "Supplier", flex: 1 },
-    { field: "selling_price", headerName: "Price", type: "number", flex: 1 },
-    { field: "stock", headerName: "Stock", type: "number", flex: 1 },
+    {
+      field: "supplier",
+      headerName: "Supplier",
+      flex: 1,
+      renderCell: (params) => (
+        <Box
+          width={"100%"}
+          height={"100%"}
+          display="flex"
+          alignItems={"center"}
+          gap={1}
+        >
+          <p>{params.row.supplier.company_name}</p>
+        </Box>
+      ),
+    },
+    { field: "selling_price", headerName: "Price", type: "number", flex: 0.75 },
+    { field: "stock", headerName: "Stock", type: "number", flex: 0.5 },
     {
       field: "rating",
       headerName: "Rating",
       // width: 100,
-      flex: 1,
+      flex: 0.75,
       justifyContent: "center",
       sortable: false, // Không cần sắp xếp
       filterable: false, // Không cần lọc
@@ -150,87 +184,116 @@ const ProductPage = () => {
       ),
     },
   ];
-
-  const rows = [
-    {
-      id: 1,
-      product_name: "Lovemotion Shirt",
-      image_url: "/assets/images/product-1.png",
-      supplier: "TSUN",
-      selling_price: 200000,
-      stock: 10,
-    },
-    {
-      id: 2,
-      product_name: "Oversize Shirt",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/ban_sao_cua_dsc_3621_d8abc7303213493693686cc8f7e7dfba_1024x1024.jpg",
-      supplier: "TSUN",
-      selling_price: 300000,
-      stock: 20,
-    },
-    {
-      id: 3,
-      product_name: "2 Panel Polo Shirt",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/polo2w_75dea7fcba004e6182d401c0df2c28f7_master.jpg",
-
-      supplier: "TSUN",
-      selling_price: 200000,
-      stock: 5,
-    },
-    {
-      id: 4,
-      product_name: "Emotions Tee",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/mockup_website_f0426a4d9e9349c6ab637dd016b29ab9_1024x1024.jpg",
-
-      supplier: "TSUN",
-      selling_price: 100000,
-      stock: 50,
-    },
-    {
-      id: 5,
-      product_name: "Shy Teddy Woo Tee",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/f28ffa40d2826bdc329331_2c91583b19034f6c8c3992a8fdc56750_master.jpg",
-
-      supplier: "TSUN",
-      selling_price: 400000,
-      stock: 30,
-    },
-    {
-      id: 6,
-      product_name: "Aurora Tee",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/ban_sao_cua_122_2__33b52599222244109ea8d53f057a613f_1024x1024.jpg",
-
-      supplier: "TSUN",
-      selling_price: 250000,
-      stock: 100,
-    },
-    {
-      id: 7,
-      product_name: "Big Teddy Tee",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/ban_sao_cua_251_2__405e3d3e74984072882e4324b2db94f0_master.jpg",
-
-      supplier: "TSUN",
-      selling_price: 500000,
-      stock: 80,
-    },
-    {
-      id: 8,
-      product_name: "Puzzle Tee",
-      image_url:
-        "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_1024x1024.jpg",
-      supplier: "Accessories",
-      selling_price: 150000,
-      stock: 40,
-    },
-  ];
-
   const paginationModel = { page: 0, pageSize: 6 };
+
+  // const rows = [
+  //   {
+  //     id: 1,
+  //     product_name: "Lovemotion Shirt",
+  //     image_url: "/assets/images/product-1.png",
+  //     supplier: "TSUN",
+  //     selling_price: 200000,
+  //     stock: 10,
+  //   },
+  //   {
+  //     id: 2,
+  //     product_name: "Oversize Shirt",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_dsc_3621_d8abc7303213493693686cc8f7e7dfba_1024x1024.jpg",
+  //     supplier: "TSUN",
+  //     selling_price: 300000,
+  //     stock: 20,
+  //   },
+  //   {
+  //     id: 3,
+  //     product_name: "2 Panel Polo Shirt",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/polo2w_75dea7fcba004e6182d401c0df2c28f7_master.jpg",
+
+  //     supplier: "TSUN",
+  //     selling_price: 200000,
+  //     stock: 5,
+  //   },
+  //   {
+  //     id: 4,
+  //     product_name: "Emotions Tee",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/mockup_website_f0426a4d9e9349c6ab637dd016b29ab9_1024x1024.jpg",
+
+  //     supplier: "TSUN",
+  //     selling_price: 100000,
+  //     stock: 50,
+  //   },
+  //   {
+  //     id: 5,
+  //     product_name: "Shy Teddy Woo Tee",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/f28ffa40d2826bdc329331_2c91583b19034f6c8c3992a8fdc56750_master.jpg",
+
+  //     supplier: "TSUN",
+  //     selling_price: 400000,
+  //     stock: 30,
+  //   },
+  //   {
+  //     id: 6,
+  //     product_name: "Aurora Tee",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_122_2__33b52599222244109ea8d53f057a613f_1024x1024.jpg",
+
+  //     supplier: "TSUN",
+  //     selling_price: 250000,
+  //     stock: 100,
+  //   },
+  //   {
+  //     id: 7,
+  //     product_name: "Big Teddy Tee",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_251_2__405e3d3e74984072882e4324b2db94f0_master.jpg",
+
+  //     supplier: "TSUN",
+  //     selling_price: 500000,
+  //     stock: 80,
+  //   },
+  //   {
+  //     id: 8,
+  //     product_name: "Puzzle Tee",
+  //     image_url:
+  //       "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_1024x1024.jpg",
+  //     supplier: "Accessories",
+  //     selling_price: 150000,
+  //     stock: 40,
+  //   },
+  // ];
+  const [products, setProducts] = useState([]);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await productService.getProducts();
+      setProducts(response);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+  };
+  // handle delete product
+  const handleDeleteProduct = async () => {
+    try {
+      await productService.deleteProduct(selectedProduct.id);
+      toast.success("Product deleted successfully");
+      // Cập nhật lại danh sách sản phẩm sau khi xóa
+      fetchProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("Failed to delete product");
+    }
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
   return (
     <div className="product-page">
       <div className="page-content">
@@ -359,7 +422,7 @@ const ProductPage = () => {
 
               <input
                 type="text"
-                placeholder="Search orders ..."
+                placeholder="Search product by name ..."
                 className="search-input"
               />
             </div>
@@ -444,7 +507,15 @@ const ProductPage = () => {
                 Filter
               </button>
 
-              {openFilter && <FilterPopup />}
+              {openFilter && (
+                <FilterPopup
+                  priceField={true}
+                  stockField={true}
+                  quantitySoldField={true}
+                  mainCategoryField={true}
+                  subCategoryField={true}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -493,7 +564,7 @@ const ProductPage = () => {
             }}
           >
             <DataGrid
-              rows={rows}
+              rows={products}
               columns={columns}
               initialState={{
                 pagination: { paginationModel },

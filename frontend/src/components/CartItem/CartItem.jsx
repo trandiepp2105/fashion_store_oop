@@ -6,112 +6,36 @@ import AcceptancePopup from "../AcceptancePopup/AcceptancePopup";
 import WaitingOverlay from "../WaitingOverlay/WaitingOverlay";
 import { AppContext } from "../../App";
 import WarningPopup from "../WarningPopup/WarningPopup";
+// toastify
+import { toast } from "react-toastify";
+const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
+
 const CartItem = ({
   cartItem,
+  fetchCart,
   isSelected,
   onItemSelectedChange,
-  setShoppingCart,
-  tempOrderInfor,
-  setTempOrderInfor,
 }) => {
   const { setOnLoading, setIsShowWarningPopup } = useContext(AppContext);
-  const [showVariant, setShowVariant] = useState(false);
 
   const [onAskingRemoveItem, setOnAskingRemoveItem] = useState(false);
-
-  const isWarrantySelected = (cartItemId, warrantyId) => {
-    const item = tempOrderInfor.find(
-      (orderInfo) => orderInfo.cartItemId === cartItemId
-    );
-
-    if (!item || !item.listWarranty) {
-      return false; // Không tìm thấy item hoặc listWarranty
-    }
-
-    // Kiểm tra xem có warranty với warrantyId và chosen là true không
-    return item.listWarranty.some(
-      (warranty) => warranty.id === warrantyId && warranty.chosen === true
-    );
-  };
-
-  const onSelectWarranty = (cartItemId, warrantyId) => {
-    setTempOrderInfor((prevTempOrderInfor) => {
-      const updatedOrderInfor = prevTempOrderInfor.map((orderInfo) => {
-        if (orderInfo.cartItemId === cartItemId) {
-          // Kiểm tra và cập nhật mỗi warranty
-          const updatedListWarranty = orderInfo.listWarranty.map((warranty) => {
-            if (warranty.id === warrantyId) {
-              // Nếu warranty chưa có trường "chosen", thêm trường "chosen" và đặt giá trị mặc định là false
-              if (warranty.chosen === undefined) {
-                warranty.chosen = false;
-              }
-              // Đảo giá trị của chosen (nếu đang true thì set false, ngược lại)
-              return { ...warranty, chosen: !warranty.chosen };
-            }
-            return warranty;
-          });
-
-          return { ...orderInfo, listWarranty: updatedListWarranty };
-        }
-        return orderInfo;
-      });
-
-      return updatedOrderInfor;
-    });
-  };
-
-  const adjustCartItemQuantity = async (quantity) => {
-    const cartItemId = cartItem.id;
-    if (cartItem.quantity === quantity) return;
+  const handleDleteCartItem = async () => {
     setOnLoading(true);
     try {
-      const response = await cartSurvice.adjustCartItemInformation(
-        cartItemId,
-        quantity
-      );
+      const response = await cartSurvice.removeCartItem(cartItem.id);
       if (response) {
-        setShoppingCart(response);
+        fetchCart();
+        // Show success toast
+        toast.success("Delete cart item success");
       }
     } catch (error) {
-      console.error("Error while adjusting cart item quantity", error);
+      console.error("Error while deleting cart item", error);
+      // Show error toast
+      toast.error("Delete cart item failed");
     } finally {
       setOnLoading(false);
     }
   };
-
-  const adjustCartItemVariant = async (variantId) => {
-    const cartItemId = cartItem.id;
-    if (cartItem.variant && cartItem.variant.id === variantId) return;
-    setOnLoading(true);
-    try {
-      const response = await cartSurvice.adjustCartItemInformation(
-        cartItemId,
-        cartItem.quantity,
-        variantId
-      );
-      if (response) {
-        setShoppingCart(response);
-      }
-    } catch (error) {
-      console.error("Error while adjusting cart item variant", error);
-    } finally {
-      setOnLoading(false);
-    }
-  };
-  const handleRemoveSingleItem = async () => {
-    const cartItemId = cartItem.id;
-    try {
-      const response = await cartSurvice.removeCartItem([cartItemId]);
-      if (response) {
-        setShoppingCart(response);
-      }
-    } catch (error) {
-      console.error("Error while removing single item", error);
-    } finally {
-      setOnAskingRemoveItem(false);
-    }
-  };
-
   return (
     <div className="cart-item">
       {onAskingRemoveItem && (
@@ -119,7 +43,10 @@ const CartItem = ({
           handleClose={() => {
             setOnAskingRemoveItem(false);
           }}
-          handleAccept={handleRemoveSingleItem}
+          handleAccept={() => {
+            handleDleteCartItem();
+            setOnAskingRemoveItem(false);
+          }}
         />
       )}
       <div className="block-product-info">
@@ -140,17 +67,13 @@ const CartItem = ({
                 className="check-icon"
               >
                 <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
                 <g
                   id="SVGRepo_tracerCarrier"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 />
-
                 <g id="SVGRepo_iconCarrier">
-                  {" "}
                   <g id="Interface / Check">
-                    {" "}
                     <path
                       id="Vector"
                       d="M6 12L10.2426 16.2426L18.727 7.75732"
@@ -158,20 +81,15 @@ const CartItem = ({
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                    />{" "}
-                  </g>{" "}
+                    />
+                  </g>
                 </g>
               </svg>
             </div>
           </div>
           <div className="product-image">
             <img
-              src={
-                (cartItem.variant && cartItem.variant.image_url) ||
-                (cartItem.product && cartItem.product.main_image_url) ||
-                "/assets/images/variant.jpg"
-              }
-              // src="/assets/images/variant.jpg"
+              src={`${HOST}${cartItem.variant.image_url}`}
               alt="variant"
               className="product-img"
             />
@@ -187,108 +105,32 @@ const CartItem = ({
 
             {cartItem.variant && (
               <div className="variant-choose">
-                <button
-                  className="variant-choose-btn"
-                  onClick={() => setShowVariant(!showVariant)}
-                >
-                  Màu: <p>{cartItem.variant.name}</p>{" "}
-                  <svg
-                    width="64px"
-                    height="64px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M12.7071 14.7071C12.3166 15.0976 11.6834 15.0976 11.2929 14.7071L6.29289 9.70711C5.90237 9.31658 5.90237 8.68342 6.29289 8.29289C6.68342 7.90237 7.31658 7.90237 7.70711 8.29289L12 12.5858L16.2929 8.29289C16.6834 7.90237 17.3166 7.90237 17.7071 8.29289C18.0976 8.68342 18.0976 9.31658 17.7071 9.70711L12.7071 14.7071Z"
-                        fill="#000000"
-                      />{" "}
-                    </g>
-                  </svg>
+                <button className="variant-choose-btn">
+                  Color: <p>{cartItem.variant.variant.color}</p>{" "}
                 </button>
-                {showVariant && (
-                  <div className="list-variant">
-                    <div className="triangle-top"></div>
-                    {cartItem.product.variants.map((variant) => (
-                      <button
-                        type="button"
-                        className="variant-item"
-                        onClick={() => adjustCartItemVariant(variant.id)}
-                      >
-                        <img
-                          src={variant.image_url}
-                          alt="variant"
-                          className="variant-image"
-                        />
-                        <p className="variant-name">{variant.name}</p>
-                        {variant.id === cartItem.variant.id && (
-                          <>
-                            <div className="triangle"></div>
-                            <svg
-                              width="15px"
-                              height="15px"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="check-icon"
-                            >
-                              <g id="SVGRepo_bgCarrier" stroke-width="1" />
-
-                              <g
-                                id="SVGRepo_tracerCarrier"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-
-                              <g id="SVGRepo_iconCarrier">
-                                {" "}
-                                <g id="Interface / Check">
-                                  {" "}
-                                  <path
-                                    id="Vector"
-                                    d="M6 12L10.2426 16.2426L18.727 7.75732"
-                                    stroke="#ffffff"
-                                    stroke-width="3"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />{" "}
-                                </g>{" "}
-                              </g>
-                            </svg>
-                          </>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <button className="variant-choose-btn">
+                  Size: <p>{cartItem.variant.variant.size}</p>{" "}
+                </button>
               </div>
             )}
           </div>
           <div className="product-price">
-            <p className="price-sale">
-              {formatCurrencyVN(
-                (cartItem.variant && cartItem.variant.price) ||
-                  cartItem.product.price_show
-              )}
-            </p>
-            <p className="price-through">
-              {formatCurrencyVN(
-                (cartItem.variant && cartItem.variant.price_through) ||
-                  cartItem.product.price_through
-              )}
-            </p>
+            {cartItem.product.selling_price !==
+            cartItem.product.discount_price ? (
+              <>
+                {" "}
+                <p className="price-sale">
+                  {formatCurrencyVN(cartItem.product.discount_price)}
+                </p>
+                <p className="price-through">
+                  {formatCurrencyVN(cartItem.product.selling_price)}
+                </p>{" "}
+              </>
+            ) : (
+              <p className="price-sale">
+                {formatCurrencyVN(cartItem.product.discount_price)}
+              </p>
+            )}
           </div>
           <div className="wrapper-quantity-selector">
             <div className="quantity-selector">
@@ -296,10 +138,6 @@ const CartItem = ({
                 className={`quantity-btn descrease ${
                   cartItem.quantity === 1 ? "disabled" : ""
                 }`}
-                onClick={() => {
-                  if (cartItem.quantity === 1) return;
-                  adjustCartItemQuantity(cartItem.quantity - 1);
-                }}
               >
                 <svg
                   width="15px"
@@ -317,14 +155,13 @@ const CartItem = ({
                   />
 
                   <g id="SVGRepo_iconCarrier">
-                    {" "}
                     <path
                       d="M6 12L18 12"
                       stroke="#d1d5db"
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                    />{" "}
+                    />
                   </g>
                 </svg>
               </button>
@@ -332,13 +169,10 @@ const CartItem = ({
               <button
                 className={`quantity-btn increase ${
                   cartItem.variant &&
-                  cartItem.variant.stock <= cartItem.quantity
+                  cartItem.variant.stock_quantity <= cartItem.quantity
                     ? "disabled"
                     : ""
                 }`}
-                onClick={() => {
-                  adjustCartItemQuantity(cartItem.quantity + 1);
-                }}
               >
                 <svg
                   width="15px"
@@ -356,14 +190,13 @@ const CartItem = ({
                   />
 
                   <g id="SVGRepo_iconCarrier">
-                    {" "}
                     <path
                       d="M4 12H20M12 4V20"
                       stroke="#d1d5db"
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                    />{" "}
+                    />
                   </g>
                 </svg>
               </button>
@@ -390,175 +223,6 @@ const CartItem = ({
           </button>
         </div>
       </div>
-
-      {cartItem.warranty_plans && cartItem.warranty_plans.length > 0 && (
-        <div className="wrapper-warranty">
-          <div className="block-warranty">
-            <div className="block-warranty__title">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g id="Shield Keyhole">
-                  <path
-                    id="Shape"
-                    d="M8.27735 0.0839749C8.1094 -0.0279916 7.8906 -0.0279916 7.72265 0.0839749C5.78446 1.3761 3.68833 2.1823 1.42929 2.50503C1.18296 2.54021 1 2.75117 1 3V7.5C1 11.3913 3.30699 14.2307 7.82051 15.9667C7.93605 16.0111 8.06395 16.0111 8.17949 15.9667C12.693 14.2307 15 11.3913 15 7.5V3C15 2.75117 14.817 2.54021 14.5707 2.50503C12.3117 2.1823 10.2155 1.3761 8.27735 0.0839749ZM9.5 7C9.5 7.65311 9.0826 8.20873 8.5 8.41465V10.5C8.5 10.7761 8.27614 11 8 11C7.72386 11 7.5 10.7761 7.5 10.5V8.41465C6.9174 8.20873 6.5 7.65311 6.5 7C6.5 6.17157 7.17157 5.5 8 5.5C8.82843 5.5 9.5 6.17157 9.5 7Z"
-                    fill="url(#paint0_linear_95_14735)"
-                  ></path>
-                </g>
-                <defs>
-                  <linearGradient
-                    id="paint0_linear_95_14735"
-                    x1="8"
-                    y1="0"
-                    x2="8"
-                    y2="16"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#E10202"></stop>
-                    <stop offset="1" stop-color="#FF9B9B"></stop>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <span>Chọn gói bảo hành</span>
-            </div>
-
-            <div className="block-warranty__content">
-              {cartItem.warranty_plans &&
-                cartItem.warranty_plans.map((warranty, index) => (
-                  <div className="warranty-item">
-                    <div className="custom-checkbox">
-                      <input
-                        type="checkbox"
-                        id={`select-warranty-${index}`}
-                        checked={
-                          warranty.price > 0
-                            ? isWarrantySelected(cartItem.id, warranty.id)
-                            : true
-                        }
-                        onChange={() => {
-                          if (!isSelected) {
-                            setIsShowWarningPopup(true);
-                          } else {
-                            if (warranty.price > 0) {
-                              onSelectWarranty(cartItem.id, warranty.id);
-                            }
-                          }
-                        }}
-                      />
-                      <div className="checkbox-indicator">
-                        <svg
-                          width="15px"
-                          height="15px"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="check-icon"
-                        >
-                          <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                          <g
-                            id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-
-                          <g id="SVGRepo_iconCarrier">
-                            {" "}
-                            <g id="Interface / Check">
-                              {" "}
-                              <path
-                                id="Vector"
-                                d="M6 12L10.2426 16.2426L18.727 7.75732"
-                                stroke="#ffffff"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />{" "}
-                            </g>{" "}
-                          </g>
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="warranty-info">
-                      <div className="warranty-name">
-                        {
-                          // "Đặc quyền Bảo hành 1 đổi 1 MTXT (BT)"
-                          warranty.name
-                        }
-                      </div>
-                      <div className="warranty-price">
-                        {
-                          // "+ 500.000 đ"
-                          warranty.price > 0
-                            ? `+ ${formatCurrencyVN(warranty.price)}`
-                            : "Miễn phí"
-                        }
-                      </div>
-                      {/* <div className="warranty-price-through">2.400.000 đ</div> */}
-                    </div>
-                  </div>
-                ))}
-
-              {/* <div className="warranty-item">
-                <div className="custom-checkbox">
-                  <input
-                    type="checkbox"
-                    id="select-all-product"
-                    checked={warrantyType === 2}
-                    onChange={() => {
-                      setWarrantyType(2);
-                    }}
-                  />
-                  <div className="checkbox-indicator">
-                    <svg
-                      width="15px"
-                      height="15px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="check-icon"
-                    >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                      <g
-                        id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-
-                      <g id="SVGRepo_iconCarrier">
-                        {" "}
-                        <g id="Interface / Check">
-                          {" "}
-                          <path
-                            id="Vector"
-                            d="M6 12L10.2426 16.2426L18.727 7.75732"
-                            stroke="#ffffff"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />{" "}
-                        </g>{" "}
-                      </g>
-                    </svg>
-                  </div>
-                </div>
-                <div className="warranty-info">
-                  <div className="warranty-name">
-                    Đặc quyền Bảo hành 1 đổi 1 MTXT (BT)
-                  </div>
-                  <div className="warranty-price">+ 500.000 đ</div>
-                  <div className="warranty-price-through">2.400.000 đ</div>
-                </div>
-              </div> */}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

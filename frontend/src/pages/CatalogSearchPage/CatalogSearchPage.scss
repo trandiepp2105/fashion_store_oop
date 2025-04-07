@@ -168,11 +168,11 @@
       width: 100%;
       display: flex;
       flex-wrap: wrap;
-      gap: 45px 20px;
-      justify-content: center;
+      gap: 45px 30px;
+      // justify-content: center;
 
       .catalog-item {
-        width: calc((100% - 80px) / 5);
+        width: calc((100% - 90px) / 4);
       }
     }
   }

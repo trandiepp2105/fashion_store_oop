@@ -4,6 +4,7 @@ const AcceptancePopup = ({
   handleClose,
   handleAccept,
   description = "Are you sure you want to delete this order?",
+  acceptBtnText = "Delete",
 }) => {
   return (
     <div className="acceptance-popup">
@@ -48,7 +49,7 @@ const AcceptancePopup = ({
           </button>
 
           <button className="link-button accept-btn" onClick={handleAccept}>
-            Delete
+            {acceptBtnText}
           </button>
         </div>
       </div>

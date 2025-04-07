@@ -1,14 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom"; // Import useParams
 import "./OrderDetailPage.scss";
 import CartItem from "../../components/CartItem/CartItem";
 import PopupEditOrderInfo from "../../components/PopupEditOrderInfo/PopupEditOrderInfo";
 import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
-
+import orderService from "../../services/orderService";
+// navigate
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import formatCurrencyVN from "../../utils/formatCurrencyVN";
+// toastify
+import { toast } from "react-toastify";
 const OrderDetailPage = () => {
+  const { id } = useParams(); // Extract id from URL
+  const navigate = useNavigate(); // Initialize useNavigate
   const [showListOrderItem, setShowListOrderItem] = useState(true);
   const [showInvoice, setShowInvoice] = useState(true);
   const [showHistoryOrderStatus, setShowHistoryOrderStatus] = useState(true);
   const [showOrderStatus, setShowOrderStatus] = useState(true);
+  const [orderDetail, setOrderDetail] = useState({});
+
+  const fetchOrderDetail = async () => {
+    try {
+      const response = await orderService.getOrder(id);
+      if (response) {
+        setOrderDetail(response);
+      }
+      console.log("Order detail:", response);
+    } catch (error) {
+      console.error("Error fetching order detail:", error);
+    }
+  };
+
+  // Fetch order detail when the component mounts
+  useEffect(() => {
+    fetchOrderDetail();
+  }, [id]);
+
   const toggleListOrderItem = () => {
     setShowListOrderItem(!showListOrderItem);
   };
@@ -18,24 +45,6 @@ const OrderDetailPage = () => {
   const toggleHistoryOrderStatus = () => {
     setShowHistoryOrderStatus(!showHistoryOrderStatus);
   };
-
-  const toggleOrderStatus = () => {
-    setShowOrderStatus(!showOrderStatus);
-  };
-
-  const [customerInfo, setCustomerInfo] = useState({
-    id: 1,
-    name: "Tran Van A",
-    email: "email@gmail.com",
-    phone: "0123456789",
-  });
-
-  const [shippingInfo, setShippingInfo] = useState({
-    id: 1,
-    name: "Nguyen Van B",
-    phone: "0123456789",
-    address: "123 Street, City, Country",
-  });
 
   const [isOpenEditOrderInfoPopup, setIsOpenEditOrderInfoPopup] =
     useState(false);
@@ -49,21 +58,38 @@ const OrderDetailPage = () => {
   const handleToggleDeleteOrderPopup = () => {
     setIsOpenDeleteOrderPopup(!isOpenDeleteOrderPopup);
   };
+
+  const handleConfirmDeleteOrder = async () => {
+    try {
+      await orderService.deleteOrder(id);
+      toast.success("Delete order successfully");
+      navigate("/orders");
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast.error("Error deleting order");
+    }
+  };
   return (
     <div className="page order-detail-page">
       {isOpenEditOrderInfoPopup && (
         <PopupEditOrderInfo
-          orderInfor={customerInfo}
+          orderInfor={orderDetail.shipping_info}
           handleToggle={handleToggleEditOrderInfoPopup}
+          fetchParentData={fetchOrderDetail}
         />
       )}
       {isOpenDeleteOrderPopup && (
-        <AcceptancePopup handleClose={handleToggleDeleteOrderPopup} />
+        <AcceptancePopup
+          description="Are you sure you want to delete this order?"
+          acceptBtnText="Delete"
+          handleClose={handleToggleDeleteOrderPopup}
+          handleAccept={handleConfirmDeleteOrder}
+        />
       )}
       <div className="page-content">
         <div className="header">
           <div className="left-side">
-            <button className="back-btn">
+            <button className="back-btn" onClick={() => navigate(-1)}>
               <svg
                 width="20px"
                 height="20px"
@@ -95,15 +121,25 @@ const OrderDetailPage = () => {
             <div className="title">
               <h5 className="back-description">Back to list</h5>
               <div className="order-summmary-info">
-                <h2>Order ID: 879136</h2>
+                <h2>Order ID: {id}</h2> {/* Display the extracted id */}
                 <div className="list-status">
-                  <span className="status-item order-status">Order Placed</span>
+                  <span className="status-item order-status">
+                    {orderDetail?.status}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
           <div className="right-side">
-            <button className="confirm-btn">PACKAGED</button>
+            <button className="confirm-btn">
+              {orderDetail?.status === "PENDING"
+                ? "PACKED"
+                : orderDetail?.status === "PACKED"
+                ? "DELIVERING"
+                : orderDetail?.status === "DELIVERING"
+                ? "DELIVERED"
+                : "COMPLETED"}
+            </button>
             <button
               className="delete-btn"
               onClick={handleToggleDeleteOrderPopup}
@@ -151,13 +187,11 @@ const OrderDetailPage = () => {
                   </svg>
                 </button>
               </h4>
-              {showListOrderItem && (
+              {orderDetail?.order_items && (
                 <div className="list-order-item">
-                  <CartItem />
-                  <CartItem />
-                  <CartItem />
-                  <CartItem />
-                  <CartItem />
+                  {orderDetail?.order_items.map((item, index) => (
+                    <CartItem key={index} orderItem={item} />
+                  ))}
                 </div>
               )}
             </div>
@@ -210,9 +244,11 @@ const OrderDetailPage = () => {
                           <p>Subtotal</p>
                         </div>
                         <div className="invoice-item__description">
-                          <p>1 item</p>
+                          <p>{}</p>
                         </div>
-                        <div className="invoice-item__value">2.500.000 đ</div>
+                        <div className="invoice-item__value">
+                          {formatCurrencyVN(orderDetail.total_amount)}
+                        </div>
                       </div>
                     </div>
                     <div className="invoice-item discount">
@@ -221,24 +257,26 @@ const OrderDetailPage = () => {
                           <p>Total Discount</p>
                         </div>
                         <div className="invoice-item__description">
-                          <p>2 Vouchers</p>
+                          {/* <p>2 Vouchers</p> */}
                         </div>
-                        <div className="invoice-item__value">1.500.000 đ</div>
+                        <div className="invoice-item__value">
+                          {formatCurrencyVN(
+                            orderDetail.total_amount - orderDetail.final_amount
+                          )}
+                        </div>
                       </div>
-                      <div className="detail-discount">
+                      {/* <div className="detail-discount">
                         <div className="discount-item">
                           <div className="discount-item__name">Sale</div>
-                          <div className="discount-item__value">
-                            1.000.000 đ
-                          </div>
+                          <div className="discount-item__value">0 đ</div>
                         </div>
                         <div className="discount-item">
                           <div className="discount-item__name">
                             New Customer
                           </div>
-                          <div className="discount-item__value">500.000 đ</div>
+                          <div className="discount-item__value">0 đ</div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                     <div className="invoice-item">
                       <div className="general-info">
@@ -257,7 +295,9 @@ const OrderDetailPage = () => {
                           <p>Total</p>
                         </div>
 
-                        <div className="invoice-item__value">1.000.000 đ</div>
+                        <div className="invoice-item__value">
+                          {formatCurrencyVN(orderDetail.final_amount)}
+                        </div>
                       </div>
                     </div>
                     <div className="invoice-item paid-by-customer">
@@ -384,7 +424,7 @@ const OrderDetailPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="order-detail-item">
+              {/* <div className="order-detail-item">
                 <div className="order-detail-item__title">
                   <p>Customer info</p>
                   <button
@@ -510,7 +550,7 @@ const OrderDetailPage = () => {
                     <p>(+84) 385 320 575</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
               <div className="order-detail-item">
                 <div className="order-detail-item__title">
                   <p>Shipping Info</p>
@@ -576,7 +616,7 @@ const OrderDetailPage = () => {
                         <path d="M54.55,56.85A22.55,22.55,0,0,0,32,34.3h0A22.55,22.55,0,0,0,9.45,56.85Z" />
                       </g>
                     </svg>
-                    <p>Tran Van A</p>
+                    <p>{orderDetail?.shipping_info?.recipient_name}</p>
                   </div>
                   <div className="info-item">
                     <svg
@@ -605,20 +645,26 @@ const OrderDetailPage = () => {
                         />{" "}
                       </g>
                     </svg>
-                    <p>(+84) 385 320 575</p>
+                    <p>{orderDetail?.shipping_info?.phone_number}</p>
                   </div>
                   <div className="info-item">
-                    <p>Phường 4</p>
+                    <p>{orderDetail?.shipping_info?.ward_commune}</p>
                   </div>
                   <div className="info-item">
-                    <p>Quận 5</p>
+                    <p>{orderDetail?.shipping_info?.district}</p>
                   </div>
                   <div className="info-item">
-                    <p>Thành phố Hồ Chí Minh</p>
+                    <p>{orderDetail?.shipping_info?.province_city}</p>
                   </div>
                   <div className="info-item">
                     <p>
-                      227 Nguyễn Văn Cừ, Phường 4, Quận 5, Thành phố Hồ Chí Minh
+                      {orderDetail?.shipping_info?.specific_address +
+                        ", " +
+                        orderDetail?.shipping_info?.ward_commune +
+                        ", " +
+                        orderDetail?.shipping_info?.district +
+                        ", " +
+                        orderDetail?.shipping_info?.province_city}
                     </p>
                   </div>
                   <div className="info-item info-item--map">

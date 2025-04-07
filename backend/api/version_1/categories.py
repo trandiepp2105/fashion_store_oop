@@ -12,6 +12,7 @@ import os
 import shutil
 import logging
 from schemas.category import UpdateCategorySchema
+from schemas.category import CreateCategorySchema  # Import the new schema
 # Basic logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -111,40 +112,29 @@ def get_category_by_id(
     "/",
     response_model=CategorySchema,
     summary="Create a new category",
-    description="This API allows creating a new category with a name, description, parent ID, and an icon file."
+    description="This API allows creating a new category with a name and description."
 )
-async def create_category(
-    name: str = Form(...),
-    description: str = Form(None),
-    parent_id: int = Form(None),
-    icon_file: UploadFile = Form(...),
+def create_category(
+    category_data: CreateCategorySchema = Body(...),
     session: Session = Depends(get_db)
 ):
     """
     Endpoint to create a new Category record.
     """
-
     try:
-        # Save the uploaded file to the server
-        upload_dir = "d:/HK6/OOP_PROGRAMING/PROJECT/fashion_store_oop/backend/media/icons/"
-        os.makedirs(upload_dir, exist_ok=True)
-        file_path = os.path.join(upload_dir, icon_file.filename)
-
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(icon_file.file, buffer)
-
         # Validate parent_id
+        parent_id = category_data.parent_id if category_data.parent_id != 0 else None 
         if parent_id is not None:
             parent_category = Category.get_by_id(session, parent_id)
-            if not parent_category:
+            if not parent_category :
                 parent_id = None  # Set to NULL if parent_id is invalid
-        
+
         # Create a new category instance
         new_category = Category(
-            name=name,
-            description=description,
+            name=category_data.name,
+            description=category_data.description,
             parent_id=parent_id,
-            icon_url=file_path  # Save the file path as the icon_url
+            icon_url=category_data.icon_url  # Use default or provided icon_url
         )
         new_category.save(session)  # Save the new category to the database
 

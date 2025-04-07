@@ -10,183 +10,30 @@ import ScrollListFeaturedProduct from "../../components/ScrollListFeaturedProduc
 import HorizontalScrollBar from "../../components/HorizontalScrollBar/HorizontalScrollBar";
 import BlockCategory from "../../components/BlockCategory/BlockCategory";
 import productService from "../../services/productService";
+// toast
+import { toast } from "react-toastify";
 const HomePage = ({
   listFeaturedProduct = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
   ],
 }) => {
-  const bannerSlides = [
-    {
-      id: 1,
-      image: "/assets/banner/banner1.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/images/banner2.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner3.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner4.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner5.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner6.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner7.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-    {
-      id: 1,
-      image: "/assets/banner/banner8.png",
-      caption: "IPHONE 16 SERIES",
-      captionLine1: "IPHONE 16 SERIES",
-      captionLine2: "Mua ngay",
-    },
-  ];
-
-  const listRelatedTag = [
-    "Apple",
-    "Samsung",
-    "Oppo",
-    "Vivo",
-    "Xiaomi",
-    "Realme",
-    "Xem tất cả",
-  ];
-
-  const [hotSaleProducts, setHotSaleProducts] = useState([]);
+  const [bestSellerProducts, setBestSellerProducs] = useState([]);
   const [newArrivalProducts, setNewArrivalProducts] = useState([]);
-  const fetchHotSaleProducts = async (tagName = "SALE") => {
-    const response = await productService.getProductsByTagName(tagName);
-    if (response) {
-      setHotSaleProducts(response);
-    }
-  };
 
-  const fetchNewArrivalProducts = async (tagName = "NEW_ARRIVAL") => {
-    const response = await productService.getProductsByTagName(tagName);
-    if (response) {
+  const fetchNewArrivalProducts = async () => {
+    try {
+      const response = await productService.getNewArrivalProducts();
       setNewArrivalProducts(response);
+    } catch (error) {
+      console.error("Error while fetching new arrival products", error);
+      // toast.error("Error while fetching new arrival products");
     }
   };
 
   useEffect(() => {
-    fetchHotSaleProducts();
     fetchNewArrivalProducts();
   }, []);
-  const [tempProducts, setTempProducts] = useState([
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-  ]);
+
   return (
     <div className="page home-page">
       <div className="main-banner">
@@ -201,22 +48,23 @@ const HomePage = ({
         {/* <div className="hot-sale">
           <HotSaleDisplay hotSaleProducts={hotSaleProducts} />
         </div> */}
-        <div className="block-featured-product">
+        {/* <div className="block-featured-product">
           <div className="product-list-title">
             <div className="title-link">NEW ARRIVAL</div>
             <p>Some description for this category</p>
           </div>
           <HorizontalScrollBar similarProducts={newArrivalProducts} />
-        </div>
+        </div> */}
         <div className="block-featured-product">
           <div className="product-list-title">
             <Link to="/" className="title-link">
-              BEST SELLER
+              NEW ARRIVAL
             </Link>
+            <p>Some description for this category</p>
           </div>
           <div className="wrapper-list-product">
             <div className="list-product">
-              {tempProducts.map((product, index) => {
+              {newArrivalProducts.map((product, index) => {
                 return (
                   <div className="product-contaner">
                     <ProductContainer
@@ -230,14 +78,30 @@ const HomePage = ({
             </div>
           </div>
         </div>
-        {/* <div className="block-category">
-          <div className="block-category-title">
-            <Link to="/" className="title-link">
-              ĐIỆN THOẠI
-            </Link>
+        {bestSellerProducts && bestSellerProducts.length > 0 && (
+          <div className="block-featured-product">
+            <div className="product-list-title">
+              <Link to="/" className="title-link">
+                BEST SELLER
+              </Link>
+            </div>
+            <div className="wrapper-list-product">
+              <div className="list-product">
+                {bestSellerProducts.map((product, index) => {
+                  return (
+                    <div className="product-contaner">
+                      <ProductContainer
+                        key={index}
+                        productGeneralInfo={product}
+                        className="product-item"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          <BlockCategory />
-        </div> */}
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from api.version_1 import auth, users, products, orders, cart, categories, orders_return, payments, sales, suppliers, role, shipping_info
+from api.version_1 import auth, users, products, orders, cart, categories, orders_return, payments, sales, suppliers, role, shipping_info, invoice
 
 api_v1_router = APIRouter(
     prefix="/api/v1",
@@ -19,4 +19,4 @@ api_v1_router.include_router(role.router, tags=["roles"], prefix="/roles")
 api_v1_router.include_router(orders_return.router, tags=["orders_return"], prefix="/orders_return")
 api_v1_router.include_router(payments.router, tags=["payments"], prefix="/payments")
 api_v1_router.include_router(shipping_info.router, tags=["shipping_info"], prefix="/shipping_info")
-
+api_v1_router.include_router(invoice.router, tags=["invoice"], prefix="/invoice")

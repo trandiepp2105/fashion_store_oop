@@ -1,88 +1,56 @@
 import apiClient from "./apiClient";
 
 const productService = {
-  getAllCategories: async () => {
+  getNewArrivalProducts: async (limit = 20) => {
     try {
-      const response = await apiClient.get("product/categories");
+      const response = await apiClient.get(`/products/latest?limit=${limit}`);
       return response.data;
     } catch (error) {
-      console.error("Error while fetching categories", error);
+      console.error("Error while fetching new arrival products", error);
       return;
     }
   },
 
-  getSubCategories: async (categoryName) => {
+  getBestSellingProducts: async (limit = 20) => {
     try {
       const response = await apiClient.get(
-        `product/categories?category_name=${categoryName}`
+        `/products/best-sellers?limit=${limit}`
       );
       return response.data;
     } catch (error) {
-      console.error("Error while fetching subcategories", error);
+      console.error("Error while fetching best selling products", error);
       return;
     }
   },
 
-  searchProductsByCategory: async (categoryName, page = 1, url = null) => {
-    var endpoint = "";
-    if (url) {
-      endpoint = url;
-    } else {
-      endpoint =
-        page > 1
-          ? `product/products?category_name=${categoryName}&page=${page}`
-          : `product/products?category_name=${categoryName}`;
-    }
+  getProducts: async (params = {}) => {
     try {
-      const response = await apiClient.get(endpoint);
+      const response = await apiClient.get("/products", { params });
       return response.data;
     } catch (error) {
-      console.error("Error while fetching products by category", error);
+      console.error("Error while fetching products", error);
       return;
     }
-  },
-
-  getProductsByTagName: async (tagName, page = 1, url = null) => {
-    var endpoint = "";
-    if (url) {
-      endpoint = url;
-    } else {
-      endpoint =
-        page > 1
-          ? `product/products?tag_name=${tagName}&page=${page}`
-          : `product/products?tag_name=${tagName}`;
-    }
-    try {
-      const response = await apiClient.get(endpoint);
-      return response.data;
-    } catch (error) {
-      console.error("Error while fetching products by tag", error);
-      return;
-    }
-  },
-  getAllProducts: async () => {
-    const response = await apiClient.get("product/products");
-    return response.data;
   },
 
   getProductById: async (id) => {
-    const response = await apiClient.get(`product/products/${id}`);
-    return response.data;
+    try {
+      const response = await apiClient.get(`/products/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error while fetching product by ID", error);
+      return;
+    }
   },
 
-  createProduct: async (productData) => {
-    const response = await apiClient.post("/products", productData);
-    return response.data;
-  },
-
-  updateProduct: async (productId, productData) => {
-    const response = await apiClient.put(`/products/${productId}`, productData);
-    return response.data;
-  },
-
-  deleteProduct: async (productId) => {
-    const response = await apiClient.delete(`/products/${productId}`);
-    return response.data;
+  getProductSales: async (id) => {
+    try {
+      const response = await apiClient.get(`/products/${id}/sales`);
+      return response.data;
+    } catch (error) {
+      console.error("Error while fetching product sales", error);
+      return;
+    }
   },
 };
 

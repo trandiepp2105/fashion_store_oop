@@ -1,16 +1,16 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./CartItem.scss";
 import formatCurrencyVN from "../../utils/formatCurrencyVN";
+const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
 
-const CartItem = ({}) => {
+const CartItem = ({ orderItem }) => {
   return (
     <div className="cart-item">
       <div className="block-product-info">
         <div className="left-side">
           <div className="product-image">
             <img
-              src={"/assets/dien-thoai-xiaomi-redmi-note-14.png"}
-              // src="/assets/images/variant.jpg"
+              src={`${HOST}${orderItem.product_variant.image_url}`}
               alt="variant"
               className="product-img"
             />
@@ -19,16 +19,12 @@ const CartItem = ({}) => {
 
         <div className="right-side">
           <div className="product-variant-choose">
-            <div className="product-name">
-              {
-                "Máy tính xách tay Lenovo IdeaPad 3 14IAH8i5-12450H/16GB/512GB/14FHD/Win11_Xám_83EQ0005VN"
-              }
-            </div>
+            <div className="product-name">{orderItem.product.name}</div>
 
             {
               <div className="variant-choose">
                 <button className="variant-choose-btn">
-                  Màu: <p>Xám</p>{" "}
+                  Color: <p>{orderItem.product_variant.variant.color}</p>{" "}
                   <svg
                     width="64px"
                     height="64px"
@@ -114,20 +110,20 @@ const CartItem = ({}) => {
             }
           </div>
           <div className="product-price">
-            <p className="price-sale">
-              {/* {formatCurrencyVN(
-                (cartItem.variant && cartItem.variant.price) ||
-                  cartItem.product.price_show
-              )} */}
-              {formatCurrencyVN(20000000)}
-            </p>
-            <p className="price-through">
-              {/* {formatCurrencyVN(
-                (cartItem.variant && cartItem.variant.price_through) ||
-                  cartItem.product.price_through
-              )} */}
-              {formatCurrencyVN(25000000)}
-            </p>
+            {orderItem.selling_price !== orderItem.discount_price ? (
+              <>
+                <p className="price-sale">
+                  {formatCurrencyVN(orderItem.discount_price)}
+                </p>
+                <p className="price-through">
+                  {formatCurrencyVN(orderItem.selling_price)}
+                </p>
+              </>
+            ) : (
+              <p className="price-sale">
+                {formatCurrencyVN(orderItem.discount_price)}
+              </p>
+            )}
           </div>
           <div className="wrapper-quantity-selector">
             <div className="quantity-selector">
@@ -165,7 +161,7 @@ const CartItem = ({}) => {
                   </g>
                 </svg>
               </button>
-              <p className="quantity">{1}</p>
+              <p className="quantity">{orderItem.quantity}</p>
               <button
                 className={`quantity-btn increase `}
                 // className={`quantity-btn increase ${

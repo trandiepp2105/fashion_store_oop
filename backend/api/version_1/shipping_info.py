@@ -65,6 +65,23 @@ def get_shipping_infos(
         print(f"Error fetching shipping infos: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching shipping infos.")
 
+@router.get(
+    "/{user_id}",
+    response_model=list[ShippingInfoSchema],
+    summary="Get all shipping infos",
+    description="Retrieve all shipping information for the authenticated user."
+)
+def get_shipping_infos_by_user_id(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        shipping_infos = ShippingInfo.get_all_shipping_infos_by_user(db, user_id)
+        return shipping_infos
+    except Exception as e:
+        print(f"Error fetching shipping infos: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while fetching shipping infos.")
+
 @router.put(
     "/{shipping_info_id}",
     response_model=ShippingInfoSchema,

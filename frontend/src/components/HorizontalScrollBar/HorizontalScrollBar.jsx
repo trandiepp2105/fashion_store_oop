@@ -111,88 +111,7 @@ const HorizontalScrollBar = ({ similarProducts }) => {
       Math.min(0, prev + productContainerWidth + 10)
     );
   };
-  const [tempProducts, setTempProducts] = useState([
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-  ]);
+
   return (
     <div className="horizontal-scroll-bar">
       <span className="prev-product" onClick={goToPrevProduct}>
@@ -302,7 +221,7 @@ const HorizontalScrollBar = ({ similarProducts }) => {
         ref={containerListProductRef}
         style={{ transform: `translateX(${translateXProduct}px)` }}
       >
-        {tempProducts.map((product, index) => {
+        {similarProducts.map((product, index) => {
           return (
             <div className="product-container" ref={productContainerRef}>
               <ProductContainer productGeneralInfo={product} />

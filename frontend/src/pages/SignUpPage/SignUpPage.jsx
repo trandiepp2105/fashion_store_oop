@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import AlertPopup from "../../components/AlertPopup/AlertPopup";
 import addTemporaryComponent from "../../utils/renderAlertPopup";
 import { AppContext } from "../../App";
+// toastify
+import { toast } from "react-toastify";
 const SignUpPage = () => {
   const navigate = useNavigate();
   const { onLoading, setOnLoading } = useContext(AppContext);
@@ -32,6 +34,11 @@ const SignUpPage = () => {
       displayError: false,
     },
     repeatPassword: {
+      value: "",
+      error: "",
+      displayError: false,
+    },
+    phone: {
       value: "",
       error: "",
       displayError: false,
@@ -92,6 +99,17 @@ const SignUpPage = () => {
       });
       return;
     }
+    if (!signUpData.phone.value) {
+      setSignUpData({
+        ...signUpData,
+        phone: {
+          ...signUpData.phone,
+          error: "Phone number is required",
+          displayError: true,
+        },
+      });
+      return;
+    }
     if (signUpData.password.value !== signUpData.repeatPassword.value) {
       setSignUpData({
         ...signUpData,
@@ -110,31 +128,36 @@ const SignUpPage = () => {
         name: signUpData.name.value,
         email: signUpData.email.value,
         password: signUpData.password.value,
+        phone_number: signUpData.phone.value,
       });
-      if (response.status === 201) {
-        setOtpTitle(
-          "Please check your email and enter the 6-degit OTP code below"
-        );
-        addTemporaryComponent(
-          <AlertPopup
-            status="Success"
-            description="Register successfully. Please verify your email"
-          />,
-          2000
-        );
-      } else if (response.status === 200) {
-        setOtpTitle("Yout email has been registered. Please verify your email");
-        addTemporaryComponent(
-          <AlertPopup
-            status="Success"
-            description="Email already exists. Please verify your email"
-          />,
-          2000
-        );
-      }
-      setStep(2);
+      toast.success("Register successfully");
+      navigate("/login");
+
+      // if (response.status === 201) {
+      //   setOtpTitle(
+      //     "Please check your email and enter the 6-degit OTP code below"
+      //   );
+      //   addTemporaryComponent(
+      //     <AlertPopup
+      //       status="Success"
+      //       description="Register successfully. Please verify your email"
+      //     />,
+      //     2000
+      //   );
+      // } else if (response.status === 200) {
+      //   setOtpTitle("Yout email has been registered. Please verify your email");
+      //   addTemporaryComponent(
+      //     <AlertPopup
+      //       status="Success"
+      //       description="Email already exists. Please verify your email"
+      //     />,
+      //     2000
+      //   );
+      // }
+      // setStep(2);
     } catch (error) {
       console.error("Error while registering", error);
+      toast.error("Error while registering");
     } finally {
       setOnLoading(false);
     }
@@ -212,6 +235,21 @@ const SignUpPage = () => {
               label="Email"
               errorText={signUpData.email.error}
               errorDisplay={signUpData.email.displayError}
+            />
+            <InputGroup
+              id="phone"
+              type="text"
+              value={signUpData.phone.value}
+              onchange={(value) =>
+                setSignUpData({
+                  ...signUpData,
+                  phone: { value, error: "", displayError: false },
+                })
+              }
+              placeholder="Enter your phone number"
+              label="Phone Number"
+              errorText={signUpData.phone.error}
+              errorDisplay={signUpData.phone.displayError}
             />
             <InputGroup
               id="password"

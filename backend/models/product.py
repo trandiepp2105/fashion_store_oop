@@ -107,6 +107,24 @@ class Product(Base, BaseModel):
         session.add(product_variant)
         return product_variant
 
+    def get_sales(self, session):
+        """
+        Retrieve all sales associated with this product.
+
+        Args:
+            session (Session): The database session.
+
+        Returns:
+            List[Sale]: A list of sales associated with the product.
+        """
+        from models.sale import Sale, SaleProduct
+        return (
+            session.query(Sale)
+            .join(SaleProduct, Sale.id == SaleProduct.sale_id)
+            .filter(SaleProduct.product_id == self.id)
+            .all()
+        )
+
 class ProductRaing(Base):
     __tablename__ = "productrating"
     __table_args__ = {"extend_existing": True}

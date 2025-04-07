@@ -12,7 +12,9 @@ import addTemporaryComponent from "../../utils/renderAlertPopup";
 import { AppContext } from "../../App";
 import paymentService from "../../services/paymentService";
 import SearchProductBox from "../SearchProductBox/SearchProductBox";
+import categoryService from "../../services/categoryService";
 
+// toast
 const NavBar = () => {
   const navigate = useNavigate();
   const { isUserLogin, setIsUserLogin, shoppingCart } = useContext(AppContext);
@@ -57,7 +59,9 @@ const NavBar = () => {
     try {
       await userService.logout();
       addTemporaryComponent(<AlertPopup />, 1000);
+
       setIsUserLogin(false);
+      navigate("/");
     } catch (error) {
       console.error("Error while logging out", error);
     } finally {
@@ -66,7 +70,7 @@ const NavBar = () => {
   };
   useEffect(() => {
     const fetchCategories = async () => {
-      const data = await productService.getAllCategories();
+      const data = await categoryService.getCategories();
       setCategories(data);
     };
     fetchCategories();
@@ -83,132 +87,132 @@ const NavBar = () => {
     },
   ];
 
-  const fakeCategory = [
-    {
-      name: "Men",
-      description: "Men Fashion",
-      icon_url: "https://resource-server/category-icon/default.png",
-      id: 1,
-      subcategories: [
-        {
-          name: "Tops & Shirts",
-          description: "Men Fashion",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 10,
-          subcategories: [
-            {
-              name: "T-Shirts",
-              description: "Men Fashion",
-              icon_url: "https://resource-server/category-icon/default.png",
-              id: 10,
-            },
-            {
-              name: "Shirts",
-              description: "",
-              icon_url: "https://resource-server/category-icon/default.png",
-              id: 12,
-            },
-            {
-              name: "Accessories",
-              description: "",
-              icon_url: "https://resource-server/category-icon/default.png",
-              id: 12,
-            },
-          ],
-        },
-        {
-          name: "Pants & Bottoms",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-        {
-          name: "Accessories",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-      ],
-    },
-    {
-      name: "Women",
-      description: "Men Fashion",
-      icon_url: "https://resource-server/category-icon/default.png",
-      id: 1,
-      subcategories: [
-        {
-          name: "Tops & Shirts",
-          description: "Men Fashion",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 10,
-        },
-        {
-          name: "Pants & Bottoms",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-        {
-          name: "Accessories",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-      ],
-    },
-    {
-      name: "Kid",
-      description: "Men Fashion",
-      icon_url: "https://resource-server/category-icon/default.png",
-      id: 1,
-      subcategories: [
-        {
-          name: "Tops & Shirts",
-          description: "Men Fashion",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 10,
-        },
-        {
-          name: "Pants & Bottoms",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-        {
-          name: "Accessories",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-      ],
-    },
-    {
-      name: "Unisex",
-      description: "Men Fashion",
-      icon_url: "https://resource-server/category-icon/default.png",
-      id: 1,
-      subcategories: [
-        {
-          name: "Tops & Shirts",
-          description: "Men Fashion",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 10,
-        },
-        {
-          name: "Pants & Bottoms",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-        {
-          name: "Accessories",
-          description: "",
-          icon_url: "https://resource-server/category-icon/default.png",
-          id: 12,
-        },
-      ],
-    },
-  ];
+  // const fakeCategory = [
+  //   {
+  //     name: "Men",
+  //     description: "Men Fashion",
+  //     icon_url: "https://resource-server/category-icon/default.png",
+  //     id: 1,
+  //     subcategories: [
+  //       {
+  //         name: "Tops & Shirts",
+  //         description: "Men Fashion",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 10,
+  //         subcategories: [
+  //           {
+  //             name: "T-Shirts",
+  //             description: "Men Fashion",
+  //             icon_url: "https://resource-server/category-icon/default.png",
+  //             id: 10,
+  //           },
+  //           {
+  //             name: "Shirts",
+  //             description: "",
+  //             icon_url: "https://resource-server/category-icon/default.png",
+  //             id: 12,
+  //           },
+  //           {
+  //             name: "Accessories",
+  //             description: "",
+  //             icon_url: "https://resource-server/category-icon/default.png",
+  //             id: 12,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         name: "Pants & Bottoms",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //       {
+  //         name: "Accessories",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     name: "Women",
+  //     description: "Men Fashion",
+  //     icon_url: "https://resource-server/category-icon/default.png",
+  //     id: 1,
+  //     subcategories: [
+  //       {
+  //         name: "Tops & Shirts",
+  //         description: "Men Fashion",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 10,
+  //       },
+  //       {
+  //         name: "Pants & Bottoms",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //       {
+  //         name: "Accessories",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     name: "Kid",
+  //     description: "Men Fashion",
+  //     icon_url: "https://resource-server/category-icon/default.png",
+  //     id: 1,
+  //     subcategories: [
+  //       {
+  //         name: "Tops & Shirts",
+  //         description: "Men Fashion",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 10,
+  //       },
+  //       {
+  //         name: "Pants & Bottoms",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //       {
+  //         name: "Accessories",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     name: "Unisex",
+  //     description: "Men Fashion",
+  //     icon_url: "https://resource-server/category-icon/default.png",
+  //     id: 1,
+  //     subcategories: [
+  //       {
+  //         name: "Tops & Shirts",
+  //         description: "Men Fashion",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 10,
+  //       },
+  //       {
+  //         name: "Pants & Bottoms",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //       {
+  //         name: "Accessories",
+  //         description: "",
+  //         icon_url: "https://resource-server/category-icon/default.png",
+  //         id: 12,
+  //       },
+  //     ],
+  //   },
+  // ];
 
   const [onSearching, setOnSearching] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -230,6 +234,14 @@ const NavBar = () => {
     setOnSearching(false);
     setSearchValue("");
   };
+
+  const handleClickCart = () => {
+    if (!isUserLogin) {
+      setIsOpenLoginModal(true);
+      return;
+    }
+    navigate("/cart");
+  };
   return (
     <div className={style.wrapperNavBar}>
       <div className={style.navBar}>
@@ -243,7 +255,7 @@ const NavBar = () => {
         )}
         <Link to={"/"} className={style.homeButton}>
           <div className={style.logoDesktop}></div>
-          <div className={style.brandName}>strore</div>
+          <div className={style.brandName}>viberstrore</div>
         </Link>
         <div className={style.wrapperMenu}>
           <div className={style.mainMenu}>
@@ -267,7 +279,7 @@ const NavBar = () => {
                 </div>
               </Link>
             </div>
-            {fakeCategory.map((category, index) => (
+            {categories?.map((category, index) => (
               <div key={index} className={style.wrapperMenuItem}>
                 <Link
                   to={`/catalogsearch?cate=${category.id}`}
@@ -371,14 +383,18 @@ const NavBar = () => {
           {onSearching && <SearchProductBox searchResult={searchResult} />}
         </form>
         {headerItemData.map((data, index) => (
-          <Link key={index} to={data.to} className={style.headerItem}>
+          <Link
+            key={index}
+            onClick={handleClickCart}
+            className={style.headerItem}
+          >
             <div
               className={`${style.wrapperBoxIcon} ${
                 index === 1 ? style.wrapperTruckIcon : null
               } ${index === 2 ? style.wrapperCartIcon : null}`}
             >
               {data.text[0] === "Giỏ hàng" && (
-                <span>{shoppingCartQuantity}</span>
+                <span>{shoppingCart?.length}</span>
               )}
               <img
                 src={process.env.PUBLIC_URL + data.iconPath}
@@ -387,13 +403,7 @@ const NavBar = () => {
               />
             </div>
             <div className={style.headerItemContent}>
-              {data.text.length < 2 ? (
-                data.text[0]
-              ) : (
-                <>
-                  {data.text[0]} <br /> {data.text[1]}
-                </>
-              )}
+              {/* {data.text.length < 2 ? data.text[0] : <>{"Cart"}</>} */}
             </div>
           </Link>
         ))}

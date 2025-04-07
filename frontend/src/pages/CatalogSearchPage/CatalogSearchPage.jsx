@@ -5,104 +5,213 @@ import "./CatalogSearchPage.scss";
 import { Link } from "react-router-dom";
 import ProductContainer from "../../components/ProductContainer/ProductContainer";
 import productService from "../../services/productService";
+import categoryService from "../../services/categoryService";
 const CatalogSearchPage = () => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(null);
+  const [parentCategory, setParentCategory] = useState(null);
+  const [products, setProducts] = useState([]);
+  const listFilter = [
+    "Price: low to high",
+    "Price: high to low",
+    "Name: A-Z",
+    "Name: Z-A",
+    "Newest",
+    "Oldest",
+  ];
+  const [filter, setFilter] = useState(listFilter[2]); // Default to the first filter
+
+  const fetchProducts = async (params = {}) => {
+    try {
+      const response = await productService.getProducts(params);
+      setProducts(response);
+    } catch (error) {
+      console.error("Error while fetching products", error);
+      // Handle error (e.g., show a notification)
+    }
+  };
+
+  const fetchParentCategory = async (categoryID) => {
+    try {
+      const response = await categoryService.getCategory(categoryID);
+      setParentCategory(response);
+    } catch (error) {
+      console.error("Error while fetching categories", error);
+      // Handle error (e.g., show a notification)
+    }
+  };
+  const fetchCategory = async (categoryID) => {
+    try {
+      const response = await categoryService.getCategory(categoryID);
+      setCategory(response);
+
+      if (response && response.parent_id) {
+        fetchParentCategory(category.parent_id);
+      }
+    } catch (error) {
+      console.error("Error while fetching categories", error);
+      // Handle error (e.g., show a notification)
+    }
+  };
+
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     const queryParams = new URLSearchParams(location.search);
     const searchQueryParam = queryParams.get("q");
-    const categoryParam = queryParams.get("cate");
-
+    const cateParam = queryParams.get("cate");
+    if (cateParam) {
+      fetchCategory(cateParam);
+    }
     setSearchQuery(searchQueryParam);
-    setCategory(categoryParam);
-    console.log("searchQuery", searchQuery);
-    console.log("category", category);
-    // Logic xử lý khi query param thay đổi
-  }, [location]); // Dependency là location
+    // setCategory(categoryParam);
+    var sortBy = "";
+    switch (filter) {
+      case "Price: low to high":
+        sortBy = "price";
+        break;
+      case "Price: high to low":
+        sortBy = "price";
+        break;
+      case "Name: A-Z":
+        sortBy = "name";
+        break;
+      case "Name: Z-A":
+        sortBy = "name";
+        break;
+      case "Newest":
+        sortBy = "date";
+        break;
+      case "Oldest":
+        sortBy = "date";
+        break;
 
-  const [tempProducts, setTempProducts] = useState([
-    {
-      id: 1,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 2,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 3,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 4,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 5,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 6,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 7,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 8,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 9,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-    {
-      id: 10,
-      name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
-      image_url: "/assets/images/temp_image_product.png",
-      description: "default description",
-      original_price: 500000,
-      selling_price: 300000,
-    },
-  ]);
+      default:
+        sortBy = "name";
+        break;
+    }
+
+    // sort value
+    var sortValue = "";
+    switch (filter) {
+      case "Price: low to high":
+        sortValue = "asc";
+        break;
+      case "Price: high to low":
+        sortValue = "desc";
+        break;
+      case "Name: A-Z":
+        sortValue = "asc";
+        break;
+      case "Name: Z-A":
+        sortValue = "desc";
+        break;
+      case "Newest":
+        sortValue = "desc";
+        break;
+      case "Oldest":
+        sortValue = "asc";
+        break;
+      default:
+        sortValue = "asc";
+        break;
+    }
+    // Fetch products based on the search query and category
+    const params = {
+      search: searchQueryParam,
+      category_id: cateParam,
+      sort_field: sortBy,
+      sort: sortValue,
+    };
+    fetchProducts(params);
+  }, [location.search, filter]); // Dependency là location.search và filter
+  // Logic xử lý khi query param thay đổi
+
+  // const [tempProducts, setTempProducts] = useState([
+  //   {
+  //     id: 1,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 9,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  //   {
+  //     id: 10,
+  //     name: "Quần Dài Vải Nhung Tâm Ống Rộng - Corduroy Baggy Pants - Light Blue",
+  //     image_url: "/assets/images/temp_image_product.png",
+  //     description: "default description",
+  //     original_price: 500000,
+  //     selling_price: 300000,
+  //   },
+  // ]);
   return (
     <div className="page catalog-search-page">
       <div className="navigator">
@@ -113,11 +222,20 @@ const CatalogSearchPage = () => {
           <div className="navigator-item">Search</div>
         ) : (
           <>
-            <Link className="navigator-item" to="/catalog">
-              Danh mục
-            </Link>
-            <Link className="navigator-item" to="/catalog/search">
-              T-Shirts
+            <Link className="navigator-item">Danh mục</Link>
+            {parentCategory && (
+              <Link
+                className="navigator-item"
+                to={`/catalogsearch/?cate=${parentCategory?.id}`}
+              >
+                {`${parentCategory?.name}`}
+              </Link>
+            )}
+            <Link
+              className="navigator-item"
+              to={`/catalogsearch/?cate=${category?.id}`}
+            >
+              {category?.name || "All"}
             </Link>
           </>
         )}
@@ -194,12 +312,14 @@ const CatalogSearchPage = () => {
         </div>
         {category && (
           <div className="title">
-            <p>T-Shirts</p>
+            <p>{`${parentCategory ? parentCategory.name + " - " : ""}${
+              category.name
+            }`}</p>
           </div>
         )}
         <div className="wrapper-order-box">
           <div className="select">
-            <div className="selected-option">Newest</div>
+            <div className="selected-option">{filter}</div>
             <div className="dropdown-icon">
               <svg
                 fill="#bababa"
@@ -225,20 +345,22 @@ const CatalogSearchPage = () => {
               </svg>
             </div>
             <div className="options">
-              <div className="option">Giá: tăng dần</div>
-              <div className="option">Giá: giảm dần</div>
-              <div className="option">Tên: A-Z</div>
-              <div className="option">Tên: Z-A</div>
-              <div className="option">Cũ nhất</div>
-              <div className="option">Mới nhất</div>
-              <div className="option">Bán chạy nhất</div>
+              {listFilter.map((option, index) => (
+                <div
+                  className={`option ${filter === option ? "selected" : ""}`} // Highlight selected option
+                  key={index}
+                  onClick={() => setFilter(option)} // Apply filter on click
+                >
+                  {option}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
       <div className="catalog-list">
         <div className="catalog-list-inner">
-          {tempProducts.map((product, index) => {
+          {products.map((product, index) => {
             return (
               <div className="catalog-item" key={index}>
                 <ProductContainer productGeneralInfo={product} />

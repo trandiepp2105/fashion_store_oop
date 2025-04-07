@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AddProductPage.scss";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -12,119 +12,157 @@ import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import PopupVariant from "../../components/PopupVariant/PopupVariant";
+import { useNavigate } from "react-router-dom";
+import categoryService from "../../services/categoryService";
+import supplierService from "../../services/supplierService";
+import SupplierOptions from "../../components/SupplierOptions/SupplierOptions";
+import PopupCreate from "../../components/PopupCreate/PopupCreate";
+import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
+import productService from "../../services/productService";
+import { toast } from "react-toastify";
+
 const AddProductPage = () => {
+  const navigate = useNavigate();
+
+  const [tempProductData, setTempProductData] = useState({
+    name: "",
+    original_price: "",
+    selling_price: "",
+    description: "",
+    supplier_id: 0,
+  });
+
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
-  const [suppliers, setSuppliers] = useState([
-    { id: 1, name: "Supplier 1" },
-    { id: 2, name: "Supplier 2" },
-    { id: 3, name: "Supplier 3" },
-    { id: 4, name: "Supplier 4" },
-    { id: 5, name: "Supplier 5" },
-    { id: 6, name: "Supplier 6" },
-    { id: 7, name: "Supplier 7" },
-    { id: 8, name: "Supplier 8" },
-    { id: 9, name: "Supplier 9" },
-    { id: 10, name: "Supplier 10" },
-    { id: 11, name: "Supplier 11" },
-    { id: 12, name: "Supplier 12" },
-    { id: 13, name: "Supplier 13" },
-    { id: 14, name: "Supplier 14" },
-    { id: 15, name: "Supplier 15" },
-    { id: 16, name: "Supplier 16" },
-    { id: 17, name: "Supplier 17" },
-    { id: 18, name: "Supplier 18" },
-    { id: 19, name: "Supplier 19" },
-    { id: 20, name: "Supplier 20" },
-  ]);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const handleSelectSupplier = (option) => {
-    setSelectedSupplier(option);
-  };
+  // State to manage the open/close state of the supplier options
   const [isOpenSupplierOption, setIsOpenSupplierOption] = useState(false);
-
   const handleToggleSupplierOption = () => {
     setIsOpenSupplierOption(!isOpenSupplierOption);
+  };
+
+  const [variants, setVariants] = useState([]); // State to store the list of variants
+  const [variantIdCounter, setVariantIdCounter] = useState(1); // Counter for generating unique IDs
+
+  // Function to add a new variant
+  const handleAddVariant = (newVariant) => {
+    setVariants((prevVariants) => [
+      ...prevVariants,
+      { ...newVariant, id: variantIdCounter }, // Assign the current counter value as the ID
+    ]);
+    setVariantIdCounter((prevCounter) => prevCounter + 1); // Increment the counter
   };
 
   const columns = [
     {
       field: "id",
-      width: 0,
+      headerName: "ID",
+      width: 80,
       sortable: false,
-      hidable: false,
       filterable: false,
+      hidable: false,
     },
     {
       field: "size",
       headerName: "Size",
-      // width: 150,
       flex: 1,
       sortable: false,
-      hidable: false,
       filterable: false,
+      hidable: false,
     },
     {
       field: "color",
       headerName: "Color",
-      // width: 150,
       flex: 1,
       sortable: false,
-      hidable: false,
       filterable: false,
-    },
-    {
-      field: "stock",
-      headerName: "Stock",
-      // width: 150,
-      flex: 1,
-      sortable: false,
       hidable: false,
-      filterable: false,
     },
     {
       field: "image_url",
       headerName: "Image",
-      width: 80,
-      // flex: 1,
-      justifyContent: "center",
-      sortable: true,
-      filterable: false,
-      hidable: false,
+      width: 100,
       renderCell: (params) => (
-        <Box width={"100%"} height={"100%"} display="flex" gap={1}>
-          <div className="wrapper-variant-image">
-            <img src={params.row.image_url} alt="" />
-          </div>
+        <Box
+          width={"100%"}
+          height={"100%"}
+          display="flex"
+          justifyContent="center"
+        >
+          <img
+            src={URL.createObjectURL(params.row.image_url)} // Preview the image file
+            alt="Variant"
+            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+          />
         </Box>
       ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 80,
-      justifyContent: "center",
-      sortable: false, // Không cần sắp xếp
-      filterable: false, // Không cần lọc
+      sortable: false,
+      filterable: false,
       hidable: false,
-      renderCell: (params) => (
-        <Box width={"100%"} height={"100%"} display="flex" gap={1}></Box>
-      ),
     },
   ];
 
-  const [variants, setVariants] = useState([]);
-
   const paginationModel = { page: 0, pageSize: 10 };
 
+  // State to manage the open/close state of the add variant popup
   const [isOpenAddVariantPopup, setIsOpenAddVariantPopup] = useState(false);
-
   const toggleAddVariantPopup = () => {
     setIsOpenAddVariantPopup(!isOpenAddVariantPopup);
   };
 
   const [mainCategories, setMainCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [suppliers, setSupliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const handleSelectSupplier = (option) => {
+    setSelectedSupplier(option);
+  };
+  const handleSelectMainCategory = (option) => {
+    setSelectedMainCategory(option);
+    setSelectedSubCategory(null);
+    setSubCategories(option.subcategories);
+  };
+
+  const handleSelectSubcategory = (option) => {
+    setSelectedSubCategory(option);
+  };
+
+  const fetchMainCategories = async () => {
+    try {
+      const response = await categoryService.getCategories();
+
+      setMainCategories(response);
+    } catch (error) {
+      console.error("Error fetching main categories:", error);
+    }
+  };
+
+  const fetchSuppliers = async () => {
+    try {
+      const response = await supplierService.getSuppliers();
+
+      setSupliers(response);
+    } catch (error) {
+      console.error("Error fetching main categories:", error);
+    }
+  };
+
+  const createSupplier = async (supplier) => {
+    try {
+      const response = await supplierService.createSupplier(supplier);
+      setSupliers((prev) => [...prev, response]);
+      setSelectedSupplier(response);
+      toast.success("Create supplier successfully");
+    } catch (error) {
+      console.error("Error creating supplier:", error);
+      toast.error("Error creating supplier");
+    }
+  };
+  useEffect(() => {
+    fetchMainCategories();
+    fetchSuppliers();
+  }, []);
 
   const [isOpenMainCategoryOption, setIsOpenMainCategoryOption] =
     useState(false);
@@ -137,15 +175,106 @@ const AddProductPage = () => {
   const handleToggleSubCategoryOption = () => {
     setIsOpenSubCategoryOption(!isOpenSubCategoryOption);
   };
+
+  const [imageFile, setImageFile] = useState(null);
+  const initialSupplierInfo = {
+    company_name: "Company name",
+    contact_person: "Contact person",
+    email: "Email",
+    phone_number: "Phone Number",
+    address: "Address",
+    tax_id: "Tax ID",
+    website: "Websie",
+  };
+  const [isOpenCreateSupplierPopup, setIsOpenCreateSupplierPopup] =
+    useState(false);
+  const toggleCreateSupplierPopup = () => {
+    setIsOpenCreateSupplierPopup(!isOpenCreateSupplierPopup);
+  };
+
+  const handleCreateProduct = async () => {
+    // Validate the form data
+    if (
+      !tempProductData.name ||
+      !tempProductData.original_price ||
+      !tempProductData.selling_price ||
+      !tempProductData.description ||
+      !selectedMainCategory ||
+      !selectedSubCategory ||
+      !selectedSupplier ||
+      !imageFile
+    ) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    // post form data to server
+    const formData = new FormData();
+    console.log("product data:", tempProductData);
+    formData.append("name", tempProductData.name);
+    formData.append("original_price", tempProductData.original_price);
+    formData.append("selling_price", tempProductData.selling_price);
+    formData.append("description", tempProductData.description);
+    formData.append("supplier_id", selectedSupplier.id);
+    // formData.append("release_date", selectedDate);
+    formData.append("image_file", imageFile);
+
+    // category is a dictionary
+    const category = {
+      id: selectedMainCategory.id,
+      subcategory: {
+        id: selectedSubCategory.id,
+      },
+    };
+
+    formData.append("category", JSON.stringify(category));
+
+    try {
+      const response = await productService.createProduct(formData);
+      console.log("Product created successfully:", response);
+      toast.success("Product created successfully");
+      navigate(`/products/${response.id}`, {
+        state: { openVariant: true },
+      });
+    } catch (error) {
+      toast.error("Error creating product");
+    }
+  };
+
+  const [isOpenAcceptancePopup, setIsOpenAcceptancePopup] = useState(false);
+  const handleToggleAcceptancePopup = () => {
+    setIsOpenAcceptancePopup(!isOpenAcceptancePopup);
+  };
   return (
     <div className="page product-detail-page">
       {isOpenAddVariantPopup && (
-        <PopupVariant handleToggle={toggleAddVariantPopup} />
+        <PopupVariant
+          handleToggle={toggleAddVariantPopup}
+          handleAddVariant={handleAddVariant} // Pass the function to add a variant
+        />
+      )}
+      {isOpenCreateSupplierPopup && (
+        <PopupCreate
+          handleToggle={toggleCreateSupplierPopup}
+          initData={initialSupplierInfo}
+          popupName="supplier"
+          handleSubmit={createSupplier}
+        />
+      )}
+      {isOpenAcceptancePopup && (
+        <AcceptancePopup
+          handleAccept={() => {
+            handleCreateProduct();
+            handleToggleAcceptancePopup();
+          }}
+          handleClose={handleToggleAcceptancePopup}
+          description="Are you sure you want to save this product?"
+          acceptBtnText="Save"
+        />
       )}
       <div className="page-content">
         <div className="header">
           <div className="left-side">
-            <button className="back-btn">
+            <button className="back-btn" onClick={() => navigate(-1)}>
               <svg
                 width="20px"
                 height="20px"
@@ -176,7 +305,7 @@ const AddProductPage = () => {
             </button>
             <div className="title">
               <h5 className="back-description">Back to list</h5>
-              <h2 className="product-name">Product Details</h2>
+              <h2 className="product-name">Add new product</h2>
             </div>
           </div>
           <div className="right-side">
@@ -184,7 +313,19 @@ const AddProductPage = () => {
               {/* <button className="btn quick-btn delete-product-btn">
                 Deltete Product
               </button> */}
-              <button className="btn quick-btn save-product-btn">Save</button>
+              <button
+                className="btn quick-btn add-supplier-btn"
+                onClick={toggleCreateSupplierPopup}
+              >
+                Add Supplier
+              </button>
+
+              <button
+                className="btn quick-btn save-product-btn"
+                onClick={handleToggleAcceptancePopup}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -197,12 +338,22 @@ const AddProductPage = () => {
                 <div className="info-item">
                   <p className="info-title">Main Category</p>
 
-                  <CustomSelect options={mainCategories} />
+                  <CustomSelect
+                    selectedOption={selectedMainCategory}
+                    handleSelectOption={handleSelectMainCategory}
+                    options={mainCategories}
+                    optionName="main category"
+                  />
                 </div>
 
                 <div className="info-item">
                   <p className="info-title">Subcategory</p>
-                  <CustomSelect options={subCategories} />
+                  <CustomSelect
+                    selectedOption={selectedSubCategory}
+                    handleSelectOption={handleSelectSubcategory}
+                    options={subCategories}
+                    optionName="subcategory"
+                  />
                 </div>
               </div>
               <div className="info-container">
@@ -211,13 +362,26 @@ const AddProductPage = () => {
                 <div className="preview-image-section">
                   <div className="preview-image-list">
                     <div className="preview-image-item">
-                      {/* <img
-                        src="/assets/dien-thoai-xiaomi-redmi-note-14.png"
-                        alt=""
-                      /> */}
+                      {imageFile && (
+                        <img
+                          src={URL.createObjectURL(imageFile)}
+                          alt="Preview"
+                        />
+                      )}
                     </div>
                   </div>
-                  <button className="add-new-image-btn">
+                  <input
+                    type="file"
+                    name="image_file"
+                    id="image_file"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setImageFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <label htmlFor="image_file" className="add-new-image-btn">
                     <svg
                       width="25px"
                       height="25px"
@@ -251,8 +415,8 @@ const AddProductPage = () => {
                         />{" "}
                       </g>
                     </svg>
-                    Add Another Image
-                  </button>
+                    Add Image
+                  </label>
                 </div>
               </div>
             </div>
@@ -268,8 +432,17 @@ const AddProductPage = () => {
                         name=""
                         id=""
                         className="info-input"
-                        disabled={true}
-                        value="Xiaomi Redmi Note 14"
+                        placeholder="product name"
+                        // disabled={true}
+                        value={tempProductData.name}
+                        onChange={(e) => {
+                          setTempProductData((prev) => {
+                            return {
+                              ...prev,
+                              name: e.target.value,
+                            };
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -284,8 +457,18 @@ const AddProductPage = () => {
                         name=""
                         id=""
                         className="info-input"
-                        disabled={true}
-                        value="2000000"
+                        // disabled={true}
+                        // value="2000000"
+                        placeholder="200.000"
+                        value={tempProductData.original_price}
+                        onChange={(e) => {
+                          setTempProductData((prev) => {
+                            return {
+                              ...prev,
+                              original_price: e.target.value,
+                            };
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -298,8 +481,18 @@ const AddProductPage = () => {
                         name=""
                         id=""
                         className="info-input"
-                        disabled={true}
-                        value="2000000"
+                        placeholder="200.000"
+                        // disabled={true}
+                        // value="2000000"
+                        value={tempProductData.selling_price}
+                        onChange={(e) => {
+                          setTempProductData((prev) => {
+                            return {
+                              ...prev,
+                              selling_price: e.target.value,
+                            };
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -313,8 +506,16 @@ const AddProductPage = () => {
                         name=""
                         id=""
                         className="info-input"
-                        disabled={true}
-                        value="Something about the product"
+                        placeholder="Something about the product"
+                        value={tempProductData.description}
+                        onChange={(e) => {
+                          setTempProductData((prev) => {
+                            return {
+                              ...prev,
+                              description: e.target.value,
+                            };
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -375,7 +576,7 @@ const AddProductPage = () => {
                     >
                       <div className="wrapper-options">
                         <div className="selected-value">
-                          {selectedSupplier?.name || "Select supplier"}
+                          {selectedSupplier?.company_name || "Select supplier"}
                         </div>
                         <svg
                           width="25px"
@@ -405,10 +606,11 @@ const AddProductPage = () => {
                         </svg>
                       </div>
                       {isOpenSupplierOption && (
-                        <Options
+                        <SupplierOptions
                           options={suppliers}
                           selectedOption={selectedSupplier}
                           handleSelect={handleSelectSupplier}
+                          optionName={"supplier"}
                         />
                       )}
                     </div>
@@ -457,10 +659,9 @@ const AddProductPage = () => {
                 <div className="list-variant">
                   <Paper sx={{ height: "100%", width: "100%" }}>
                     <DataGrid
-                      rows={variants}
+                      rows={variants} // Use the variants state
                       columns={columns}
                       initialState={{ pagination: { paginationModel } }}
-                      //   pageSizeOptions={[6, 10]}
                       checkboxSelection
                       sx={{
                         border: 0,
