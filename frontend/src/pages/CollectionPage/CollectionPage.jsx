@@ -7,13 +7,41 @@ import ProductContainer from "../../components/ProductContainer/ProductContainer
 import productService from "../../services/productService";
 const CollectionPage = () => {
   const location = useLocation();
+  const [products, setProducts] = useState([]);
   const [collection, setCollection] = useState("");
+
+  const fetchProducts = async (collection) => {
+    if (!collection) {
+      return;
+    }
+    var latest = false;
+    var best_sellers = false;
+    if (collection === "NEW ARRIVAL") {
+      latest = true;
+    }
+
+    if (collection === "BEST SELLERS") {
+      best_sellers = true;
+    }
+    const response = await productService.getProducts({
+      latest: latest,
+      best_sellers: best_sellers,
+    });
+    console.log("response", response);
+    if (response) {
+      setProducts(response);
+    }
+  };
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const collectionParam = queryParams.get("collection");
 
     setCollection(collectionParam);
     console.log("collection", collection);
+
+    // Gọi hàm fetchProducts với collectionParam
+    fetchProducts(collectionParam);
     // Logic xử lý khi query param thay đổi
   }, [location]); // Dependency là location
 
@@ -218,7 +246,7 @@ const CollectionPage = () => {
       </div>
       <div className="catalog-list">
         <div className="catalog-list-inner">
-          {tempProducts.map((product, index) => {
+          {products.map((product, index) => {
             return (
               <div className="catalog-item" key={index}>
                 <ProductContainer productGeneralInfo={product} />

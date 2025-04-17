@@ -43,11 +43,12 @@ def add_product_to_cart(
         cart_item = CartItem.add_product_to_cart(
             session, user_id=current_user.id, product_id=cart_data.product_id, variant_id=cart_data.variant_id, quantity=cart_data.quantity
         )
-        product = session.query(Product).filter_by(id=cart_item.product_id).first()
+        product = Product.get_by_id(session, cart_item.product_id)
         product_variant = session.query(ProductVariant).filter_by(product_id=cart_data.product_id, variant_id=cart_data.variant_id).first()
         if not product_variant:
             raise HTTPException(status_code=404, detail="Product variant not found.")
-        variant = session.query(Variant).filter_by(id=product_variant.variant_id).first()
+        # variant = session.query(Variant).filter_by(id=product_variant.variant_id).first()
+        variant = Variant.get_by_id(session, product_variant.variant_id)
         if not variant:
             raise HTTPException(status_code=404, detail="Variant not found.")
 
@@ -102,9 +103,11 @@ def get_cart_items(
 
     response_items = []
     for item in cart_items:
-        product = session.query(Product).filter_by(id=item.product_id).first()
+        # product = session.query(Product).filter_by(id=item.product_id).first()
+        product = Product.get_by_id(session, item.product_id)
         product_variant = session.query(ProductVariant).filter_by(product_id=item.product_id, variant_id=item.variant_id).first()
-        variant = session.query(Variant).filter_by(id=product_variant.variant_id).first()
+        # variant = session.query(Variant).filter_by(id=product_variant.variant_id).first()
+        variant = Variant.get_by_id(session, product_variant.variant_id)
         if not product_variant or not variant:
             continue
 
@@ -144,7 +147,8 @@ def increase_cart_item_quantity(
     session: Session = Depends(get_db),
     current_user: User = Depends(User.get_current_user)
 ):
-    cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    # cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    cart_item = CartItem.get_by_id(session, cart_item_id)
     if not cart_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -157,7 +161,8 @@ def increase_cart_item_quantity(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    # product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    product = Product.get_by_id(session, cart_item.product_id)
     product_variant = session.query(ProductVariant).filter_by(product_id=cart_item.product_id, variant_id=cart_item.variant_id).first()
     return CartItemResponse(
         id=cart_item.id,
@@ -189,7 +194,8 @@ def decrease_cart_item_quantity(
     session: Session = Depends(get_db),
     current_user: User = Depends(User.get_current_user)
 ):
-    cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    # cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    cart_item = CartItem.get_by_id(session, cart_item_id)
     if not cart_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -202,7 +208,8 @@ def decrease_cart_item_quantity(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    # product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    product = Product.get_by_id(session, cart_item.product_id)
     product_variant = session.query(ProductVariant).filter_by(product_id=cart_item.product_id, variant_id=cart_item.variant_id).first()
     return CartItemResponse(
         id=cart_item.id,
@@ -281,7 +288,8 @@ def set_cart_item_quantity(
     session: Session = Depends(get_db),
     current_user: User = Depends(User.get_current_user)
 ):
-    cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    # cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+    cart_item = CartItem.get_by_id(session, cart_item_id)
     if not cart_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -294,7 +302,8 @@ def set_cart_item_quantity(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    # product = session.query(Product).filter_by(id=cart_item.product_id).first()
+    product = Product.get_by_id(session, cart_item.product_id)
     product_variant = session.query(ProductVariant).filter_by(product_id=cart_item.product_id, variant_id=cart_item.variant_id).first()
     return CartItemResponse(
         id=cart_item.id,

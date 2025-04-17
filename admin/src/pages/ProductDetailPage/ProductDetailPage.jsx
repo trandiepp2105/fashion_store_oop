@@ -106,6 +106,24 @@ const ProductDetailPage = () => {
     }
   };
 
+  const handleDeleteProductVariant = async () => {
+    try {
+      const response = await productService.deleteVariant(
+        productId,
+        selectedVariant.variant_id
+      );
+      console.log("Product variant deleted successfully");
+      toast.success("Product variant deleted successfully");
+      fetchProductData();
+
+      handleToggleDeleteVariantPopup();
+    } catch (error) {
+      console.error("Error deleting product variant:", error);
+      toast.error("Error deleting product variant");
+      handleToggleDeleteVariantPopup();
+    }
+  };
+
   const handleSelectSupplier = (option) => {
     setSelectedSupplier(option);
   };
@@ -384,6 +402,7 @@ const ProductDetailPage = () => {
         <AcceptancePopup
           description="Are you sure you want to delete this variant?"
           handleClose={handleToggleDeleteVariantPopup}
+          handleAccept={handleDeleteProductVariant}
         />
       )}
       <div className="page-content">
@@ -573,7 +592,13 @@ const ProductDetailPage = () => {
                         id=""
                         className="info-input"
                         // disabled={true}
-                        value="100000"
+                        value={tempProductData?.original_price}
+                        onChange={(e) =>
+                          setTempProductData({
+                            ...tempProductData,
+                            original_price: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -589,7 +614,14 @@ const ProductDetailPage = () => {
                         name="selling_price"
                         id="selling_price"
                         className="info-input"
-                        value="500000"
+                        // disabled={true}
+                        value={tempProductData?.selling_price}
+                        onChange={(e) =>
+                          setTempProductData({
+                            ...tempProductData,
+                            selling_price: e.target.value,
+                          })
+                        }
                       />
                     </label>
                   </div>
@@ -602,7 +634,8 @@ const ProductDetailPage = () => {
                         id=""
                         className="info-input"
                         disabled={true}
-                        value="100"
+                        // value="100"
+                        value={tempProductData?.stock}
                       />
                     </div>
                   </div>

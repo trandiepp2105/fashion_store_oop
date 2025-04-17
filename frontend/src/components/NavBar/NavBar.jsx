@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import style from "./NavBar.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import MainMenu from "../MainMenu/MainMenu";
-import productService from "../../services/productService";
+
 import ModalLogin from "../ModalLogin/ModalLogin";
 import userService from "../../services/userService";
 import LogoutPopup from "../LogoutPopup/LogoutPopup";
@@ -387,6 +386,7 @@ const NavBar = () => {
             key={index}
             onClick={handleClickCart}
             className={style.headerItem}
+            to={data.to}
           >
             <div
               className={`${style.wrapperBoxIcon} ${

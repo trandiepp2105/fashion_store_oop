@@ -6,10 +6,6 @@ from sqlalchemy.sql.functions import current_timestamp
 class Base(DeclarativeBase):
     metadata = database_metadata
     
-    @classmethod
-    def get_all(cls, session: Session):
-        return session.query(cls).all()
-    
     def save(self, session: Session):
         session.add(self)
         session.commit()
@@ -20,7 +16,7 @@ class Base(DeclarativeBase):
         session.delete(self)
         session.commit()
 
-    #Alias của save vì chức năng của chúng là như nhau
+    # alias for save method
     def add(self, session: Session): 
         return self.save(session)
     
@@ -30,10 +26,14 @@ class Base(DeclarativeBase):
                 setattr(self, key, value)
         session.commit()
         return self
-
+    
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
+    @classmethod
+    def get_all(cls, session: Session):
+        return session.query(cls).all()
+
     @classmethod
     def get_by_id(cls, session: Session, record_id: int):
         instance = session.get(cls, record_id)
@@ -54,9 +54,13 @@ class Base(DeclarativeBase):
         session.refresh(instance)  # Refresh to get the latest state
         return instance, True  # Return the instance and True (created)
 
+
+    
 class BaseModel:
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
-    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp(), nullable=False)
+    created_at = Column(DateTime, server_default=func.current_timestamp(),
+                 nullable=False)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), 
+                onupdate=func.current_timestamp(), nullable=False)
 

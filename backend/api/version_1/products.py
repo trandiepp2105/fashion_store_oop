@@ -19,7 +19,7 @@ from schemas.sale import SaleResponse  # Import the SaleResponse schema
 import os
 import shutil
 import logging
-
+from config.settings import MEDIA, MEDIA_URL
 # Basic logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -48,23 +48,29 @@ def save_file_with_unique_name(upload_dir: str, file: UploadFile) -> str:
     "/",
     response_model=List[ProductResponse],
     summary="Retrieve all products",
-    description="This API returns a list of all products with optional filters and sorting."
+    description="This API returns a list of all products with optional filters, sorting, and special queries for best-sellers or latest products."
 )
 def get_all_products(
     category_id: Optional[int] = Query(None, description="Filter by category ID"),
     search: Optional[str] = Query(None, description="Search products by name"),
     sort: Optional[str] = Query("asc", description="Sort order: 'asc' for ascending, 'desc' for descending"),
     sort_field: Optional[str] = Query("name", description="Sort field: 'name', 'date', or 'price'"),
+    best_sellers: Optional[bool] = Query(False, description="Retrieve best-selling products"),
+    latest: Optional[bool] = Query(False, description="Retrieve the latest products"),
+    limit: Optional[int] = Query(30, description="Limit the number of products returned"),
     session: Session = Depends(get_db)
 ):
     """
-    Retrieve all products with optional filters and sorting.
+    Retrieve all products with optional filters, sorting, and special queries for best-sellers or latest products.
 
     Args:
         category_id (int, optional): Filter by category ID.
         search (str, optional): Search products by name.
         sort (str, optional): Sort order: 'asc' for ascending, 'desc' for descending.
         sort_field (str, optional): Sort field: 'name', 'date', or 'price'.
+        best_sellers (bool, optional): Retrieve best-selling products.
+        latest (bool, optional): Retrieve the latest products.
+        limit (int, optional): Limit the number of products returned.
         session (Session): The database session.
 
     Returns:
@@ -73,32 +79,47 @@ def get_all_products(
     try:
         query = session.query(Product)
 
-        # Filter by category
-        if category_id:
-            query = query.join(ProductCategory).filter(ProductCategory.category_id == category_id)
-
-        # Search by name
-        if search:
-            query = query.filter(Product.name.ilike(f"%{search}%"))
-
-        # Sorting
-        if sort_field == "name":
-            sort_column = Product.name
-        elif sort_field == "date":
-            sort_column = Product.created_at
-        elif sort_field == "price":
-            sort_column = Product.selling_price
+        # Handle best-sellers query
+        if best_sellers:
+            best_sellers_query = (
+                session.query(Product, func.sum(OrderItem.quantity).label("total_sold"))
+                .join(OrderItem, Product.id == OrderItem.product_id)
+                .group_by(Product.id)
+                .order_by(func.sum(OrderItem.quantity).desc())
+                .limit(limit)
+                .all()
+            )
+            products = [product for product, _ in best_sellers_query]
+        elif latest:
+            # Handle latest products query
+            products = query.order_by(Product.created_at.desc()).limit(limit).all()
         else:
-            raise HTTPException(status_code=400, detail="Invalid sort_field value. Use 'name', 'date', or 'price'.")
+            # Apply filters and sorting for general query
+            # Filter by category
+            if category_id:
+                query = query.join(ProductCategory).filter(ProductCategory.category_id == category_id)
 
-        if sort == "desc":
-            sort_column = sort_column.desc()
-        elif sort != "asc":
-            raise HTTPException(status_code=400, detail="Invalid sort value. Use 'asc' or 'desc'.")
+            # Search by name
+            if search:
+                query = query.filter(Product.name.ilike(f"%{search}%"))
 
-        query = query.order_by(sort_column)
+            # Sorting
+            if sort_field == "name":
+                sort_column = Product.name
+            elif sort_field == "date":
+                sort_column = Product.created_at
+            elif sort_field == "price":
+                sort_column = Product.selling_price
+            else:
+                raise HTTPException(status_code=400, detail="Invalid sort_field value. Use 'name', 'date', or 'price'.")
 
-        products = query.all()
+            if sort == "desc":
+                sort_column = sort_column.desc()
+            elif sort != "asc":
+                raise HTTPException(status_code=400, detail="Invalid sort value. Use 'asc' or 'desc'.")
+
+            query = query.order_by(sort_column)
+            products = query.all()
 
         if not products:
             return []
@@ -141,10 +162,12 @@ async def create_product(
     session: Session = Depends(get_db)
 ):
     try:
-        upload_dir = "./media/products"
+        # upload_dir = "./media/products"
+        upload_dir = os.path.join(MEDIA, "products")
         file_path = save_file_with_unique_name(upload_dir, image_file)
-        image_url = f"/media/products/{os.path.basename(file_path)}"
 
+        # image_url = f"/media/products/{os.path.basename(file_path)}"
+        image_url = os.path.join(MEDIA_URL, "products", os.path.basename(file_path))
         with session.begin():  # Start a transaction
             if supplier_id:
                 supplier = session.query(Supplier).filter(Supplier.id == supplier_id).first()
@@ -206,63 +229,6 @@ async def create_product(
         session.rollback()  # Rollback the transaction on error
         print(f"Error creating product: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error while creating product. {e}")
-
-@router.get(
-    "/best-sellers",
-    response_model=List[ProductResponse],
-    summary="Retrieve best-selling products",
-    description="This API returns the best-selling products based on order items."
-)
-def get_best_selling_products(
-    limit: int = Query(10, description="Limit the number of products returned"),
-    session: Session = Depends(get_db)
-):
-    """
-    Retrieve the best-selling products based on order items.
-
-    Args:
-        limit (int): The maximum number of products to return.
-        session (Session): The database session.
-
-    Returns:
-        List[ProductResponse]: A list of the best-selling products.
-    """
-    try:
-        # Query to aggregate product sales based on order items
-        best_sellers = (
-            session.query(Product, func.sum(OrderItem.quantity).label("total_sold"))
-            .join(OrderItem, Product.id == OrderItem.product_id)
-            .group_by(Product.id)
-            .order_by(func.sum(OrderItem.quantity).desc())
-            .limit(limit)
-            .all()
-        )
-
-        if not best_sellers:
-            return []
-
-        product_responses = []
-        for product, total_sold in best_sellers:
-            supplier = product.get_supplier(session)
-            product_responses.append(ProductResponse(
-                id=product.id,
-                name=product.name,
-                selling_price=product.selling_price,
-                image_url=product.image_url,
-                rating=product.get_average_rating(),
-                discount_price=product.get_discount_price(session),
-                stock=product.get_total_stock(session),
-                supplier={
-                    "id": supplier.id,
-                    "company_name": supplier.company_name
-                } if supplier else None
-            ))
-
-        return product_responses
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error while querying best-selling products: {e}")
-
-
 
 @router.get(
     "/latest",  # Change the path to avoid conflict
@@ -413,12 +379,15 @@ def update_product(
     # If new image is provided, delete old image and save new image
     if image_file:
         if product.image_url:
-            old_image_path = os.path.join("./media/products", product.image_url.split("/")[-1])
+            # old_image_path = os.path.join("./media/products", product.image_url.split("/")[-1])
+            old_image_path = os.path.join(MEDIA, "products", product.image_url.split("/")[-1])
             if os.path.exists(old_image_path):
                 os.remove(old_image_path)
-        upload_dir = "./media/products"
+        # upload_dir = "./media/products"
+        upload_dir = os.path.join(MEDIA, "products")
         file_path = save_file_with_unique_name(upload_dir, image_file)
-        product.image_url = f"/media/products/{os.path.basename(file_path)}"
+        # product.image_url = f"/media/products/{os.path.basename(file_path)}"
+        product.image_url = os.path.join(MEDIA_URL, "products", os.path.basename(file_path))
 
     session.commit()
     session.refresh(product)
@@ -453,7 +422,8 @@ def delete_product(product_id: int, session: Session = Depends(get_db)):
         # Delete the product
         session.delete(product)
 
-        image_path = os.path.join("./media/products", product.image_url.split("/")[-1])
+        # image_path = os.path.join("./media/products", product.image_url.split("/")[-1])
+        image_path = os.path.join(MEDIA, "products", product.image_url.split("/")[-1])
         if os.path.exists(image_path):
             os.remove(image_path)
         session.commit()
@@ -464,7 +434,7 @@ def delete_product(product_id: int, session: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Internal server error while deleting product: {e}")
 
 @router.post(
-    "/{product_id}/add-variant",
+    "/{product_id}/variants",
     summary="Add variants to a product",
     description="This API allows adding multiple variants (sizes, color, stock, image) to a product."
 )
@@ -486,9 +456,11 @@ async def add_variant_to_product(
         size_list = [size_item.strip() for size_item in size.split(",") if size_item.strip()]
 
         # Save the image file
-        upload_dir = "./media/variants"
+        # upload_dir = "./media/variants"
+        upload_dir = os.path.join(MEDIA, "variants")
         file_path = save_file_with_unique_name(upload_dir, image_file)
-        image_url = f"/media/variants/{os.path.basename(file_path)}"
+        # image_url = f"/media/variants/{os.path.basename(file_path)}"
+        image_url = os.path.join(MEDIA_URL, "variants", os.path.basename(file_path))
 
         # Process each size
         for size in size_list:
@@ -518,7 +490,7 @@ async def add_variant_to_product(
         raise HTTPException(status_code=500, detail=f"Internal server error while adding variants: {e}")
 
 @router.delete(
-    "/{product_id}/add-variant/{variant_id}",
+    "/{product_id}/variants/{variant_id}",
     summary="Delete a product variant",
     description="This API deletes a product variant using the composite key (product_id, variant_id)."
 )
@@ -535,7 +507,9 @@ def delete_product_variant(
 
         # Delete the image file if it exists
         if product_variant.image_url:
-            image_path = os.path.join(".", product_variant.image_url.lstrip("/"))
+            # image_path = os.path.join(".", product_variant.image_url.lstrip("/"))
+            image_path = os.path.join(MEDIA, "variants", product_variant.image_url.split("/")[-1])
+
             if os.path.exists(image_path):
                 os.remove(image_path)
 
@@ -546,34 +520,4 @@ def delete_product_variant(
     except Exception as e:
         session.rollback()
         raise HTTPException(status_code=500, detail=f"Internal server error while deleting product variant: {e}")
-
-@router.get(
-    "/{product_id}/sales",
-    response_model=List[SaleResponse],
-    summary="Retrieve sales for a product",
-    description="This API returns all sales associated with a specific product."
-)
-def get_product_sales(
-    product_id: int,
-    session: Session = Depends(get_db)
-):
-    """
-    Retrieve all sales associated with a specific product.
-
-    Args:
-        product_id (int): The ID of the product.
-        session (Session): The database session.
-
-    Returns:
-        List[SaleResponse]: A list of sales associated with the product.
-    """
-    try:
-        product = session.query(Product).filter(Product.id == product_id).first()
-        if not product:
-            raise HTTPException(status_code=404, detail="Product not found")
-
-        sales = product.get_sales(session)
-        return sales
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error while retrieving sales: {e}")
 

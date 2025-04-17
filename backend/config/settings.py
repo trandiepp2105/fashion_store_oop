@@ -1,19 +1,26 @@
 import os
 import urllib.parse
+from pathlib import Path
+from datetime import timedelta, datetime, timezone  
+import os
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
-# MYSQL_PORT = os.getenv("MYSQL_PORT", "3308")
-# MYSQL_ROOT_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD", "Diep2105@")
-# MYSQL_USER = os.getenv("MYSQL_USER", "root")
-# MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "Diep2105@")    
-# MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "fashion_store")
+MEDIA = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
+MYSQL_PORT = os.getenv("MYSQL_PORT", "3310")
+MYSQL_ROOT_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD", "Diep2105@")
+MYSQL_USER = os.getenv("MYSQL_USER", "root")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "Diep2105@")    
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "fashion_store")
 
-MYSQL_HOST = "127.0.0.1"
-MYSQL_PORT = "3308"
-MYSQL_ROOT_PASSWORD = "Diep2105@"
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "Diep2105@" 
-MYSQL_DATABASE = "fashion_store"
+# MYSQL_HOST = "127.0.0.1"
+# MYSQL_PORT = "3308"
+# MYSQL_ROOT_PASSWORD = "Diep2105@"
+# MYSQL_USER = "root"
+# MYSQL_PASSWORD = "Diep2105@" 
+# MYSQL_DATABASE = "fashion_store"
 
 MYSQL_PASSWORD_ENCODED = urllib.parse.quote(MYSQL_PASSWORD)
 

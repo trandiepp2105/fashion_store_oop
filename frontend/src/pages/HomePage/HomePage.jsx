@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./HomePages.scss";
-import MainMenu from "../../components/MainMenu/MainMenu";
-import BannerSlider from "../../components/BannerSlider/BannerSlider";
-import BoxGallery from "../../components/BoxGallery/BoxGallery";
 import { Link } from "react-router-dom";
-import HotSaleDisplay from "../../components/HotSaleDisplay/HotSaleDisplay";
 import ProductContainer from "../../components/ProductContainer/ProductContainer";
-import ScrollListFeaturedProduct from "../../components/ScrollListFeaturedProduct/ScrollListFeaturedProduct";
-import HorizontalScrollBar from "../../components/HorizontalScrollBar/HorizontalScrollBar";
-import BlockCategory from "../../components/BlockCategory/BlockCategory";
+
 import productService from "../../services/productService";
 // toast
-import { toast } from "react-toastify";
 const HomePage = ({
   listFeaturedProduct = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,

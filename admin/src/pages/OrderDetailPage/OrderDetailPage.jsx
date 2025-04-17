@@ -69,6 +69,17 @@ const OrderDetailPage = () => {
       toast.error("Error deleting order");
     }
   };
+
+  const handleUpdateOrderStatus = async () => {
+    try {
+      await orderService.updateOrderStatus(id);
+      toast.success("Update order status successfully");
+      fetchOrderDetail();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast.error("Error updating order status");
+    }
+  };
   return (
     <div className="page order-detail-page">
       {isOpenEditOrderInfoPopup && (
@@ -131,7 +142,7 @@ const OrderDetailPage = () => {
             </div>
           </div>
           <div className="right-side">
-            <button className="confirm-btn">
+            <button className="confirm-btn" onClick={handleUpdateOrderStatus}>
               {orderDetail?.status === "PENDING"
                 ? "PACKED"
                 : orderDetail?.status === "PACKED"
@@ -233,7 +244,9 @@ const OrderDetailPage = () => {
                 </button>
               </h4>
               <div className="list-status">
-                <span className="status-item order-status">Order Placed</span>
+                <span className="status-item order-status">
+                  {orderDetail.status}
+                </span>
               </div>
               {showInvoice && (
                 <div className="invoice">

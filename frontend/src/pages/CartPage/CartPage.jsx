@@ -8,9 +8,6 @@ import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
 import { useNavigate } from "react-router-dom";
 import formatCurrencyVN from "../../utils/formatCurrencyVN";
 import { Link } from "react-router-dom";
-import storeService from "../../services/storeService";
-import ChooseShop from "../../components/ChooseShop/ChooseShop";
-import UserSelectAddress from "../../components/UserSelectAddress/UserSelectAddress";
 import shippingInfoService from "../../services/shippingInfoService";
 
 import { toast } from "react-toastify";

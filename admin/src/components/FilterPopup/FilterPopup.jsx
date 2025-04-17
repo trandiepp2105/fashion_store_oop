@@ -12,6 +12,18 @@ const FilterPopup = ({
   orderStatusField = false,
   orderDateField = false,
   orderTotalField = false,
+  mainCategories = [],
+  selectedMainCategory = null,
+  handleSelectMainCategory,
+  subCategories = [],
+  selectedSubcategory = null,
+  handleSelectSubcategory,
+  stockRange,
+  setStockRange,
+  priceRange,
+  setPriceRange,
+  quantitySoldRange,
+  setQuantitySoldRange,
 }) => {
   const listFilterOption = [
     {
@@ -60,9 +72,6 @@ const FilterPopup = ({
       ],
     },
   ];
-  const [stockRange, setStockRange] = React.useState([0, 5000]);
-  const [priceRange, setPriceRange] = React.useState([0, 10000000]);
-  const [quantitySoldRange, setQuantitySoldRange] = React.useState([0, 5000]);
   const [orderTotalRange, setOrderTotalRange] = React.useState([0, 100000000]);
   const handleStockChange = (event, newValue) => {
     setStockRange(newValue);
@@ -79,35 +88,6 @@ const FilterPopup = ({
   const handleOrderTotalChange = (event, newValue) => {
     setOrderTotalRange(newValue);
   };
-  const mainCategories = [
-    {
-      id: 1,
-      name: "Men",
-    },
-    {
-      id: 2,
-      name: "Women",
-    },
-    {
-      id: 3,
-      name: "Kid",
-    },
-  ];
-
-  const subCategories = [
-    {
-      id: 1,
-      name: "T-Shirt",
-    },
-    {
-      id: 2,
-      name: "Pants",
-    },
-    {
-      id: 3,
-      name: "Shoes",
-    },
-  ];
 
   const orderStatus = [
     {
@@ -280,7 +260,7 @@ const FilterPopup = ({
                         setPriceRange([value, priceRange[1]]);
                       }}
                       min={0} // Giá trị nhỏ nhất
-                      max={10000} // Giá trị lớn nhất (10000000 / 1000)
+                      max={5000} // Giá trị lớn nhất (5000000 / 1000)
                     />
                   </div>
                   <span>~</span>
@@ -299,7 +279,7 @@ const FilterPopup = ({
                         setPriceRange([priceRange[0], value]);
                       }}
                       min={0} // Giá trị nhỏ nhất
-                      max={10000} // Giá trị lớn nhất (10000000 / 1000)
+                      max={5000} // Giá trị lớn nhất (5000000 / 1000)
                     />
                   </div>
                 </div>
@@ -310,7 +290,7 @@ const FilterPopup = ({
                     onChange={handleChangePrice}
                     valueLabelDisplay="auto"
                     min={0} // Giá trị nhỏ nhất
-                    max={10000000} // Giá trị lớn nhất
+                    max={5000000} // Giá trị lớn nhất
                     step={1000} // Bước nhảy
                   />
                 </Box>
@@ -435,7 +415,13 @@ const FilterPopup = ({
             <div className="filter-box__content">
               {mainCategories.map((option) => (
                 <label key={option.id} className="filer-option">
-                  <CheckBox name={"main-cate"} />
+                  <CheckBox
+                    name={"main-cate"}
+                    checked={selectedMainCategory === option} // Compare by id
+                    onChange={() => {
+                      handleSelectMainCategory(option); // Select
+                    }}
+                  />
                   <p className="label" htmlFor={"main-cate"}>
                     {option.name}
                   </p>
@@ -447,7 +433,7 @@ const FilterPopup = ({
         {subCategoryField && (
           <div className="filter-box">
             <div className="filter-box__header">
-              <p className="title">Order status</p>
+              <p className="title">Subcategory</p>
               <button className="hidden-filter-box-btn">
                 <svg
                   width="25px"
@@ -476,7 +462,13 @@ const FilterPopup = ({
             <div className="filter-box__content">
               {subCategories.map((option) => (
                 <label key={option.id} className="filer-option">
-                  <CheckBox name={"sub-cate"} />
+                  <CheckBox
+                    name={"sub-cate"}
+                    checked={selectedSubcategory === option} // Compare by id
+                    onChange={() => {
+                      handleSelectSubcategory(option); // Select
+                    }}
+                  />
                   <p className="label" htmlFor={"sub-cate"}>
                     {option.name}
                   </p>

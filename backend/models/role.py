@@ -7,7 +7,7 @@ class Role(Base):
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
-    description = Column(Text)
+    description = Column(Text, default="No description provided")
     
     #user_roles = relationship("UserRole", back_populates="role", cascade="all, delete-orphan")
 
@@ -45,13 +45,13 @@ class UserRole(Base):
     def assign_role_to_user(cls, session, user_id, role_id):
         """Assign a role to a user."""
         user_role = cls(user_id=user_id, role_id=role_id)
-        session.add(user_role)
-        session.commit()
+        user_role.save(session)
     
     @classmethod
     def revoke_role_from_user(cls, session, user_id, role_id):
         """Revoke a role from a user."""
         user_role = session.query(cls).filter_by(user_id=user_id, role_id=role_id).first()
         if user_role:
-            session.delete(user_role)
-            session.commit()
+            user_role.delete(session)
+            # session.delete(user_role)
+            # session.commit()

@@ -156,106 +156,49 @@ def add_order(
         raise HTTPException(status_code=500, detail=f"Internal server error while creating order: {e}")
 
 @router.get(
-    "/me",
+    "/",
     response_model=List[OrderSchema],
-    summary="Get all orders of the authenticated user",
-    description="Retrieve all orders placed by the authenticated user."
+    summary="Get orders based on user role",
+    description="Retrieve orders based on user role (ADMIN or customer) with optional filters."
 )
-def get_user_orders(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(User.get_current_user)
-):
-    try:
-        orders = db.query(Order).filter(Order.user_id == current_user.id).all()
-        response = [compose_order_response(order, db) for order in orders]
-        return response
-    except Exception as e:
-        print(f"Error fetching user orders: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error while fetching orders.")
-
-@router.get(
-    "/filter",
-    response_model=OrderListResponse,
-    summary="Filter orders",
-    description="Filter orders based on status, date range, amount range, or user ID."
-)
-def filter_orders(
+def get_orders(
     status: Optional[OrderStatus] = Query(None, description="Filter by order status"),
     start_date: Optional[datetime] = Query(None, description="Filter by start date"),
     end_date: Optional[datetime] = Query(None, description="Filter by end date"),
     min_amount: Optional[float] = Query(None, description="Filter by minimum total amount"),
     max_amount: Optional[float] = Query(None, description="Filter by maximum total amount"),
-    user_id: Optional[int] = Query(None, description="Filter by user ID"),
     db: Session = Depends(get_db),
     current_user: User = Depends(User.get_current_user)
 ):
     """
-    Filters orders based on query parameters.
-
-    Args:
-        status (OrderStatus, optional): Filter by order status.
-        start_date (datetime, optional): Filter by start date.
-        end_date (datetime, optional): Filter by end date.
-        min_amount (float, optional): Filter by minimum total amount.
-        max_amount (float, optional): Filter by maximum total amount.
-        user_id (int, optional): Filter by user ID.
-        db (Session): The database session.
-        current_user (User): The authenticated user.
-
-    Returns:
-        OrderListResponse: A list of filtered orders.
+    Retrieve orders based on user role (ADMIN or customer) with optional filters.
     """
-    query = db.query(Order)
-
-    # Apply filters
-    if status:
-        query = query.filter(Order.status == status)
-    if start_date and end_date:
-        query = query.filter(Order.order_date.between(start_date, end_date))
-    if min_amount is not None and max_amount is not None:
-        query = query.filter(Order.total_amount.between(min_amount, max_amount))
-    if user_id:
-        query = query.filter(Order.user_id == user_id)
-    else:
-        query = query.filter(Order.user_id == current_user.id)
-
-    orders = query.all()
-    response = [compose_order_response(order, db) for order in orders]
-    return OrderListResponse(data=response)
-
-@router.get(
-    "/admin",
-    response_model=List[OrderSchema],
-    summary="Get all orders (Admin)",
-    description="Retrieve all orders regardless of user. For admin use."
-)
-def get_all_orders(
-    db: Session = Depends(get_db)
-):
     try:
-        orders = Order.get_all(db)
+        query = db.query(Order)
+        user_role = current_user.get_roles(db)
+        user_role_str = [role.name for role in user_role]
+        # Check user role
+        if "ADMIN" in user_role_str:
+            # Admin can view all orders
+            pass
+        else:
+            # Customers can only view their own orders
+            query = query.filter(Order.user_id == current_user.id)
+
+        # Apply filters
+        if status:
+            query = query.filter(Order.status == status)
+        if start_date and end_date:
+            query = query.filter(Order.order_date.between(start_date, end_date))
+        if min_amount is not None and max_amount is not None:
+            query = query.filter(Order.total_amount.between(min_amount, max_amount))
+
+        orders = query.all()
         response = [compose_order_response(order, db) for order in orders]
         return response
     except Exception as e:
-        print(f"Error fetching all orders: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error while fetching all orders.")
-
-
-# @router.get(
-#     "/{order_id}",
-#     response_model=OrderSchema,
-#     summary="Get order detail",
-#     description="Retrieve detailed order information using order ID."
-# )
-# def get_order_detail(
-#     order_id: int,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(User.get_current_user)
-# ):
-#     order = db.query(Order).filter(Order.id == order_id, Order.user_id == current_user.id).first()
-#     if not order:
-#         raise HTTPException(status_code=404, detail="Order not found or does not belong to the user.")
-#     return compose_order_response(order, db)
+        print(f"Error fetching orders: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while fetching orders.")
 
 @router.get(
     "/{order_id}",
@@ -283,7 +226,8 @@ def delete_order(
     current_user: User = Depends(User.get_current_user)
 ):
     try:
-        order = db.query(Order).filter_by(id=order_id, user_id=current_user.id).first()
+        # order = db.query(Order).filter_by(id=order_id, user_id=current_user.id).first()
+        order = Order.get_by_id(session=db, record_id=order_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found or does not belong to the user.")
 
@@ -302,10 +246,10 @@ def delete_order(
 def update_order_status(
     order_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(User.get_current_user)
 ):
     try:
-        order = db.query(Order).filter_by(id=order_id, user_id=current_user.id).first()
+        # order = db.query(Order).filter_by(id=order_id, user_id=current_user.id).first()
+        order = Order.get_by_id(session=db, record_id=order_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found or does not belong to the user.")
 

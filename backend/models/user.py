@@ -170,6 +170,7 @@ class User(Base, BaseModel):
             list[User]: A list of users with the specified phone number.
         """
         return session.query(cls).filter_by(phone_number=phone_number).all()
+    
     @classmethod
     def filter_by_status(cls, session, active):
         """
@@ -197,6 +198,7 @@ class User(Base, BaseModel):
             list[User]: A list of users with the specified role.
         """
         return session.query(cls).join(UserRole).filter(UserRole.role_id == role_id).all()
+    
     @classmethod
     def get_by_email(cls, session, email):
         """

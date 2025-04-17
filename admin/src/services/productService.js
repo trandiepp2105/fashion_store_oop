@@ -1,9 +1,13 @@
 import apiAdmin from "./apiAdmin";
 
 const productService = {
-  getProducts: async () => {
+  getProducts: async (params = {}) => {
     try {
-      const response = await apiAdmin.get("/products/");
+      const response = await apiAdmin.get("/products/", {
+        params: {
+          ...params,
+        },
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -61,13 +65,24 @@ const productService = {
   addVariant: async (productId, variant) => {
     try {
       const response = await apiAdmin.post(
-        `/products/${productId}/add-variant/`,
+        `/products/${productId}/variants/`,
         variant,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  deleteVariant: async (productId, variantId) => {
+    try {
+      const response = await apiAdmin.delete(
+        `/products/${productId}/variants/${variantId}/`
       );
       return response.data;
     } catch (error) {

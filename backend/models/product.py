@@ -5,10 +5,13 @@ from datetime import datetime
 from sqlalchemy.sql.functions import current_timestamp
 from models.sale import Sale, SaleProduct
 from enums.sale_type import SaleType
+
+
 class Product(Base, BaseModel):
     __tablename__ = "product"
 
-    supplier_id = Column(Integer, ForeignKey("supplier.id", ondelete="SET NULL"), nullable=True)
+    supplier_id = Column(Integer, ForeignKey("supplier.id",
+                 ondelete="SET NULL"), nullable=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
     original_price = Column(Integer, nullable=False)
@@ -21,12 +24,51 @@ class Product(Base, BaseModel):
     def __repr__(self):
         return f"<Product(name={self.name}, selling_price={self.selling_price})>"
 
-    #Tính đánh giá trung bình
+    
+
+    
+    def get_supplier(self, session):
+        from models.supplier import Supplier
+        # supplier = session.query(Supplier).filter(Supplier.id == self.supplier_id).first()
+        supplier = Supplier.get_by_id(session, self.supplier_id) if self.supplier_id else None
+        if supplier:
+            supplier.id = str(supplier.id)  
+        return supplier
+    
+    def get_discount_price(self, session):
+
+        sale_product = session.query(SaleProduct).join(Sale).filter(
+            SaleProduct.product_id == self.id,
+            Sale.type == SaleType.PERCENTAGE,
+            Sale.start_date <= datetime.now(),
+            Sale.end_date >= datetime.now()
+        ).first()
+
+        if sale_product:
+            # sale = session.query(Sale).filter(Sale.id == sale_product.sale_id).first()
+            sale = Sale.get_by_id(session, sale_product.sale_id)
+            if sale:
+                discount = (self.selling_price * sale.value) / 100
+                return max(0, self.selling_price - discount)
+        return self.selling_price
+    
     def get_average_rating(self):
         if self.total_rating > 0:
             return self.rating_sum / self.total_rating
         return None
     
+    def get_variants(self, session):
+        return session.query(ProductVariant).filter_by(product_id=self.id).all()
+
+    def get_total_stock(self, session):
+        from sqlalchemy.sql import func
+        stock_subquery = (
+            session.query(func.sum(ProductVariant.stock_quantity).label("total_stock"))
+            .filter(ProductVariant.product_id == self.id)  # Use self.id for the current product instance
+            .scalar()
+        )
+        return stock_subquery or 0
+
     @classmethod
     def filter_by_name(cls, session, name):
         return session.query(cls).filter(cls.name.ilike(f"%{name}%")).all()
@@ -58,40 +100,11 @@ class Product(Base, BaseModel):
             .all()
         )
 
-    def get_variants(self, session):
-        return session.query(ProductVariant).filter_by(product_id=self.id).all()
 
-    def get_total_stock(self, session):
-        from sqlalchemy.sql import func
-        stock_subquery = (
-            session.query(func.sum(ProductVariant.stock_quantity).label("total_stock"))
-            .filter(ProductVariant.product_id == self.id)
-            .scalar()
-        )
-        return stock_subquery or 0
 
-    def get_discount_price(self, session):
 
-        sale_product = session.query(SaleProduct).join(Sale).filter(
-            SaleProduct.product_id == self.id,
-            Sale.type == SaleType.PERCENTAGE,
-            Sale.start_date <= datetime.now(),
-            Sale.end_date >= datetime.now()
-        ).first()
 
-        if sale_product:
-            sale = session.query(Sale).filter(Sale.id == sale_product.sale_id).first()
-            if sale:
-                discount = (self.selling_price * sale.value) / 100
-                return max(0, self.selling_price - discount)
-        return self.selling_price
 
-    def get_supplier(self, session):
-        from models.supplier import Supplier
-        supplier = session.query(Supplier).filter(Supplier.id == self.supplier_id).first()
-        if supplier:
-            supplier.id = str(supplier.id)  # Ensure supplier.id is a string
-        return supplier
 
     @classmethod
     def add_variant(cls, session, product_id, variant_id, stock, image_url):
@@ -104,7 +117,8 @@ class Product(Base, BaseModel):
             stock_quantity=stock,
             image_url=image_url
         )
-        session.add(product_variant)
+        # session.add(product_variant)
+        product_variant.save(session)
         return product_variant
 
     def get_sales(self, session):

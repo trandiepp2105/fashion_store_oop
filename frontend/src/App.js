@@ -7,7 +7,6 @@ import { useLocation } from "react-router-dom";
 import NavBar from "./components/NavBar/NavBar";
 import BannerTop from "./components/BannerTop/BannerTop";
 import { useRef, useEffect, useState, createContext } from "react";
-import Footer from "./components/Footer/Footer";
 import BackToTopButton from "./components/BackToTopButton/BackToTopButton";
 import HomePage from "./pages/HomePage/HomePage";
 // import ProductDetailPage from "./pages/User/ProductDetailPage/ProductDetailPage";

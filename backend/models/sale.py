@@ -42,8 +42,9 @@ class SaleProduct(Base):
             return sale_product
         #Nếu chưa tồn tại, tạo mới
         sale_product = SaleProduct(sale_id=self.id, product_id=product_id)
-        session.add(sale_product)
-        session.commit()
+        # session.add(sale_product)
+        # session.commit()
+        sale_product.save(session)
         return sale_product
 
 class SaleCategory(Base):

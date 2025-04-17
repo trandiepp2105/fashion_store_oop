@@ -30,11 +30,13 @@ def create_temporary_invoice(request_data: TemporaryInvoiceRequest,
     discounted_total = 0.0
 
     for cart_item_id in request_data.cart_item_ids:
-        cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+        # cart_item = session.query(CartItem).filter_by(id=cart_item_id, user_id=current_user.id).first()
+        cart_item = CartItem.get_by_id(session, cart_item_id)
         if not cart_item:
             raise HTTPException(status_code=404, detail=f"Cart item {cart_item_id} not found.")
 
-        product = session.query(Product).filter_by(id=cart_item.product_id).first()
+        # product = session.query(Product).filter_by(id=cart_item.product_id).first()
+        product = Product.get_by_id(session, cart_item.product_id)
         if not product:
             raise HTTPException(status_code=404, detail=f"Product {cart_item.product_id} not found.")
 
@@ -44,7 +46,8 @@ def create_temporary_invoice(request_data: TemporaryInvoiceRequest,
 
     discount_amount = 0.0
     if request_data.coupon_id is not None and request_data.coupon_id > 0:
-        coupon = session.query(Coupon).filter_by(id=request_data.coupon_id).first()
+        # coupon = session.query(Coupon).filter_by(id=request_data.coupon_id).first()
+        coupon = Coupon.get_by_id(session, request_data.coupon_id)
         if coupon and coupon.is_active() and coupon.is_valid(discounted_total):
             if coupon.type == SaleType.PERCENTAGE:
                 discount_amount = discounted_total * coupon.value / 100

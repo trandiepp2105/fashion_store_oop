@@ -17,7 +17,45 @@ const ProductPage = () => {
     useState(0);
   const [mainCategories, setMainCategories] = useState([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState(null);
-
+  const [subCategories, setSubcategories] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [stockRange, setStockRange] = React.useState([0, 1000]);
+  const [priceRange, setPriceRange] = React.useState([0, 5000000]);
+  const [quantitySoldRange, setQuantitySoldRange] = React.useState([0, 5000]);
+  const handleSelectSubcategory = (subcategory) => {
+    if (subcategory === selectedSubcategory) {
+      setSelectedSubcategory(null);
+    } else {
+      setSelectedSubcategory(subcategory);
+    }
+  };
+  const handleSelectMainCategory = (category) => {
+    if (category === null) {
+      setSelectedMainCategory(null);
+      setSubcategories([]);
+      setSelectedSubcategory(null);
+      return;
+    }
+    if (
+      selectedMainCategory !== null &&
+      category.id === selectedMainCategory.id
+    ) {
+      setSelectedMainCategory(null);
+      setSubcategories([]);
+      setSelectedSubcategory(null);
+      return;
+    } else {
+      setSelectedMainCategory(category);
+      const subcategories = category.subcategories || [];
+      setSubcategories(subcategories);
+    }
+  };
+  useEffect(() => {
+    console.log(
+      "Selected Main Category:",
+      selectedMainCategory ? selectedMainCategory.name : "None"
+    );
+  }, [selectedMainCategory]);
   // Hàm lấy danh sách danh mục chính
   const fetchMainCategories = async () => {
     try {
@@ -28,9 +66,38 @@ const ProductPage = () => {
     }
   };
 
-  const handleSelectMainCategory = (category) => {
-    setSelectedMainCategory(category);
+  const [products, setProducts] = useState([]);
+
+  const fetchProducts = async () => {
+    var category_id = null;
+    if (selectedSubcategory) {
+      category_id = selectedSubcategory.id;
+    } else if (selectedMainCategory) {
+      category_id = selectedMainCategory.id;
+    } else {
+      category_id = null;
+    }
+    const params = {
+      category_id: category_id,
+      price_min: priceRange[0],
+      price_max: priceRange[1],
+      stock_min: stockRange[0],
+      stock_max: stockRange[1],
+      sold_min: quantitySoldRange[0],
+      sold_max: quantitySoldRange[1],
+    };
+
+    try {
+      const response = await productService.getProducts(params);
+      setProducts(response);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
   };
+  useEffect(() => {
+    fetchProducts();
+    fetchMainCategories();
+  }, []);
   useEffect(() => {
     const updatePosition = () => {
       if (listProductRef.current) {
@@ -186,114 +253,6 @@ const ProductPage = () => {
   ];
   const paginationModel = { page: 0, pageSize: 6 };
 
-  // const rows = [
-  //   {
-  //     id: 1,
-  //     product_name: "Lovemotion Shirt",
-  //     image_url: "/assets/images/product-1.png",
-  //     supplier: "TSUN",
-  //     selling_price: 200000,
-  //     stock: 10,
-  //   },
-  //   {
-  //     id: 2,
-  //     product_name: "Oversize Shirt",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_dsc_3621_d8abc7303213493693686cc8f7e7dfba_1024x1024.jpg",
-  //     supplier: "TSUN",
-  //     selling_price: 300000,
-  //     stock: 20,
-  //   },
-  //   {
-  //     id: 3,
-  //     product_name: "2 Panel Polo Shirt",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/polo2w_75dea7fcba004e6182d401c0df2c28f7_master.jpg",
-
-  //     supplier: "TSUN",
-  //     selling_price: 200000,
-  //     stock: 5,
-  //   },
-  //   {
-  //     id: 4,
-  //     product_name: "Emotions Tee",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/mockup_website_f0426a4d9e9349c6ab637dd016b29ab9_1024x1024.jpg",
-
-  //     supplier: "TSUN",
-  //     selling_price: 100000,
-  //     stock: 50,
-  //   },
-  //   {
-  //     id: 5,
-  //     product_name: "Shy Teddy Woo Tee",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/f28ffa40d2826bdc329331_2c91583b19034f6c8c3992a8fdc56750_master.jpg",
-
-  //     supplier: "TSUN",
-  //     selling_price: 400000,
-  //     stock: 30,
-  //   },
-  //   {
-  //     id: 6,
-  //     product_name: "Aurora Tee",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_122_2__33b52599222244109ea8d53f057a613f_1024x1024.jpg",
-
-  //     supplier: "TSUN",
-  //     selling_price: 250000,
-  //     stock: 100,
-  //   },
-  //   {
-  //     id: 7,
-  //     product_name: "Big Teddy Tee",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/ban_sao_cua_251_2__405e3d3e74984072882e4324b2db94f0_master.jpg",
-
-  //     supplier: "TSUN",
-  //     selling_price: 500000,
-  //     stock: 80,
-  //   },
-  //   {
-  //     id: 8,
-  //     product_name: "Puzzle Tee",
-  //     image_url:
-  //       "https://product.hstatic.net/1000321269/product/kich_thuoc_web_to_bc9187ff6e7c44e78b28687c55c0a64b_1024x1024.jpg",
-  //     supplier: "Accessories",
-  //     selling_price: 150000,
-  //     stock: 40,
-  //   },
-  // ];
-  const [products, setProducts] = useState([]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await productService.getProducts();
-      setProducts(response);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const handleSelectProduct = (product) => {
-    setSelectedProduct(product);
-  };
-  // handle delete product
-  const handleDeleteProduct = async () => {
-    try {
-      await productService.deleteProduct(selectedProduct.id);
-      toast.success("Product deleted successfully");
-      // Cập nhật lại danh sách sản phẩm sau khi xóa
-      fetchProducts();
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("Failed to delete product");
-    }
-  };
-  useEffect(() => {
-    fetchProducts();
-  }, []);
   return (
     <div className="product-page">
       <div className="page-content">
@@ -361,7 +320,28 @@ const ProductPage = () => {
         <div className="quick-access-bar">
           <div className="left-side">
             <div className="filter-order-by-status-bar">
-              <button type="button" className="status-item active">
+              <button
+                type="button"
+                className={`status-item ${
+                  selectedMainCategory === null ? "active" : ""
+                }`}
+                onClick={() => handleSelectMainCategory(null)}
+              >
+                {"All Categories"}
+              </button>
+              {mainCategories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className={`status-item ${
+                    selectedMainCategory === category ? "active" : ""
+                  }`}
+                  onClick={() => handleSelectMainCategory(category)}
+                >
+                  {category.name}
+                </button>
+              ))}
+              {/* <button type="button" className="status-item active">
                 All Stock
               </button>
 
@@ -371,7 +351,7 @@ const ProductPage = () => {
 
               <button type="button" className="status-item">
                 Out Of Stock
-              </button>
+              </button> */}
             </div>
           </div>
           <div className="right-side">
@@ -514,6 +494,18 @@ const ProductPage = () => {
                   quantitySoldField={true}
                   mainCategoryField={true}
                   subCategoryField={true}
+                  mainCategories={mainCategories}
+                  selectedMainCategory={selectedMainCategory}
+                  handleSelectMainCategory={handleSelectMainCategory}
+                  subCategories={subCategories}
+                  selectedSubcategory={selectedSubcategory}
+                  handleSelectSubcategory={handleSelectSubcategory}
+                  stockRange={stockRange}
+                  setStockRange={setStockRange}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  quantitySoldRange={quantitySoldRange}
+                  setQuantitySoldRange={setQuantitySoldRange}
                 />
               )}
             </div>

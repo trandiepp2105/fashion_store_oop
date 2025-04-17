@@ -102,7 +102,7 @@ def create_user(
 # POST /users/admin - Tạo admin user
 @router.post(
     "/admin",
-    response_model=UserResponse,
+    # response_model=UserResponse,
     summary="Create an admin user",
     description="This API creates a new admin user and assigns the ADMIN role."
 )
@@ -193,11 +193,12 @@ def get_current_user_info(session: Session = Depends(get_db), current_user: User
         "join_date": current_user.created_at.strftime("%d/%m/%Y") if hasattr(current_user, "created_at") and current_user.created_at else None
     }
 # GET /users/{id} - Lấy thông tin người dùng theo ID
+
 @router.get(
     "/{id}",
     response_model=UserResponse,
-    summary="Retrieve all users",
-    description="This API returns a list of all users, including descriptions and icon URLs."
+    summary="Get user information by ID",
+    description="Retrieve user information by ID, including roles and status(using by admin)."
 )
 def get_user_detail(
     id: int, session: Session = Depends(get_db)
@@ -228,8 +229,8 @@ def get_user_detail(
 @router.patch(
     "/{id}",
     response_model=UserResponse,
-    summary="Retrieve all users",
-    description="This API returns a list of all users, including descriptions and icon URLs."
+    summary="Update user information",
+    description="Update user information by ID(using by admin)."
 )
 def update_user(
     id: int, user_data: UserUpdate, session: Session = Depends(get_db)
@@ -244,8 +245,8 @@ def update_user(
 # DELETE /users/{id} - Xóa người dùng
 @router.delete(
     "/{id}",
-    summary="Retrieve all users",
-    description="This API returns a list of all users, including descriptions and icon URLs."
+    summary="Delete a user by ID",
+    description="Delete a user by ID(using by admin)."
 )
 def delete_user(
     id: int, session: Session = Depends(get_db),

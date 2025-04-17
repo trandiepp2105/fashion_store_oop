@@ -18,9 +18,12 @@ class ShippingInfo(Base):
         """Set this shipping information as the default one."""
         shipping_infos = session.query(ShippingInfo).filter_by(user_id=self.user_id).all()
         for info in shipping_infos:
-            info.is_default = False
-        self.is_default = True
-        session.commit()
+            # info.is_default = False
+            info.update_info(session, is_default=False)
+        
+
+        # self.is_default = True
+        self.update_info(session, is_default=True)
 
     @classmethod
     def get_all_shipping_infos_by_user(cls, session, user_id):

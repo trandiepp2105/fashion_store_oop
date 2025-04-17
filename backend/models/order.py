@@ -46,10 +46,19 @@ class Order(Base, BaseModel):
         self.final_amount = 0
         self.status = OrderStatus.PENDING
 
-        # Query cart items and calculate total and final amounts
-        cart_items = session.query(CartItem).filter(CartItem.id.in_(cart_item_ids)).all()
+        cart_items = []
+
+        for cart_item_id in cart_item_ids:
+            cart_item = CartItem.get_by_id(session, cart_item_id)
+            if cart_item:
+                cart_items.append(cart_item)
+            else:
+                raise ValueError(f"Cart item with ID {cart_item_id} not found.")
+            
+
         for item in cart_items:
-            product = session.query(Product).filter_by(id=item.product_id).first()
+            # product = session.query(Product).filter_by(id=item.product_id).first()
+            product = Product.get_by_id(session, item.product_id)
             if product:
                 # Calculate total amount based on selling price
                 self.total_amount += product.selling_price * item.quantity
@@ -57,7 +66,8 @@ class Order(Base, BaseModel):
                 # Calculate discount from sales
                 sale_product = session.query(SaleProduct).filter_by(product_id=product.id).first()
                 if sale_product:
-                    sale = session.query(Sale).filter_by(id=sale_product.sale_id).first()
+                    # sale = session.query(Sale).filter_by(id=sale_product.sale_id).first()
+                    sale = Sale.get_by_id(session, sale_product.sale_id)
                     if sale and sale.is_active():
                         if sale.type == SaleType.PERCENTAGE:
                             discount = (product.selling_price * sale.value / 100) * item.quantity
@@ -77,8 +87,8 @@ class Order(Base, BaseModel):
 
         # Apply coupon if provided
         if coupon_id:
-            coupon = session.query(Coupon).filter_by(id=coupon_id).first()
-            if coupon and coupon.is_active() and coupon.is_valid(self.total_amount, 0):  # Assuming usage_count = 0
+            coupon = Coupon.get_by_id(session, coupon_id)
+            if coupon and coupon.is_active() and coupon.is_valid(self.total_amount, 0):  
                 if coupon.type == SaleType.PERCENTAGE:
                     coupon_discount = self.total_amount * coupon.value / 100
                 elif coupon.type == SaleType.FIXED:
@@ -89,6 +99,7 @@ class Order(Base, BaseModel):
 
         # Ensure final_amount is not negative
         self.final_amount = max(self.final_amount, 0)
+
 
     def update_status(self, session):
         """
@@ -105,8 +116,8 @@ class Order(Base, BaseModel):
         """
         status_flow = [
             OrderStatus.PENDING,
-            OrderStatus.PACKAGED,
-            OrderStatus.SHIPPING,
+            OrderStatus.PACKED,
+            OrderStatus.DELIVERING,
             OrderStatus.DELIVERED
         ]
         if self.status not in status_flow:
@@ -114,7 +125,7 @@ class Order(Base, BaseModel):
         
         current_index = status_flow.index(self.status)
         if current_index + 1 < len(status_flow):
-            self.status = status_flow[current_index + 1]
+            self.status = status_flow[current_index + 1].value
             return self.save(session)
         else:
             raise ValueError("Order is already in the final status and cannot progress further.")
@@ -224,7 +235,8 @@ class OrderItem(Base):
             ValueError: If the associated order is not in PENDING status or does not exist.
         """
         # Fetch the associated order
-        order = session.query(Order).filter_by(id=self.order_id).first()
+        # order = session.query(Order).filter_by(id=self.order_id).first()
+        order = Order.get_by_id(session, self.order_id)
         if not order:
             raise ValueError("Order not found.")
         
@@ -250,7 +262,8 @@ class OrderItem(Base):
             ValueError: If the associated order is not in PENDING status or does not exist.
         """
         # Fetch the associated order
-        order = session.query(Order).filter_by(id=self.order_id).first()
+        # order = session.query(Order).filter_by(id=self.order_id).first()
+        order = Order.get_by_id(session, self.order_id)
         if not order:
             raise ValueError("Order not found.")
         
@@ -278,7 +291,8 @@ class OrderItem(Base):
         final_amount = 0
 
         for item in order_items:
-            product = session.query(Product).filter_by(id=item.product_id).first()
+            # product = session.query(Product).filter_by(id=item.product_id).first()
+            product = Product.get_by_id(session, item.product_id)
             if product:
                 # Calculate total amount
                 total_amount += product.selling_price * item.quantity
@@ -286,7 +300,8 @@ class OrderItem(Base):
                 # Calculate discount from sales
                 sale_product = session.query(SaleProduct).filter_by(product_id=product.id).first()
                 if sale_product:
-                    sale = session.query(Sale).filter_by(id=sale_product.sale_id).first()
+                    # sale = session.query(Sale).filter_by(id=sale_product.sale_id).first()
+                    sale = Sale.get_by_id(session, sale_product.sale_id)
                     if sale and sale.is_active():
                         if sale.type == SaleType.PERCENTAGE:
                             discount = (product.selling_price * sale.value / 100) * item.quantity
@@ -303,9 +318,11 @@ class OrderItem(Base):
                 final_amount += (product.selling_price * item.quantity) - discount
 
         # Update order amounts
-        order.total_amount = total_amount
-        order.final_amount = max(final_amount, 0)  # Ensure final_amount is not negative
-        order.save(session)
+
+        # order.total_amount = total_amount
+        # order.final_amount = max(final_amount, 0)  # Ensure final_amount is not negative
+        # order.save(session)   
+        order.update_info(session, total_amount=total_amount, final_amount=max(final_amount, 0))
     
     @classmethod
     def get_items_by_order(cls, session, order_id):

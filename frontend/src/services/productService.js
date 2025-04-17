@@ -1,27 +1,27 @@
 import apiClient from "./apiClient";
 
 const productService = {
-  getNewArrivalProducts: async (limit = 20) => {
-    try {
-      const response = await apiClient.get(`/products/latest?limit=${limit}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error while fetching new arrival products", error);
-      return;
-    }
-  },
+  // getNewArrivalProducts: async (limit = 20) => {
+  //   try {
+  //     const response = await apiClient.get(`/products/latest?limit=${limit}`);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error while fetching new arrival products", error);
+  //     return;
+  //   }
+  // },
 
-  getBestSellingProducts: async (limit = 20) => {
-    try {
-      const response = await apiClient.get(
-        `/products/best-sellers?limit=${limit}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error while fetching best selling products", error);
-      return;
-    }
-  },
+  // getBestSellingProducts: async (limit = 20) => {
+  //   try {
+  //     const response = await apiClient.get(
+  //       `/products/best-sellers?limit=${limit}`
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error while fetching best selling products", error);
+  //     return;
+  //   }
+  // },
 
   getProducts: async (params = {}) => {
     try {

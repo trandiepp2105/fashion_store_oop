@@ -2,19 +2,14 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import "./ProductDetailPage.scss";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 
-import ProductContainer from "../../components/ProductContainer/ProductContainer";
-import HorizontalScrollBar from "../../components/HorizontalScrollBar/HorizontalScrollBar";
 import productService from "../../services/productService";
-import BoxGallery from "../../components/BoxGallery/BoxGallery";
 import formatCurrencyVN from "../../utils/formatCurrencyVN";
 import AddToCartModal from "../../components/AddToCartModal/AddToCartModal";
 import ModalLogin from "../../components/ModalLogin/ModalLogin";
 import { AppContext } from "../../App";
 import cartSurvice from "../../services/cartSurvice";
-import addTemporaryComponent from "../../utils/renderAlertPopup";
 
 import { Link } from "react-router-dom";
-import AcceptancePopup from "../../components/AcceptancePopup/AcceptancePopup";
 import { toast } from "react-toastify"; // Import toast for notifications
 const HOST = `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
 
@@ -37,7 +32,9 @@ const ProductDetailPage = () => {
   const [newArrivalProducts, setNewArrivalProducts] = useState([]);
   const fetchNewArrivalProducts = async () => {
     try {
-      const response = await productService.getNewArrivalProducts();
+      const response = await productService.getProducts({
+        latest: true,
+      });
       setNewArrivalProducts(response);
     } catch (error) {
       console.error("Error while fetching new arrival products", error);
@@ -210,7 +207,7 @@ const ProductDetailPage = () => {
             <span className="sku">SKU: shyteddywhite1</span>
           </div>
           <div className="product-price">
-            {productSales.length > 0 &&
+            {productSales?.length > 0 &&
               (() => {
                 const percentageSales = productSales.filter(
                   (sale) => sale.type === "PERCENTAGE"
@@ -367,13 +364,6 @@ const ProductDetailPage = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="block-featured-product">
-        <div className="product-list-title">
-          <div className="title-link">NEW ARRIVAL</div>
-          <p>Some description for this category</p>
-        </div>
-        <HorizontalScrollBar similarProducts={newArrivalProducts} />
       </div>
     </div>
   );

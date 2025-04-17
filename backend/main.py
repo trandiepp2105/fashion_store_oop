@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 
 # Import configuration and routers
 from config import settings
-from config.settings import get_mysql_connection_url
+from config.settings import get_mysql_connection_url, BASE_DIR
 from api.main import api_v1_router
 from fastapi.staticfiles import StaticFiles
 
@@ -62,19 +62,18 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 from fastapi.middleware.cors import CORSMiddleware
 origins = [
     "http://localhost:3000",  
-    "http://127.0.0.1:3000",  
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",   
     "http://26.178.178.33:3000",
-    "http://26.178.178.33",
     "http://26.178.178.33:3001",
-    
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,                # KHÔNG được dùng ["*"] nếu allow_credentials=True
-    allow_credentials=True,               # Cho phép gửi cookies/session
-    allow_methods=["*"],                  # Cho phép tất cả method như GET, POST
-    allow_headers=["*"],                  # Cho phép tất cả headers
+    allow_origins=origins,                
+    allow_credentials=True,            
+    allow_methods=["*"],                
+    allow_headers=["*"],         
 )
 
 
@@ -84,7 +83,6 @@ app.include_router(api_v1_router)
 # --- Application Entry Point ---
 if __name__ == "__main__":
     logger.info("Starting application...")
-
     # Wait for the database to be ready before starting the server
     if wait_for_db():
         logger.info("Database is ready. Starting Uvicorn server...")

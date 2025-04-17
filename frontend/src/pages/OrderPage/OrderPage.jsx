@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./OrderPage.scss";
 import ProvisionalInvoice from "../../components/ProvisionalInvoice/ProvisionalInvoice";
 import PaymentMethodItem from "../../components/PaymentMethodItem/PaymentMethodItem";
-import ChooseShop from "../../components/ChooseShop/ChooseShop";
+
 import { useLocation } from "react-router-dom";
 
 const OrderPage = ({
@@ -122,9 +122,6 @@ const OrderPage = ({
           </div>
         </div>
         <div className="address-form">
-          {isChooseShopModalOpen && (
-            <ChooseShop handleToggle={handleToggleChooseShopModal} />
-          )}
           <p className="address-form__title">Hình thức nhận hàng</p>
           <div className="delivery-methods">
             <div className="delivery-method">

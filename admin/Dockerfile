@@ -1,7 +1,7 @@
 # Stage 1: Build React App
 FROM node:20 AS build
 
-WORKDIR /frontend
+WORKDIR /admin
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -11,7 +11,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy build files from the React app
-COPY --from=build /frontend/build /usr/share/nginx/html
+COPY --from=build /admin/build /usr/share/nginx/html
 
 # Copy custom Nginx configuration
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
